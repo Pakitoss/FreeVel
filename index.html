@@ -22,26 +22,36 @@
     el.className = 'auth-msg note' + (tipo ? ' ' + tipo : '');
   }
 
-  async function registraUtente() {
-    const email = document.getElementById('auth-email').value.trim();
-    const password = document.getElementById('auth-password').value;
-    if (!email || !password) return authMsg('Enter both email and password.', 'bad');
+   async function registraUtente() {
+    try {
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      if (!email || !password) return authMsg('Enter both email and password.', 'bad');
 
-    authMsg('Creating your account…');
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) authMsg('Sign-up failed: ' + error.message, 'bad');
-    else authMsg('Account created. Check your email to confirm it, then sign in.', 'ok');
+      authMsg('Creating your account…');
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) authMsg('Sign-up failed: ' + error.message, 'bad');
+      else authMsg('Account created. Check your email to confirm it, then sign in.', 'ok');
+    } catch (e) {
+      authMsg('Unexpected error: ' + e.message, 'bad');
+      console.error(e);
+    }
   }
 
   async function loginUtente() {
-    const email = document.getElementById('auth-email').value.trim();
-    const password = document.getElementById('auth-password').value;
-    if (!email || !password) return authMsg('Enter both email and password.', 'bad');
+    try {
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      if (!email || !password) return authMsg('Enter both email and password.', 'bad');
 
-    authMsg('Signing in…');
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) authMsg('Sign-in failed: ' + error.message, 'bad');
-    else { authMsg(''); controllaSessione(); }
+      authMsg('Signing in…');
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) authMsg('Sign-in failed: ' + error.message, 'bad');
+      else { authMsg(''); controllaSessione(); }
+    } catch (e) {
+      authMsg('Unexpected error: ' + e.message, 'bad');
+      console.error(e);
+    }
   }
   // Logout Utente
   async function logoutUtente() {
