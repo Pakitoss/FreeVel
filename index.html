@@ -374,7 +374,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 .me[aria-current="page"]{background:var(--sign);color:var(--sign-ink);border-color:var(--sign)}
 .avatar{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--sign);color:var(--sign-ink);font-family:var(--f-display);font-weight:800;font-size:16px;letter-spacing:.02em;flex:none}
 .me[aria-current="page"] .avatar{background:var(--sign-ink);color:var(--sign)}
-.avatar.empty{background:transparent;border:2px dashed currentColor}
+.avatar.empty{background:#6fc594 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='11.5' r='5.6' fill='%23111'/%3E%3Cpath d='M4.5 32c0-7.2 5.1-11.6 11.5-11.6S27.5 24.8 27.5 32z' fill='%23111'/%3E%3C/svg%3E") center/100% 100% no-repeat;border:0}
+.me[aria-current="page"] .avatar.empty{background:#6fc594 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='11.5' r='5.6' fill='%23111'/%3E%3Cpath d='M4.5 32c0-7.2 5.1-11.6 11.5-11.6S27.5 24.8 27.5 32z' fill='%23111'/%3E%3C/svg%3E") center/100% 100% no-repeat;box-shadow:0 0 0 2px var(--sign-ink)}
 .avatar.lg{width:56px;height:56px;font-size:26px}
 @media (max-width:720px){
   .band .wrap{flex-wrap:wrap}
@@ -589,7 +590,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
       <a href="#feedback" data-v="feedback"><span class="k">06</span>Feedback</a>
     </nav>
     <a class="me" href="#profile" data-v="profile" aria-label="My profile">
-      <span class="avatar" id="avatar" aria-hidden="true"></span><span class="me-l">My profile</span>
+      <span class="avatar empty" id="avatar" aria-hidden="true"></span><span class="me-l">My profile</span>
     </a>
     <div class="lang" id="lang" data-noi18n>
       <button class="lang-btn" id="lang-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Language: English">
