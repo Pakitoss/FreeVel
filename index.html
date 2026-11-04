@@ -11,9 +11,92 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const SUPABASE_URL = 'https://jbyyrkzheygkgfwdfcuy.supabase.co';
-  const SUPABASE_ANON_KEY = 'INCOLLA_QUI_LA_TUA_PUBLISHABLE_KEY';
+  const SUPABASE_ANON_KEY = 'sb_publishable_wSr4GS-PhUb1MbVZZPGv8g_tNSVg-fj';
 
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Registrazione Utente
+  async function registraUtente() {
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+
+    if (!email || !password) return alert('Inserisci sia email che password.');
+
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) alert('Errore di registrazione: ' + error.message);
+    else alert('Registrazione effettuata! Controlla la tua email per confermare l\'account.');
+  }
+
+  // Login Utente
+  async function loginUtente() {
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) alert('Errore di accesso: ' + error.message);
+    else {
+      alert('Accesso effettuato!');
+      controllaSessione();
+    }
+  }
+
+  // Logout Utente
+  async function logoutUtente() {
+    await supabase.auth.signOut();
+    controllaSessione();
+  }
+
+  // Controllo sessione all'avvio
+  async function controllaSessione() {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const authForm = document.getElementById('auth-form');
+    const userInfo = document.getElementById('user-info');
+
+    if (user) {
+      if (authForm) authForm.style.display = 'none';
+      if (userInfo) userInfo.style.display = 'block';
+      const label = document.getElementById('user-email-label');
+      if (label) label.textContent = user.email;
+      caricaDatiDalCloud(user.id);
+    } else {
+      if (authForm) authForm.style.display = 'block';
+      if (userInfo) userInfo.style.display = 'none';
+    }
+  }
+
+  // Salva la scheda su Supabase
+  async function salvaSchedaCloud(datiScheda) {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      localStorage.setItem('freevel_sheet', JSON.stringify(datiScheda));
+      alert('Scheda salvata nel browser locale. Accedi per sincronizzarla sul tuo account!');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('user_sheets')
+      .upsert([{ user_id: user.id, sheet_data: datiScheda }], { onConflict: 'user_id' });
+
+    if (error) alert('Errore durante il salvataggio sul cloud: ' + error.message);
+    else alert('Scheda salvata con successo nella tua Area Personale!');
+  }
+
+  // Carica la scheda dal cloud
+  async function caricaDatiDalCloud(userId) {
+    const { data, error } = await supabase
+      .from('user_sheets')
+      .select('sheet_data')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (data && data.sheet_data) {
+      console.log('Dati utente recuperati da Supabase:', data.sheet_data);
+    }
+  }
+
+  // Esegui il controllo sessione all'apertura della pagina
+  document.addEventListener('DOMContentLoaded', controllaSessione);
 </script>
 <style>
 /* FreeVel styles */
