@@ -13,7 +13,9 @@
   const SUPABASE_URL = 'https://jbyyrkzheygkgfwdfcuy.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_wSr4GS-PhUb1MbVZZPGv8g_tNSVg-fj';
 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // Inizializzazione client con nome univoco per evitare conflitti con la libreria CDN
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   // Messaggio sotto il form (tipo: 'ok' | 'bad' | vuoto)
   function authMsg(testo, tipo) {
     const el = document.getElementById('auth-msg');
@@ -22,14 +24,14 @@
     el.className = 'auth-msg note' + (tipo ? ' ' + tipo : '');
   }
 
-   async function registraUtente() {
+  async function registraUtente() {
     try {
       const email = document.getElementById('auth-email').value.trim();
       const password = document.getElementById('auth-password').value;
       if (!email || !password) return authMsg('Enter both email and password.', 'bad');
 
       authMsg('Creating your account…');
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { error } = await supabaseClient.auth.signUp({ email, password });
       if (error) authMsg('Sign-up failed: ' + error.message, 'bad');
       else authMsg('Account created. Check your email to confirm it, then sign in.', 'ok');
     } catch (e) {
@@ -45,7 +47,7 @@
       if (!email || !password) return authMsg('Enter both email and password.', 'bad');
 
       authMsg('Signing in…');
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
       if (error) authMsg('Sign-in failed: ' + error.message, 'bad');
       else { authMsg(''); controllaSessione(); }
     } catch (e) {
@@ -53,15 +55,16 @@
       console.error(e);
     }
   }
+
   // Logout Utente
   async function logoutUtente() {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
     controllaSessione();
   }
 
   // Controllo sessione all'avvio
   async function controllaSessione() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
 
     const authForm = document.getElementById('auth-form');
     const userInfo = document.getElementById('user-info');
@@ -80,7 +83,7 @@
 
   // Salva la scheda su Supabase
   async function salvaSchedaCloud(datiScheda) {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
 
     if (!user) {
       localStorage.setItem('freevel_sheet', JSON.stringify(datiScheda));
@@ -88,7 +91,7 @@
       return;
     }
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('user_sheets')
       .upsert([{ user_id: user.id, sheet_data: datiScheda }], { onConflict: 'user_id' });
 
@@ -96,16 +99,25 @@
     else alert('Scheda salvata con successo nella tua Area Personale!');
   }
 
-  // Carica la scheda dal cloud
+  // Carica la scheda dal cloud e ripopola il form
   async function caricaDatiDalCloud(userId) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('user_sheets')
       .select('sheet_data')
       .eq('user_id', userId)
       .maybeSingle();
 
+    if (error) {
+      console.error('Errore nel caricamento dal cloud:', error.message);
+      return;
+    }
+
     if (data && data.sheet_data) {
-      console.log('Dati utente recuperati da Supabase:', data.sheet_data);
+      if (typeof S !== 'undefined') {
+        S = data.sheet_data;
+        if (typeof fill === 'function') fill();
+        if (typeof renderAll === 'function') renderAll();
+      }
     }
   }
 
@@ -532,7 +544,6 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 </style>
 </head>
 <body>
-</div>
 <header class="band gut">
   <div class="wrap">
     <a class="logo" href="#card" aria-label="FreeVel, home">
