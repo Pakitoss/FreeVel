@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>FreeVel – Scheda Assistenza Carrozzina</title>
+<title>FreeVel</title>
 <meta name="google-site-verification" content="0z1cz5WHd3Pj6ETIvAIINzapBeERWU1OElrAHkQwp2U" />
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:wght@600;700;800&display=swap">
@@ -524,7 +524,10 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
   nav.tabs{flex:1 1 auto;min-width:0;justify-content:flex-end}
   nav.tabs a{padding:9px 11px}
 }
-@media (min-width:721px) and (max-width:1240px){nav.tabs .k{display:none}}
+@media (min-width:721px) and (max-width:1439px){nav.tabs .k{display:none}}
+/* never clip the first tab when the row is full: push from the left instead of justify-content:flex-end */
+@media (min-width:721px){nav.tabs{justify-content:flex-start}nav.tabs a:first-child{margin-left:auto}}
+@media (min-width:721px) and (max-width:1240px){.me-l{display:none}.me{padding:4px}nav.tabs a{padding:9px 8px;font-size:14px}}
 @media (min-width:721px) and (max-width:980px){.me-l{display:none}.me{padding:4px}nav.tabs{justify-content:flex-start}}
 /* ---------- account box (My profile) ---------- */
 .auth{display:grid;gap:4px;border-left:6px solid var(--sign)}
@@ -541,6 +544,37 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 .auth-user{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
 .auth-user .who{display:grid;gap:4px;min-width:0}
 .auth-user .who strong{font-family:var(--f-display);font-size:24px;font-weight:700;line-height:1.1;overflow-wrap:anywhere}
+
+/* ---------- language switcher ---------- */
+.lang{position:relative;flex:none}
+.lang-btn{display:flex;align-items:center;gap:6px;height:42px;padding:0 12px;border-radius:99px;border:1.5px solid #ffffff2e;background:transparent;color:var(--band-ink);font:700 14px var(--f-body);cursor:pointer}
+.lang-btn:hover{border-color:var(--band-muted)}
+.lang-btn svg{width:18px;height:18px}
+.lang-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:20;min-width:170px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 12px 30px -10px #0f1b2d59;display:grid;gap:2px}
+.lang-menu button{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:0;border-radius:8px;background:transparent;font:600 15px var(--f-body);color:inherit;cursor:pointer;text-align:left}
+.lang-menu button:hover,.lang-menu button:focus-visible{background:var(--field)}
+.lang-menu button[aria-checked="true"]{background:var(--sign);color:var(--sign-ink)}
+.lang-c{font-family:var(--f-mono);font-size:11px;font-weight:700;border:1.5px solid currentColor;border-radius:4px;padding:1px 5px}
+@media (max-width:720px){.lang{order:2}.lang-btn{height:38px;padding:0 10px}}
+.letter-lang{display:flex;align-items:center;justify-content:space-between;gap:10px}
+
+/* ---------- header: one row only on wide screens; otherwise tabs get their own scrollable row ---------- */
+.band .wrap{max-width:1280px}
+@media (max-width:1299px){
+  .band .wrap{flex-wrap:wrap!important;gap:8px 10px}
+  .logo{margin-right:auto}
+  .me{order:2;margin-left:0;padding:5px 12px 5px 5px}
+  .me-l{display:inline}
+  .lang{order:2}
+  nav.tabs{order:3;flex:1 1 100%;width:100%;justify-content:flex-start;margin-left:0}
+  nav.tabs a:first-child{margin-left:0}
+  nav.tabs a{padding:8px 12px;font-size:14px}
+  nav.tabs .k{display:inline}
+}
+@media (min-width:1300px){nav.tabs .k{display:none}}
+@media (min-width:901px) and (max-width:1299px){.side{top:calc(env(safe-area-inset-top,0px) + 124px)}}
+@media (max-width:1299px){.pz{scroll-margin-top:130px}}
+@media (max-width:480px){.me-l{display:none}.me{padding:4px}}
 </style>
 </head>
 <body>
@@ -563,6 +597,16 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
     <a class="me" href="#profile" data-v="profile" aria-label="My profile">
       <span class="avatar" id="avatar" aria-hidden="true"></span><span class="me-l">My profile</span>
     </a>
+    <div class="lang" id="lang" data-noi18n>
+      <button class="lang-btn" id="lang-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Language: English">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>
+        <span id="lang-code">EN</span>
+      </button>
+      <div class="lang-menu" id="lang-menu" role="menu" hidden>
+        <button type="button" role="menuitemradio" data-setlang="en" aria-checked="true"><span class="lang-c">EN</span>English</button>
+        <button type="button" role="menuitemradio" data-setlang="it" aria-checked="false"><span class="lang-c">IT</span>Italiano</button>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -640,7 +684,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
         <div class="bar"><i id="m-bar" style="width:0"></i></div>
         <div class="missing" id="m-miss"></div>
       </div>
-      <div class="sheet" id="sheet" aria-live="polite"></div>
+      <div class="sheet" id="sheet" aria-live="polite" data-noi18n></div>
       <div class="actions">
         <a class="btn sign" href="#desk">Show at check-in</a>
         <button class="btn" type="button" id="pdf" hidden>Download PDF</button>
@@ -911,7 +955,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
     <a class="btn ghost" href="#claim-before">Add before-flight photos</a>
   </div>
   <div class="desk-wrap" id="desk-wrap">
-    <article class="tag" id="tag" aria-label="Card for staff"></article>
+    <article class="tag" id="tag" aria-label="Card for staff" data-noi18n></article>
   </div>
 </section>
 
@@ -938,14 +982,14 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
       <div class="panel mail">
         <div class="panel-h">
           <h2>Message to the airline</h2>
-          <div class="seg" role="group" aria-label="Message language">
+          <div class="seg" role="group" aria-label="Message language" data-noi18n>
             <button type="button" data-lang="en" aria-pressed="true">EN</button>
             <button type="button" data-lang="it" aria-pressed="false">IT</button>
           </div>
         </div>
         <p class="note">Send it to the airline's special assistance team at least 48 hours before your flight. It updates from your card.</p>
-        <div class="subj" id="mail-subj"></div>
-        <pre id="mail-body"></pre>
+        <div class="subj" id="mail-subj" data-noi18n></div>
+        <pre id="mail-body" data-noi18n></pre>
         <div class="actions"><button class="btn" type="button" id="mail-copy">Copy message</button></div>
         <p class="note" id="mail-msg"></p>
       </div>
@@ -1078,8 +1122,15 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
         <div class="panel-h"><h3>Ready to send?</h3><span class="pill" id="c-ready">—</span></div>
         <ul class="checks" id="c-checks"></ul>
       </div>
-      <div class="letter">
-        <div class="letter-meta"><small>TO</small><span id="c-l-to"></span><small>SUBJECT</small><span id="c-l-subj"></span></div>
+      <div class="letter-lang">
+        <span class="note">Letter language</span>
+        <div class="seg" role="group" aria-label="Letter language" data-noi18n>
+          <button type="button" data-clang="en" aria-pressed="true">EN</button>
+          <button type="button" data-clang="it" aria-pressed="false">IT</button>
+        </div>
+      </div>
+      <div class="letter" data-noi18n>
+        <div class="letter-meta"><small id="c-l-tol">TO</small><span id="c-l-to"></span><small id="c-l-subjl">SUBJECT</small><span id="c-l-subj"></span></div>
         <pre id="c-l-body"></pre>
       </div>
       <div class="actions">
@@ -1176,8 +1227,534 @@ window.FREEVEL_CONFIG = {
 };
 </script>
 <script>
+/* ================= LANGUAGE (EN / IT) =================
+   Text in the page is written in English. FV_IT maps each English text to Italian.
+   - Static text and text the app draws later are swapped automatically (exact match).
+   - Sentences built from values use FV.t("... {name} ...", {name: value}) in the app code.
+   - Elements marked data-noi18n are never touched (staff card, letters, user content).
+   To add a translation: add "English text": "Testo italiano" to FV_IT below. */
+var FV_IT = /*DICT*/{
+"1 photo could not be read.": "Non è stato possibile leggere 1 foto.",
+"7 days": "7 giorni",
+"A loan wheelchair meanwhile": "Una carrozzina sostitutiva nel frattempo",
+"A removable lithium battery over 300 Wh cannot travel in the cabin. Contact your airline now.": "Una batteria al litio rimovibile oltre i 300 Wh non può viaggiare in cabina. Contatta subito la tua compagnia aerea.",
+"AGM (non-spillable)": "AGM (non versabile)",
+"About you": "Su di te",
+"Accept this option": "Accetta questa opzione",
+"Accepted, booking now": "Accettata, prenotazione in corso",
+"Accessible hotels": "Hotel accessibili",
+"Account created. Check your email to confirm it, then sign in.": "Account creato. Controlla la tua email per confermarlo, poi accedi.",
+"Add before-flight photos": "Aggiungi foto prima del volo",
+"Add photos": "Aggiungi foto",
+"Add the date to see your deadline.": "Aggiungi la data per vedere la tua scadenza.",
+"Add the weight and size in your profile so we can pick a vehicle that fits.": "Aggiungi peso e misure nel tuo profilo, così scegliamo un veicolo adatto.",
+"Add your battery type to the card to see the rules that apply to you.": "Indica il tipo di batteria nel profilo per vedere le regole che ti riguardano.",
+"Add your wheelchair in your profile": "Aggiungi la carrozzina nel tuo profilo",
+"Adding photos…": "Aggiunta delle foto…",
+"After landing": "Dopo l'atterraggio",
+"After the flight": "Dopo il volo",
+"After-flight photo": "Foto dopo il volo",
+"Airline": "Compagnia aerea",
+"Airline claims email": "Email reclami della compagnia",
+"Airline message": "Messaggio alla compagnia",
+"Airlines often ask for it to process payments.": "Le compagnie spesso lo chiedono per i rimborsi.",
+"Airport transfers": "Trasferimenti aeroportuali",
+"All clear": "Tutto in regola",
+"All data deleted.": "Tutti i dati sono stati cancellati.",
+"Amp-hours": "Ampere-ora",
+"Another download prompt is already open. Try again in a moment.": "C'è già una richiesta di download aperta. Riprova tra un attimo.",
+"Answer to copy": "Risposta da copiare",
+"Anything else the driver should know": "Altro che l'autista dovrebbe sapere",
+"Arrival airport": "Aeroporto di arrivo",
+"Arrive early and find the PRM assistance point": "Arriva in anticipo e cerca il punto di assistenza PRM",
+"Assistance code": "Codice assistenza",
+"Assistance desks usually ask you to arrive at least 2 hours before departure. We plan the pickup around that.": "I banchi di assistenza di solito chiedono di arrivare almeno 2 ore prima della partenza. Organizziamo l'orario del ritiro di conseguenza.",
+"Assistance needed": "Assistenza richiesta",
+"At EU airports, assistance for passengers with reduced mobility is free. Request it from the airline at least 48 hours ahead.": "Negli aeroporti dell'UE l'assistenza ai passeggeri con mobilità ridotta è gratuita. Richiedila alla compagnia almeno 48 ore prima.",
+"At baggage claim": "Al ritiro bagagli",
+"At check-in": "Al check-in",
+"At least 48 hours before": "Almeno 48 ore prima",
+"At the aircraft door": "Alla porta dell'aereo",
+"At the check-in desk": "Al banco del check-in",
+"At the gate (aircraft side)": "Al gate (sotto l'aereo)",
+"Available": "Disponibile",
+"Available when signed in": "Disponibile dopo l'accesso",
+"Based on IATA guidance for battery-powered mobility aids. Each airline may apply stricter limits.": "Indicazioni basate sulle linee guida IATA per gli ausili alla mobilità a batteria. Ogni compagnia può applicare limiti più severi.",
+"Battery": "Batteria",
+"Battery Wh": "Wh della batteria",
+"Battery check": "Controllo batteria",
+"Battery details missing": "Mancano i dati della batteria",
+"Battery or electrics": "Batteria o impianto elettrico",
+"Battery type": "Tipo di batteria",
+"Battery-powered wheelchairs need airline approval. Tell the airline at least 48 hours ahead.": "Le carrozzine a batteria richiedono l'approvazione della compagnia. Avvisala almeno 48 ore prima.",
+"Before and after photos, guided PIR.": "Foto prima e dopo, PIR guidato.",
+"Before departure": "Prima della partenza",
+"Before leaving the airport if you can: the whole chair, then every damaged part up close.": "Se puoi, prima di uscire dall'aeroporto: la carrozzina intera, poi ogni parte danneggiata da vicino.",
+"Before the flight": "Prima del volo",
+"Before you fly": "Prima di partire",
+"Before-flight photo": "Foto prima del volo",
+"Bikes, skis, boards: limits and fees by airline.": "Bici, sci, tavole: limiti e tariffe per compagnia.",
+"Booked": "Prenotato",
+"Booking ref": "Codice prenotazione",
+"Both": "Entrambi",
+"Brakes": "Freni",
+"CAUTION": "ATTENZIONE",
+"Can you still use it": "Puoi ancora usarla",
+"Can you still use the wheelchair?": "Puoi ancora usare la carrozzina?",
+"Cancel request": "Annulla richiesta",
+"Cancelled": "Annullata",
+"Cancelled by traveller": "Annullata dal viaggiatore",
+"Capacity per battery": "Capacità per batteria",
+"Card completeness": "Completezza della scheda",
+"Card for staff": "Scheda per il personale",
+"Card preview": "Anteprima della scheda",
+"Card text": "Testo della scheda",
+"Card type": "Tipo di scheda",
+"Carrier, weight, health documents.": "Trasportino, peso, documenti sanitari.",
+"Check needed": "Da verificare",
+"Check the airline's rules for your battery": "Verifica le regole della compagnia per la tua batteria",
+"Check the wheelchair before leaving the baggage area": "Controlla la carrozzina prima di lasciare l'area bagagli",
+"Checklist": "Checklist",
+"Checks and messages built from your card. Airline rules vary, so always confirm with yours.": "Controlli e messaggi creati dalla tua scheda. Le regole cambiano da compagnia a compagnia: verifica sempre con la tua.",
+"Claim PDF ready. Attach it to your email, with the PIR and any receipts.": "PDF del reclamo pronto. Allegalo alla tua email insieme al PIR e alle ricevute.",
+"Claim letter": "Lettera di reclamo",
+"Claim letter text": "Testo della lettera di reclamo",
+"Clear and start my own": "Svuota e compila la mia",
+"Comment": "Commento",
+"Confirm cancel": "Conferma annullamento",
+"Confirm: clear flight details": "Conferma: cancella i dati del volo",
+"Confirm: clear form and photos": "Conferma: cancella modulo e foto",
+"Confirm: delete everything": "Conferma: cancella tutto",
+"Contact method": "Modalità di contatto",
+"Contact:": "Contatto:",
+"Copy letter": "Copia lettera",
+"Copy message": "Copia messaggio",
+"Copy text": "Copia testo",
+"Copy your answer below and send it to the FreeVel team.": "Copia la tua risposta qui sotto e inviala al team FreeVel.",
+"Copying was blocked. Select the text above and copy it manually.": "La copia è stata bloccata. Seleziona il testo qui sopra e copialo a mano.",
+"Copying was blocked. The letter is selected below, so copy it manually.": "La copia è stata bloccata. La lettera è selezionata qui sotto: copiala a mano.",
+"Copying was blocked. The text is selected below, so copy it manually.": "La copia è stata bloccata. Il testo è selezionato qui sotto: copialo a mano.",
+"Could not cancel. Try again.": "Annullamento non riuscito. Riprova.",
+"Could not save. Try again.": "Salvataggio non riuscito. Riprova.",
+"Create account": "Crea account",
+"Create my profile": "Crea il mio profilo",
+"Creating your account…": "Creazione dell'account…",
+"Cushion, joystick, headrest: anything that comes off and could break.": "Cuscino, joystick, poggiatesta: tutto ciò che si stacca e potrebbe rompersi.",
+"DATA": "DATI",
+"Damage claim": "Reclamo danni",
+"Damage described": "Danno descritto",
+"Damage reports": "Segnalazione danni",
+"Damaged wheelchair claim": "Reclamo per carrozzina danneggiata",
+"Date": "Data",
+"Delete all data": "Cancella tutti i dati",
+"Departure airport": "Aeroporto di partenza",
+"Departure at {t}: aim to be at the assistance desk by {h}. We plan the pickup around that and the travel time.": "Partenza alle {t}: cerca di essere al banco di assistenza entro le {h}. Organizziamo il ritiro in base a questo orario e ai tempi di viaggio.",
+"Describe the damage": "Descrivi il danno",
+"Describe where the switch is. It saves staff time at the aircraft.": "Descrivi dove si trova l'interruttore: fa risparmiare tempo al personale sotto l'aereo.",
+"Direction": "Direzione",
+"Do not lift by the joystick\nLift by the frame only\nDo not tilt more than 20°": "Non sollevare dal joystick\nSollevare solo dal telaio\nNon inclinare oltre 20°",
+"Do not lift by the joystick&#10;Lift by the frame only&#10;Do not tilt more than 20°": "Non sollevare dal joystick&#10;Sollevare solo dal telaio&#10;Non inclinare oltre 20°",
+"Download PDF": "Scarica PDF",
+"Download cancelled.": "Download annullato.",
+"Download claim PDF": "Scarica il PDF del reclamo",
+"Download the PDF and pack it in your hand luggage": "Scarica il PDF e mettilo nel bagaglio a mano",
+"Downloads are not available here. Use Copy instead.": "I download non sono disponibili qui. Usa la copia del testo.",
+"Draft saved on this device": "Bozza salvata su questo dispositivo",
+"Drop-off address": "Indirizzo di arrivo",
+"Edit": "Modifica",
+"Edit profile": "Modifica profilo",
+"Edit trip": "Modifica viaggio",
+"Email": "Email",
+"Email address": "Indirizzo email",
+"Email so we can follow up": "Email per ricontattarti",
+"Emergency contact": "Contatto di emergenza",
+"Enter both email and password.": "Inserisci email e password.",
+"Essential": "Indispensabile",
+"Everything about you and your wheelchair that stays the same from trip to trip. Fill it in once and every new card uses it.": "Tutto ciò che riguarda te e la tua carrozzina e che non cambia da un viaggio all'altro. Compilalo una volta e ogni nuova scheda lo userà.",
+"Example data.": "Dati di esempio.",
+"Exploring": "In valutazione",
+"Extra costs so far": "Spese extra finora",
+"FROM": "RITORNO",
+"Feedback": "Feedback",
+"Fill in the form and your requests will appear here with their status.": "Compila il modulo e le tue richieste compariranno qui con il loro stato.",
+"Fill in the form, add photos from before and after the flight, and FreeVel writes the claim letter for you. Download it as a PDF with the photos and send it to the airline's claims department.": "Compila il modulo, aggiungi le foto di prima e dopo il volo e FreeVel scriverà la lettera di reclamo al posto tuo. Scaricala in PDF con le foto e inviala all'ufficio reclami della compagnia aerea.",
+"Find a vehicle by hand, then set the status and write the option here. The traveller sees it right away in their request.": "Trova un veicolo a mano, poi imposta lo stato e scrivi qui l'opzione. Il viaggiatore la vede subito nella sua richiesta.",
+"Find it on the airline's website, usually under \"baggage claims\" or \"customer relations\".": "La trovi sul sito della compagnia, di solito nella sezione «reclami bagagli» o «assistenza clienti».",
+"Flight and airport report": "Volo e rapporto in aeroporto",
+"Flight date": "Data del volo",
+"Flight departs at": "Il volo parte alle",
+"Flight details": "Dati del volo",
+"Flight lands at": "Il volo atterra alle",
+"Flight no.": "N. volo",
+"Flight:": "Volo:",
+"Fly with your wheelchair without explaining it all again at the desk.": "Vola con la tua carrozzina senza dover rispiegare tutto al banco.",
+"Folds or comes apart for transport": "Si piega o si smonta per il trasporto",
+"Footrests or armrests": "Pedane o braccioli",
+"For damage to checked items, send the airline a written claim within 7 days (Montreal Convention).": "Per i danni ai bagagli registrati, invia un reclamo scritto alla compagnia entro 7 giorni (Convenzione di Montréal).",
+"For damaged checked items the written complaint must reach the airline within 7 days of getting them back (Montreal Convention).": "Per i bagagli registrati danneggiati, il reclamo scritto deve arrivare alla compagnia entro 7 giorni dalla riconsegna (Convenzione di Montréal).",
+"Fragile instruments": "Strumenti delicati",
+"Frame": "Telaio",
+"FreeVel · prototype in testing with early users": "FreeVel · prototipo in prova con i primi utenti",
+"FreeVel, home": "FreeVel, home",
+"From the airport": "Dall'aeroporto",
+"From the baggage desk report": "Dal rapporto del banco bagagli",
+"From your profile": "Dal tuo profilo",
+"From {a}": "Da {a}",
+"Full name": "Nome e cognome",
+"Full screen": "Schermo intero",
+"Gel (non-spillable)": "Gel (non versabile)",
+"Get written confirmation of your WCHR / WCHS / WCHC code on the booking": "Fatti confermare per iscritto il codice WCHR / WCHS / WCHC sulla prenotazione",
+"Got it back damaged on": "Restituita danneggiata il",
+"HEIC photos from iPhone may not open here: set the camera to \"Most compatible\" or pick JPEG copies.": "Le foto HEIC dell'iPhone potrebbero non aprirsi qui: imposta la fotocamera su «Più compatibile» o scegli copie JPEG.",
+"Hand over wheelchair": "Consegna della carrozzina",
+"Handling": "Movimentazione",
+"Handling notes": "Le note di movimentazione",
+"Have you used it yet?": "L'hai già usata?",
+"Height": "Altezza",
+"Help us build FreeVel": "Aiutaci a costruire FreeVel",
+"Hotel or home address": "Hotel o indirizzo di casa",
+"How it works": "Come funziona",
+"How to disconnect": "Come scollegarla",
+"How to disconnect it or put it in freewheel": "Come scollegarla o metterla in folle",
+"How to handle it": "Come movimentarla",
+"How useful is the card to you?": "Quanto ti è utile la scheda?",
+"How we reach you": "Come ti contattiamo",
+"How you ride": "Come viaggi",
+"I could not file a report (PIR) at the airport": "Non ho potuto compilare il rapporto (PIR) in aeroporto",
+"I move to a car seat": "Mi sposto su un sedile",
+"I printed the PDF": "Ho stampato il PDF",
+"I sent the airline message": "Ho inviato il messaggio alla compagnia",
+"I stay in my wheelchair": "Resto sulla mia carrozzina",
+"INFO": "INFO",
+"ISOLATE": "SCOLLEGARE",
+"If anything is damaged, file a PIR before you leave": "Se qualcosa è danneggiato, compila il PIR prima di uscire",
+"If the wheelchair comes back damaged, you have 7 days to send the claim (Montreal Convention). Add before-flight photos now so they are ready.": "Se la carrozzina ti viene restituita danneggiata, hai 7 giorni per inviare il reclamo (Convenzione di Montréal). Aggiungi ora le foto di prima del volo, così sono già pronte.",
+"If you have one": "Se ce l'hai",
+"If your wheelchair arrives damaged, file a Property Irregularity Report (PIR) at the baggage desk before leaving the airport.": "Se la carrozzina arriva danneggiata, compila il rapporto PIR (Property Irregularity Report) al banco bagagli prima di uscire dall'aeroporto.",
+"Including you": "Te compreso/a",
+"Instructions for staff": "Istruzioni per il personale",
+"Instruments": "Strumenti",
+"It has a switch or connector to isolate it": "Ha un interruttore o un connettore per scollegarla",
+"Joystick or controller": "Joystick o centralina",
+"Last day to send": "Ultimo giorno per l'invio",
+"Leaving the aircraft with assistance can take 30 to 60 minutes after landing. We ask the driver to allow for it.": "Scendere dall'aereo con l'assistenza può richiedere dai 30 ai 60 minuti dopo l'atterraggio. Chiediamo all'autista di tenerne conto.",
+"Length": "Lunghezza",
+"Letter copied with the subject line. Paste it into an email and attach the PDF.": "Lettera copiata con l'oggetto. Incollala in un'email e allega il PDF.",
+"Letter language": "Lingua della lettera",
+"Lithium-ion": "Litio",
+"Loading…": "Caricamento…",
+"Make": "Marca",
+"Manual": "Manuale",
+"Manual wheelchair": "Carrozzina manuale",
+"Manual wheelchair: no battery rules apply. Airline code: WCMP.": "Carrozzina manuale: nessuna regola sulle batterie. Codice per la compagnia: WCMP.",
+"Message copied, with the subject line.": "Messaggio copiato, con l'oggetto.",
+"Message language": "Lingua del messaggio",
+"Message to the airline": "Messaggio alla compagnia",
+"Mobility scooter": "Scooter elettrico",
+"Model": "Modello",
+"My card": "La mia scheda",
+"My profile": "Il mio profilo",
+"My requests": "Le mie richieste",
+"My transfer requests": "Le mie richieste di trasferimento",
+"NOTICE": "AVVISO",
+"Name": "Nome",
+"Name and number": "Nome e numero",
+"Need a ride to or from the airport?": "Ti serve un passaggio da o per l'aeroporto?",
+"Next": "Prossimamente",
+"No": "No",
+"No Wh on the label?": "Non trovi i Wh sull'etichetta?",
+"No requests yet": "Ancora nessuna richiesta",
+"No requests yet. They appear here as soon as a traveller sends one.": "Ancora nessuna richiesta. Compariranno qui non appena un viaggiatore ne invierà una.",
+"No. of batteries": "N. di batterie",
+"Non-removable battery: it stays fitted, but must be protected from damage and isolated from the circuit.": "Batteria non rimovibile: resta montata, ma deve essere protetta dai danni e scollegata dal circuito.",
+"Non-spillable {t} battery: it can stay fitted with the terminals protected and the circuit isolated.": "Batteria {t} non versabile: può restare montata con i poli protetti e il circuito scollegato.",
+"Not at all": "Per niente",
+"Not counting the wheelchair": "Esclusa la carrozzina",
+"Not yet": "Non ancora",
+"Notes:": "Note:",
+"Nothing found": "Nessun veicolo trovato",
+"OK": "OK",
+"OPTION FROM THE FREEVEL TEAM": "OPZIONE DEL TEAM FREEVEL",
+"On arrival": "All'arrivo",
+"On the day": "Il giorno del volo",
+"On the tag stuck to your ticket": "Sull'etichetta attaccata al tuo biglietto",
+"Online sending is not set up yet.": "L'invio online non è ancora attivo.",
+"Only 8 photos fit per side; the rest were skipped.": "Entrano al massimo 8 foto per lato: le altre sono state saltate.",
+"Only partly": "Solo in parte",
+"Open in email app": "Apri nell'app email",
+"Option for the traveller": "Opzione per il viaggiatore",
+"Option ready": "Opzione pronta",
+"Optional": "Facoltativo",
+"Optional. Used only for FreeVel testing.": "Facoltativa. La usiamo solo per i test di FreeVel.",
+"PDF ready. Print it on A4 and keep it in your hand luggage.": "PDF pronto. Stampalo in A4 e tienilo nel bagaglio a mano.",
+"PIR reference": "Riferimento PIR",
+"Parts I keep with me in the cabin": "Parti che tengo con me in cabina",
+"Parts missing": "Parti mancanti",
+"Password": "Password",
+"People travelling": "Persone in viaggio",
+"Pets": "Animali",
+"Phone": "Telefono",
+"Phone call": "Telefonata",
+"Phone number": "Numero di telefono",
+"Photograph the wheelchair from every side before handing it over": "Fotografa la carrozzina da tutti i lati prima di consegnarla",
+"Photos": "Foto",
+"Photos after the flight": "Foto dopo il volo",
+"Photos before the flight": "Foto prima del volo",
+"Photos stay on this device and go into the PDF. Up to 8 per side.": "Le foto restano su questo dispositivo e finiscono nel PDF. Massimo 8 per lato.",
+"Pick a rating or write a comment first.": "Prima scegli un voto o scrivi un commento.",
+"Pickup address": "Indirizzo di partenza",
+"Plan a trip with this profile": "Pianifica un viaggio con questo profilo",
+"Please add {list}.": "Aggiungi {list}.",
+"Postal address": "Indirizzo postale",
+"Power wheelchair": "Carrozzina elettrica",
+"Price": "Prezzo",
+"Problem": "Problema",
+"Profile complete": "Profilo completo",
+"Profile completeness": "Completezza del profilo",
+"Profile status": "Stato del profilo",
+"QR code of the card": "Codice QR della scheda",
+"Ramp or lift vans, or cars with room for your chair.": "Furgoni con rampa o pedana, o auto con spazio per la carrozzina.",
+"Rating from 1 to 5": "Voto da 1 a 5",
+"Ready": "Pronto",
+"Ready for check-in": "Pronta per il check-in",
+"Ready to send?": "Pronto per l'invio?",
+"Ready-to-send text in English or Italian.": "Testo pronto da inviare in inglese o in italiano.",
+"Refund of extra costs": "Rimborso delle spese extra",
+"Removable battery up to 300 Wh: take it out and carry it in the cabin with the terminals protected.": "Batteria rimovibile fino a 300 Wh: toglila e portala in cabina con i poli protetti.",
+"Remove photo": "Rimuovi foto",
+"Remove the cushion, joystick and fragile parts and keep them with you": "Stacca cuscino, joystick e parti fragili e tienili con te",
+"Repair at their cost": "Riparazione a loro spese",
+"Repair quote": "Preventivo di riparazione",
+"Replacement": "Sostituzione",
+"Request a wheelchair-accessible ride to or from the airport. During the pilot our team searches for options by hand and replies within 24 hours. Nothing is booked or charged until you accept an option.": "Richiedi un passaggio accessibile in carrozzina da o per l'aeroporto. In questa fase pilota il nostro team cerca le opzioni a mano e ti risponde entro 24 ore. Nulla viene prenotato o addebitato finché non accetti un'opzione.",
+"Request a wheelchair-accessible transfer. We find options for you.": "Richiedi un trasferimento accessibile in carrozzina. Cerchiamo noi le opzioni.",
+"Request an accessible transfer to and from the airport": "Richiedi un trasferimento accessibile da e per l'aeroporto",
+"Request to copy": "Richiesta da copiare",
+"Request {id} sent. We will contact you {by} within 24 hours.": "Richiesta {id} inviata. Ti contatteremo {by} entro 24 ore.",
+"Requests did not load. Reopen the page later.": "Le richieste non si sono caricate. Riapri la pagina più tardi.",
+"Reset for a new trip": "Azzera per un nuovo viaggio",
+"Return on arrival": "Restituzione all'arrivo",
+"Ride:": "Viaggio:",
+"Route": "Tratta",
+"SPARES": "RICAMBI",
+"STOP": "STOP",
+"Save and notify traveller": "Salva e avvisa il viaggiatore",
+"Saved here, but online sending is not set up yet. Copy the request below and send it to the FreeVel team.": "Salvata qui, ma l'invio online non è ancora attivo. Copia la richiesta qui sotto e inviala al team FreeVel.",
+"Saved on this device": "Salvato su questo dispositivo",
+"Saved. The traveller sees it now.": "Salvato. Il viaggiatore lo vede ora.",
+"Saving…": "Salvataggio…",
+"Searching": "In ricerca",
+"Seat, cushion or backrest": "Seduta, cuscino o schienale",
+"Seating during the ride": "Posto durante il viaggio",
+"Sections": "Sezioni",
+"Select…": "Seleziona…",
+"Send answer": "Invia risposta",
+"Send by {d}.": "Invialo entro {d}.",
+"Send it to the airline's special assistance team at least 48 hours before your flight. It updates from your card.": "Invialo all'assistenza speciale della compagnia almeno 48 ore prima del volo. Si aggiorna in base alla tua scheda.",
+"Send it within 7 days.": "Invialo entro 7 giorni.",
+"Send request": "Invia richiesta",
+"Send the claim anyway, as soon as possible, and explain why it is late.": "Invia comunque il reclamo il prima possibile e spiega il motivo del ritardo.",
+"Send the letter by email and attach the PDF. Also attach a copy of the PIR, the wheelchair tag and any repair quote.": "Invia la lettera via email allegando il PDF. Allega anche una copia del PIR, l'etichetta della carrozzina e l'eventuale preventivo di riparazione.",
+"Send the message to the airline's special assistance team": "Invia il messaggio all'assistenza speciale della compagnia",
+"Send to": "Destinatario",
+"Sending failed.": "Invio non riuscito.",
+"Sending failed. Check your connection and try again.": "Invio non riuscito. Controlla la connessione e riprova.",
+"Sending…": "Invio in corso…",
+"Sent": "Inviata",
+"Serial number": "Numero di serie",
+"Set up your profile first": "Prima crea il tuo profilo",
+"Shared with the driver from your profile": "Condiviso con l'autista dal tuo profilo",
+"Show at check-in": "Mostra al check-in",
+"Show your card at the desk and ask for a tag for the wheelchair": "Mostra la scheda al banco e chiedi un'etichetta per la carrozzina",
+"Sign in": "Accedi",
+"Sign in to keep your profile in the cloud and use it on any device.": "Accedi per salvare il profilo nel cloud e usarlo su qualsiasi dispositivo.",
+"Sign out": "Esci",
+"Signed in · cloud sync on": "Accesso effettuato · sincronizzazione attiva",
+"Signing in…": "Accesso in corso…",
+"Size, fragility, extra cabin seat.": "Misure, fragilità, posto extra in cabina.",
+"Spares allowed: one battery up to 300 Wh, or two up to 160 Wh each. Check your extra batteries.": "Ricambi ammessi: una batteria fino a 300 Wh, oppure due fino a 160 Wh ciascuna. Controlla le tue batterie extra.",
+"Spillable wet-cell batteries have the strictest rules: the chair must stay upright, or the battery must be packed separately. Tell your airline well in advance.": "Le batterie ad acido libero hanno le regole più severe: la carrozzina deve restare in verticale, oppure la batteria va imballata a parte. Avvisa la compagnia con largo anticipo.",
+"Sports equipment": "Attrezzatura sportiva",
+"Sports gear": "Attrezzatura sportiva",
+"Start a new claim": "Inizia un nuovo reclamo",
+"Start a new trip": "Inizia un nuovo viaggio",
+"Status": "Stato",
+"Street, number, city": "Via, numero civico, città",
+"Suitcases": "Valigie",
+"TO": "ANDATA",
+"Take them at check-in, before you hand it over: all four sides, the joystick, the wheels and any scratches it already has.": "Scattale al check-in, prima di consegnarla: tutti e quattro i lati, il joystick, le ruote e gli eventuali graffi già presenti.",
+"Taxis, rental chair…": "Taxi, noleggio carrozzina…",
+"Team: incoming requests": "Team: richieste in arrivo",
+"Text copied. Paste it into an email or your notes.": "Testo copiato. Incollalo in un'email o nelle tue note.",
+"Thank you! Your answer was sent.": "Grazie! La tua risposta è stata inviata.",
+"The 7-day deadline was {d}.": "La scadenza dei 7 giorni era {d}.",
+"The A4 PDF is ready to print and keep in your hand luggage.": "Il PDF in formato A4 è pronto da stampare e da tenere nel bagaglio a mano.",
+"The IATA code the airline puts on your booking.": "Il codice IATA che la compagnia aerea inserisce nella tua prenotazione.",
+"The PDF could not be created. Use Copy letter instead.": "Non è stato possibile creare il PDF. Usa «Copia lettera».",
+"The PDF could not be created. Use Copy text, or show the card from your phone.": "Non è stato possibile creare il PDF. Usa «Copia testo» o mostra la scheda dal telefono.",
+"The Wh rating is missing. It is the first thing staff ask for with lithium batteries. Find it on the label, or calculate it as volts × Ah.": "Manca la capacità in Wh. È il primo dato che il personale chiede per le batterie al litio. La trovi sull'etichetta, oppure calcolala come volt × Ah.",
+"The battery is removable (per the manufacturer)": "La batteria è rimovibile (secondo il produttore)",
+"The download did not start. Use Copy instead.": "Il download non è partito. Usa la copia del testo.",
+"The wheelchair goes in the boot": "La carrozzina va nel bagagliaio",
+"These are my details now": "Ora sono i miei dati",
+"This card is filled in to show you the result. Replace the fields with your own, or clear everything and start fresh.": "Questa scheda è compilata per mostrarti il risultato. Sostituisci i campi con i tuoi dati, oppure cancella tutto e ricomincia da zero.",
+"This information does not replace your airline's rules.": "Queste informazioni non sostituiscono le regole della tua compagnia aerea.",
+"This trip": "Questo viaggio",
+"To the airport": "Verso l'aeroporto",
+"To {a}": "Verso {a}",
+"Trains": "Treni",
+"Transfers": "Trasferimenti",
+"Traveller": "Viaggiatore",
+"Traveller accepted": "Accettata dal viaggiatore",
+"Trip details change each time. Your profile stays.": "I dati del viaggio cambiano ogni volta. Il tuo profilo resta.",
+"Turn your screen toward the agent. The QR code holds the full card as text.": "Gira lo schermo verso l'operatore. Il codice QR contiene tutta la scheda in forma di testo.",
+"Two rides": "Due tratte",
+"Type": "Tipo",
+"Up to two pieces of mobility equipment, wheelchair included, travel at no extra cost.": "Fino a due ausili alla mobilità, carrozzina compresa, viaggiano senza costi aggiuntivi.",
+"Up to two spare batteries of 160 Wh or less each are allowed in the cabin.": "In cabina sono ammesse fino a due batterie di ricambio da massimo 160 Wh ciascuna.",
+"Use": "Usa",
+"Value or price paid": "Valore o prezzo pagato",
+"Van with a ramp or lift": "Furgone con rampa o pedana",
+"Visible to the FreeVel team only": "Visibile solo al team FreeVel",
+"Volt": "Volt",
+"WCHC · I can’t walk, I need a transfer to my seat": "WCHC · non cammino, mi serve il trasferimento al posto",
+"WCHR · I can walk and climb stairs, not long distances": "WCHR · cammino e salgo le scale, ma non per lunghe distanze",
+"WCHS · I can’t climb stairs, I can walk to my seat": "WCHS · non salgo le scale, ma cammino fino al posto",
+"We are looking for a vehicle. You will hear from us {by} within 24 hours.": "Stiamo cercando un veicolo. Ti contatteremo {by} entro 24 ore.",
+"We book it and send you the driver's details.": "Lo prenotiamo e ti inviamo i dati dell'autista.",
+"We could not find an accessible vehicle for this ride. Try other times, or contact the airport's assistance service.": "Non abbiamo trovato un veicolo accessibile per questa tratta. Prova con altri orari o contatta il servizio di assistenza dell'aeroporto.",
+"We find a vehicle": "Troviamo un veicolo",
+"We ticked your interest. Send your answer to count it.": "Abbiamo segnato il tuo interesse. Invia la risposta perché venga contato.",
+"Weight": "Peso",
+"Weight and size": "Peso e misure",
+"Wet cell (spillable)": "Acido libero (versabile)",
+"Wh calculator": "Calcolo Wh",
+"What is broken, what no longer works, what is missing.": "Cosa è rotto, cosa non funziona più, cosa manca.",
+"What is damaged": "Cosa è danneggiato",
+"What we are working on": "Su cosa stiamo lavorando",
+"What would you like next?": "Cosa vorresti dopo?",
+"What you ask the airline for": "Cosa chiedi alla compagnia aerea",
+"What's missing or not working?": "Cosa manca o non funziona?",
+"WhatsApp": "WhatsApp",
+"WhatsApp number": "Numero WhatsApp",
+"Wheelchair": "Carrozzina",
+"Wheelchair card": "Scheda carrozzina",
+"Wheelchair tag no.": "N. etichetta carrozzina",
+"Wheelchair:": "Carrozzina:",
+"Wheels or tyres": "Ruote o pneumatici",
+"Where to find it": "Dove trovarli",
+"Where, when, and how you ride.": "Dove, quando e come viaggi.",
+"Which ride?": "Quale tratta?",
+"Width": "Larghezza",
+"With QR code, PDF and IATA codes.": "Con codice QR, PDF e codici IATA.",
+"Write it the way you would say it. Short sentences, one per line.": "Scrivilo come lo diresti a voce. Frasi brevi, una per riga.",
+"YOUR BOOKING": "LA TUA PRENOTAZIONE",
+"Year bought": "Anno di acquisto",
+"Yes, at check-in": "Sì, al check-in",
+"Yes, with minor problems": "Sì, con piccoli problemi",
+"You accept an option": "Accetti un'opzione",
+"You already have 8 photos here. Remove one to add another.": "Hai già 8 foto qui. Rimuovine una per aggiungerne un'altra.",
+"You have not said how the battery can be disconnected. Staff must be able to do this to load the chair.": "Non hai indicato come si scollega la batteria. Il personale deve poterlo fare per caricare la carrozzina.",
+"You send a request": "Invii una richiesta",
+"You're one of the first people to try it. Two minutes of answers tell us what to keep, what to change and what to build next.": "Sei tra le prime persone a provarlo. Due minuti delle tue risposte ci dicono cosa tenere, cosa cambiare e cosa costruire dopo.",
+"Your account": "Il tuo account",
+"Your details and your wheelchair's specs are saved once and reused on every trip.": "I tuoi dati e le caratteristiche della carrozzina si salvano una volta e si riusano a ogni viaggio.",
+"Your email": "La tua email",
+"Your email or phone": "La tua email o il telefono",
+"Your flight is on {d}.": "Il tuo volo è il {d}.",
+"Your phone": "Il tuo telefono",
+"Your profile is saved once. For each trip, add the flight and FreeVel builds a handling card for airport and airline staff, with the right IATA codes, a QR code and a printable PDF.": "Il tuo profilo si salva una volta sola. Per ogni viaggio aggiungi il volo e FreeVel prepara una scheda per il personale dell'aeroporto e della compagnia aerea, con i codici IATA giusti, un codice QR e un PDF da stampare.",
+"Your rights in brief": "I tuoi diritti in breve",
+"Your wheelchair": "La tua carrozzina",
+"are in the user manual or on the label under the seat. Measure in the travel position if it folds.": "sono nel manuale d'uso o sull'etichetta sotto il sedile. Se si piega, misurala in posizione da viaggio.",
+"are what you tell staff every time. Write them once here.": "sono ciò che ripeti al personale ogni volta. Scrivile qui una volta sola.",
+"by email": "via email",
+"by phone": "per telefono",
+"day left to send": "giorno rimasto per l'invio",
+"days left to send": "giorni rimasti per l'invio",
+"does not fold": "non pieghevole",
+"e.g. I travel with a guide dog, the entrance has two steps": "es. viaggio con un cane guida, all'ingresso ci sono due gradini",
+"e.g. Ramp van with Rossi Transfers, pickup 06:30, driver Luca +39 …": "es. Furgone con rampa di Rossi Transfer, ritiro alle 06:30, autista Luca +39 …",
+"e.g. The left footrest is bent and will not lock. The joystick housing is cracked and the chair does not drive.": "es. La pedana sinistra è piegata e non si blocca. Il guscio del joystick è crepato e la carrozzina non si muove.",
+"e.g. at the desk they also asked me for…": "es. al banco mi hanno chiesto anche…",
+"e.g. pressure-relief cushion, joystick": "es. cuscino antidecubito, joystick",
+"e.g. red key under the seat, brake lever on the right": "es. chiave rossa sotto il sedile, leva del freno a destra",
+"e.g. €65": "es. 65 €",
+"flight departs {t}": "volo in partenza alle {t}",
+"flight lands {t}": "volo in arrivo alle {t}",
+"folds": "pieghevole",
+"how we can reach you": "come possiamo contattarti",
+"is printed on the battery label. If it only shows volts and Ah, use the calculator.": "sono stampati sull'etichetta della batteria. Se trovi solo volt e Ah, usa il calcolo.",
+"moves to a car seat, chair in the boot": "si sposta su un sedile, carrozzina nel bagagliaio",
+"needed": "necessario",
+"on WhatsApp": "su WhatsApp",
+"or drop them here": "o trascinale qui",
+"recommended": "consigliato",
+"soon": "presto",
+"stays in wheelchair (ramp or lift van)": "resta in carrozzina (furgone con rampa o pedana)",
+"the airport": "l'aeroporto",
+"the arrival airport": "l'aeroporto di arrivo",
+"the date of the ride from the airport": "la data del viaggio dall'aeroporto",
+"the date of the ride to the airport": "la data del viaggio verso l'aeroporto",
+"the departure airport": "l'aeroporto di partenza",
+"the drop-off address": "l'indirizzo di arrivo",
+"the pickup address": "l'indirizzo di partenza",
+"{d}/{t} done": "{d}/{t} fatti",
+"{n} active": "{n} attive",
+"{n} batteries": "{n} batterie",
+"{n} battery": "{n} batteria",
+"{n} photos could not be read.": "Non è stato possibile leggere {n} foto.",
+"{n} to add": "{n} da aggiungere",
+"{p} people · {b} suitcases": "{p} persone · {b} valigie"
+}/*END*/;
+(function(){
+  var KEY="freevel_lang",D=FV_IT;
+  function stored(){try{return localStorage.getItem(KEY)}catch(e){return null}}
+  var start=stored()||(String(navigator.language||"").toLowerCase().indexOf("it")===0?"it":"en");
+  var FV=window.FV={lang:start,dict:D,
+    t:function(x,v){var r=(FV.lang==="it"&&D[x])||x;if(v)r=r.replace(/\{(\w+)\}/g,function(m,k){return v[k]!=null?v[k]:m});return r},
+    locale:function(){return FV.lang==="it"?"it-IT":"en-GB"}};
+  document.documentElement.lang=start;
+  var SKIP="[data-noi18n],script,style,textarea",ATTRS=["placeholder","aria-label","title","alt"];
+  var orig=new WeakMap();
+  function swap(en){var m=/^(\s*)([\s\S]*?)(\s*)$/.exec(en);if(!m[2])return en;var tr=FV.lang==="it"&&D[m[2]];return tr?m[1]+tr+m[3]:en}
+  function doText(n){var p=n.parentElement;if(!p||p.closest(SKIP))return;
+    var o=orig.get(n);if(!o||o.set!==n.nodeValue){o={en:n.nodeValue};orig.set(n,o)}
+    var v=swap(o.en);if(v!==n.nodeValue)n.nodeValue=v;o.set=v}
+  function doEl(el){if(el.closest(SKIP))return;var o=orig.get(el);if(!o){o={};orig.set(el,o)}
+    ATTRS.forEach(function(a){if(!el.hasAttribute(a))return;var cur=el.getAttribute(a),r=o[a];
+      if(!r||r.set!==cur){r=o[a]={en:cur}}var v=swap(r.en);if(v!==cur)el.setAttribute(a,v);r.set=v})}
+  function apply(root){if(!root)return;
+    if(root.nodeType===3){doText(root);return}if(root.nodeType!==1)return;
+    doEl(root);var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT|NodeFilter.SHOW_ELEMENT),n;
+    while((n=w.nextNode())){if(n.nodeType===3)doText(n);else doEl(n)}}
+  FV.apply=apply;
+  function ui(){var code=document.getElementById("lang-code"),btn=document.getElementById("lang-btn");
+    if(code)code.textContent=FV.lang.toUpperCase();
+    if(btn)btn.setAttribute("aria-label",FV.lang==="it"?"Lingua: italiano":"Language: English");
+    [].forEach.call(document.querySelectorAll("[data-setlang]"),function(b){b.setAttribute("aria-checked",String(b.dataset.setlang===FV.lang))})}
+  FV.set=function(l){if(l!==FV.lang){FV.lang=l;try{localStorage.setItem(KEY,l)}catch(e){}
+    document.documentElement.lang=l;window.dispatchEvent(new Event("fv:lang"));apply(document.body)}ui()};
+  document.addEventListener("DOMContentLoaded",function(){
+    apply(document.body);ui();
+    new MutationObserver(function(ms){ms.forEach(function(m){
+      if(m.type==="childList")m.addedNodes.forEach(apply);else if(m.type==="attributes")doEl(m.target)})})
+      .observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:ATTRS});
+    var btn=document.getElementById("lang-btn"),menu=document.getElementById("lang-menu");if(!btn||!menu)return;
+    function close(){menu.hidden=true;btn.setAttribute("aria-expanded","false")}
+    btn.addEventListener("click",function(e){e.stopPropagation();var open=menu.hidden;menu.hidden=!open;btn.setAttribute("aria-expanded",String(open));
+      if(open){var cur=menu.querySelector('[aria-checked="true"]');if(cur)cur.focus()}});
+    menu.addEventListener("click",function(e){var b=e.target.closest("[data-setlang]");if(!b)return;FV.set(b.dataset.setlang);close();btn.focus()});
+    document.addEventListener("click",function(e){if(!e.target.closest("#lang"))close()});
+    document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!menu.hidden){close();btn.focus()}});
+  });
+})();
+</script>
+<script>
 (function(){
 "use strict";
+var FV=window.FV||{lang:"en",t:function(x,v){return v?x.replace(/\{(\w+)\}/g,function(m,k){return v[k]!=null?v[k]:m}):x},locale:function(){return"en-GB"}};
+function T(x,v){return FV.t(x,v)}
 var PKEY="freevel_profile_v1", TKEY="freevel_trip_v1", CK="freevel_cl_v2", OLD_KEYS=["freevel_v2","rollfly_v1"];
 /* Trip fields change every flight; everything else belongs to the traveller's profile. */
 var TRIP_KEYS=["airline","flight","date","route","pnr","handover","ret"];
@@ -1267,7 +1844,7 @@ function required(){var r=[["name","Name","f-name"],["wch","Assistance code","f-
   if(powered()){r.push(["bt","Battery type","f-bt"],["bhow","How to disconnect","f-bhow"]);if(S.bt==="li")r.push(["wh","Battery Wh","f-wh"])}return r}
 function meterInto(pre,r,doneText){var miss=r.filter(function(x){return !String(S[x[0]]||"").trim()});
   var pct=Math.round((r.length-miss.length)/r.length*100);$(pre+"-pct").textContent=pct+"%";$(pre+"-bar").style.width=pct+"%";
-  $(pre+"-miss").innerHTML=miss.length?miss.map(function(x){return'<button type="button" data-go="'+x[2]+'">+ '+esc(x[1])+'</button>'}).join(""):'<span class="pill ok"><span class="dot"></span>'+doneText+'</span>'}
+  $(pre+"-miss").innerHTML=miss.length?miss.map(function(x){return'<button type="button" data-go="'+x[2]+'">+ '+esc(T(x[1]))+'</button>'}).join(""):'<span class="pill ok"><span class="dot"></span>'+T(doneText)+'</span>'}
 function renderMeter(){meterInto("m",required(),"Ready for check-in");
   meterInto("pm",required().filter(function(x){return TRIP_KEYS.indexOf(x[0])<0}),"Profile complete")}
 
@@ -1278,6 +1855,10 @@ function goField(e){var b=e.target.closest("[data-go]");if(!b)return;var el=$(b.
   setTimeout(function(){el.scrollIntoView({block:"center"});el.focus({preventScroll:true})},60)}
 $("m-miss").addEventListener("click",goField);$("pm-miss").addEventListener("click",goField);
 
+/* battery line in the user's language (the staff card keeps battLine in English) */
+function battUI(){if(!powered())return"";var t=BT[S.bt]?T(BT[S.bt][1]):"";
+  var q=S.wh?((S.bn?S.bn+" × ":"")+S.wh+" Wh"):(S.bn?T(S.bn=="1"?"{n} battery":"{n} batteries",{n:S.bn}):"");
+  return [t,q].filter(Boolean).join(", ")}
 /* ---------- traveller summary (My card) + avatar ---------- */
 function initials(){var n=String(S.name||"").trim().split(/\s+/).filter(Boolean);
   return n.length?(n[0][0]+(n.length>1?n[n.length-1][0]:"")).toUpperCase():""}
@@ -1285,10 +1866,10 @@ function renderTraveller(){var ini=initials(),av=$("avatar");
   av.textContent=ini;av.classList.toggle("empty",!ini);
   var has=["name","weight","notes","brand"].some(function(k){return String(S[k]||"").trim()});
   if(!has){$("traveller").innerHTML='<div class="tv-empty"><h3>Set up your profile first</h3><p class="note">Your details and your wheelchair\'s specs are saved once and reused on every trip.</p><a class="btn sign" href="#profile">Create my profile</a></div>';return}
-  var pw=powered(),chair=[TYPE[S.type||"manual"][1],make(),S.weight?S.weight+" kg":""].filter(Boolean).join(" · ");
-  var batt=pw?(battLine(1)||"Battery details missing"):"";
+  var pw=powered(),chair=[T(TYPE[S.type||"manual"][1]),make(),S.weight?S.weight+" kg":""].filter(Boolean).join(" · ");
+  var batt=pw?(battUI()||T("Battery details missing")):"";
   $("traveller").innerHTML='<div class="tv"><span class="avatar lg'+(ini?'':' empty')+'" aria-hidden="true">'+esc(ini)+'</span>'+
-    '<div class="tv-main"><div class="tv-top"><h3>'+esc(S.name||"Traveller")+'</h3>'+(S.wch?'<span class="pill warn mono">'+esc(S.wch)+'</span>':'')+'</div>'+
+    '<div class="tv-main"><div class="tv-top"><h3>'+esc(S.name||T("Traveller"))+'</h3>'+(S.wch?'<span class="pill warn mono">'+esc(S.wch)+'</span>':'')+'</div>'+
     '<p>'+esc(chair)+'</p>'+(batt?'<p class="note">'+esc(batt)+'</p>':'')+'</div>'+
     '<a class="btn small ghost" href="#profile">Edit profile</a></div>'}
 
@@ -1358,7 +1939,7 @@ function verdicts(){var v=[];
                else if(wh>0)v.push(["ok","SPARES","Up to two spare batteries of 160 Wh or less each are allowed in the cabin."]);}
     }else{v.push(["info","INFO","Non-removable battery: it stays fitted, but must be protected from damage and isolated from the circuit."])}
   }else if(S.bt==="wet"){v.push(["warn","CAUTION","Spillable wet-cell batteries have the strictest rules: the chair must stay upright, or the battery must be packed separately. Tell your airline well in advance."])}
-  else{v.push(["ok","OK","Non-spillable "+BT[S.bt][0]+" battery: it can stay fitted with the terminals protected and the circuit isolated."])}
+  else{v.push(["ok","OK",T("Non-spillable {t} battery: it can stay fitted with the terminals protected and the circuit isolated.",{t:BT[S.bt][0]})])}
   if(!S.bsw)v.push(["warn","ISOLATE","You have not said how the battery can be disconnected. Staff must be able to do this to load the chair."]);
   else if(!S.bhow)v.push(["info","INFO","Describe where the switch is. It saves staff time at the aircraft."]);
   v.push(["info","NOTICE","Battery-powered wheelchairs need airline approval. Tell the airline at least 48 hours ahead."]);
@@ -1368,7 +1949,8 @@ function renderVerdicts(){var v=verdicts(),worst=v.some(function(x){return x[0]=
   var p=$("b-pill");p.className="pill "+worst;p.innerHTML='<span class="dot"></span>'+({ok:"All clear",warn:"Check needed",bad:"Problem"})[worst]}
 
 /* ---------- airline message ---------- */
-var mailLang="en";
+var mailLang=FV.lang==="it"?"it":"en";
+[].forEach.call(document.querySelectorAll("[data-lang]"),function(x){x.setAttribute("aria-pressed",String(x.dataset.lang===mailLang))});
 function mail(){var en=mailLang==="en",pw=powered(),t=S.type||"manual",nm=S.name||(en?"[your name]":"[il tuo nome]");
   var fl=[S.flight,fmtDate(S.date)].filter(Boolean).join(" ")||(en?"[flight]":"[volo]");
   var subj=en?"Special assistance request – "+nm+" – "+fl:"Richiesta assistenza speciale – "+nm+" – "+fl;
@@ -1413,9 +1995,9 @@ var C=load(CK)||{};
 function renderCL(){var h="",tot=0,done=0;
   CL.forEach(function(g,gi){h+='<div class="cl-group"><h3>'+esc(g[0])+'</h3>';g[1].forEach(function(t,i){var id="cl-"+gi+"-"+i;tot++;if(C[id])done++;
     h+='<label class="cl-item"><input type="checkbox" id="'+id+'"'+(C[id]?" checked":"")+'><span>'+esc(t)+'</span></label>'});h+='</div>'});
-  $("cl").innerHTML=h;$("cl-count").textContent=done+"/"+tot+" done"}
+  $("cl").innerHTML=h;$("cl-count").textContent=T("{d}/{t} done",{d:done,t:tot})}
 $("cl").addEventListener("change",function(e){if(e.target.id){C[e.target.id]=e.target.checked;save(CK,C);
-  var tot=$("cl").querySelectorAll("input").length,d=$("cl").querySelectorAll("input:checked").length;$("cl-count").textContent=d+"/"+tot+" done"}});
+  var tot=$("cl").querySelectorAll("input").length,d=$("cl").querySelectorAll("input:checked").length;$("cl-count").textContent=T("{d}/{t} done",{d:d,t:tot})}});
 $("cl-reset").onclick=function(){C={};save(CK,C);renderCL()};
 
 /* ---------- PDF ---------- */
@@ -1512,14 +2094,31 @@ if(!Array.isArray(CD.req))CD.req=["repair"];
 
 function cChairLine(){return [TYPE[S.type||"manual"][1],make(),S.weight?S.weight+" kg":"",dims()].filter(Boolean).join(" · ")}
 function addDays(d,n){var t=new Date(d+"T12:00:00");if(isNaN(t))return null;t.setDate(t.getDate()+n);return t}
+var RULE7="For damaged checked items the written complaint must reach the airline within 7 days of getting them back (Montreal Convention).";
 function cDeadline(){var el=$("c-deadline"),base=CD.recv||CD.date,dl=base&&addDays(base,7);
-  if(!dl){el.className="deadline";el.innerHTML='<b>Send it within 7 days.</b> For damaged checked items the written complaint must reach the airline within 7 days of getting them back (Montreal Convention). Add the date to see your deadline.';return}
-  var today=new Date();today.setHours(12,0,0,0);var left=Math.round((dl-today)/864e5),ds=dl.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
-  if(left>7){el.className="deadline";el.innerHTML='<b>Your flight is on '+fmtDate(base)+'.</b> If the wheelchair comes back damaged, you have 7 days to send the claim (Montreal Convention). Add before-flight photos now so they are ready.';return}
+  if(!dl){el.className="deadline";el.innerHTML='<b>'+T("Send it within 7 days.")+'</b> '+T(RULE7)+' '+T("Add the date to see your deadline.");return}
+  var today=new Date();today.setHours(12,0,0,0);var left=Math.round((dl-today)/864e5),ds=dl.toLocaleDateString(FV.locale(),{weekday:"long",day:"numeric",month:"long"});
+  if(left>7){el.className="deadline";el.innerHTML='<b>'+T("Your flight is on {d}.",{d:fmtDate(base)})+'</b> '+T("If the wheelchair comes back damaged, you have 7 days to send the claim (Montreal Convention). Add before-flight photos now so they are ready.");return}
   el.className="deadline "+(left<0?"bad":left<=2?"warn":"ok");
-  el.innerHTML=left<0?'<b>The 7-day deadline was '+ds+'.</b> Send the claim anyway, as soon as possible, and explain why it is late.'
-    :'<span class="dl-n">'+left+'</span><span><b>'+(left===0?"Last day to send":left===1?"day left to send":"days left to send")+'</b>Send by '+ds+'. For damaged checked items the written complaint must reach the airline within 7 days of getting them back (Montreal Convention).</span>'}
-function cLetter(){var nm=S.name||"[your name]",fl=[CD.flight,fmtDate(CD.date)].filter(Boolean).join(" on ")||"[flight]";
+  el.innerHTML=left<0?'<b>'+T("The 7-day deadline was {d}.",{d:ds})+'</b> '+T("Send the claim anyway, as soon as possible, and explain why it is late.")
+    :'<span class="dl-n">'+left+'</span><span><b>'+T(left===0?"Last day to send":left===1?"day left to send":"days left to send")+'</b>'+T("Send by {d}.",{d:ds})+' '+T(RULE7)+'</span>'}
+var cLang=FV.lang==="it"?"it":"en";
+var CLIT={"Manual wheelchair":"carrozzina manuale","Power wheelchair":"carrozzina elettrica","Mobility scooter":"scooter elettrico",
+  "Frame":"telaio","Wheels or tyres":"ruote o pneumatici","Joystick or controller":"joystick o centralina","Battery or electrics":"batteria o impianto elettrico",
+  "Seat, cushion or backrest":"seduta, cuscino o schienale","Footrests or armrests":"pedane o braccioli","Brakes":"freni","Parts missing":"parti mancanti",
+  "DAMAGED WHEELCHAIR CLAIM":"RECLAMO PER CARROZZINA DANNEGGIATA","CLAIM DETAILS":"DETTAGLI DEL RECLAMO","PHOTOS BEFORE THE FLIGHT":"FOTO PRIMA DEL VOLO","PHOTOS AFTER THE FLIGHT":"FOTO DOPO IL VOLO",
+  "Passenger":"Passeggero","Phone":"Telefono","Email":"Email","Postal address":"Indirizzo postale","Airline":"Compagnia aerea","Flight":"Volo","Route":"Tratta","Booking ref":"Codice prenotazione",
+  "Wheelchair tag":"Etichetta carrozzina","Returned damaged on":"Restituita danneggiata il","PIR reference":"Riferimento PIR","Not filed at the airport":"Non compilato in aeroporto","Wheelchair":"Carrozzina",
+  "Serial number":"Numero di serie","Year bought":"Anno di acquisto","Value":"Valore","Damaged parts":"Parti danneggiate","Description":"Descrizione","Can it be used?":"Utilizzabile?",
+  "No":"No","Only partly":"Solo in parte","Yes, with problems":"Sì, con problemi","Repair quote":"Preventivo di riparazione","Extra costs so far":"Spese aggiuntive finora",
+  "Before":"Prima","After":"Dopo","To:":"A:","Subject:":"Oggetto:","Prepared with FreeVel - page {i} of {n}":"Preparato con FreeVel - pagina {i} di {n}"};
+function CL(x,v){var r=(cLang==="it"&&CLIT[x])||x;if(v)r=r.replace(/\{(\w+)\}/g,function(m,k){return v[k]});return r}
+var REQ_IT={repair:"la riparazione della carrozzina a vostre spese",replace:"la sostituzione della carrozzina se non può essere riparata correttamente",loan:"una carrozzina sostitutiva adeguata durante la riparazione",costs:"il rimborso delle spese aggiuntive causate da questo danno"};
+var USE_IT={no:"Al momento non posso usare la carrozzina, quindi non ho alcuna mobilità autonoma.",partly:"Posso usare la carrozzina solo in parte e non è sicura per l'uso quotidiano.",yes:"Posso ancora usare la carrozzina, ma ha problemi che vanno riparati."};
+function andList(a,word){return a.length>1?a.slice(0,-1).join(", ")+" "+word+" "+a[a.length-1]:a[0]}
+function cLetter(){return cLang==="it"?cLetterIT():cLetterEN()}
+function photoCounts(){return{nb:PHOTOS.filter(function(p){return p.zone==="before"}).length,na:PHOTOS.filter(function(p){return p.zone==="after"}).length}}
+function cLetterEN(){var nm=S.name||"[your name]",fl=[CD.flight,fmtDate(CD.date)].filter(Boolean).join(" on ")||"[flight]";
   var subj="Damaged wheelchair claim – "+nm+" – "+([CD.flight,fmtDate(CD.date)].filter(Boolean).join(" ")||"flight")+(CD.pir?" – PIR "+CD.pir:"");
   var parts=(CD.parts||[]).map(function(x){return x.toLowerCase()}),L=[];
   L.push("Dear "+(CD.airline?CD.airline+" ":"")+"Baggage Claims team,","");
@@ -1534,25 +2133,55 @@ function cLetter(){var nm=S.name||"[your name]",fl=[CD.flight,fmtDate(CD.date)].
   if(parts.length)L.push("- Damaged: "+parts.join(", "));
   if(CD.desc)L.push("- "+CD.desc.replace(/\n+/g," "));
   if(CD.use)L.push("- "+USE_TXT[CD.use]);
-  var nb=PHOTOS.filter(function(p){return p.zone==="before"}).length,na=PHOTOS.filter(function(p){return p.zone==="after"}).length;
+  var c=photoCounts(),nb=c.nb,na=c.na;
   if(nb||na)L.push("","The attached PDF includes "+[nb?nb+" photo"+(nb>1?"s":"")+" taken before the flight":"",na?na+" photo"+(na>1?"s":"")+" taken after it was returned":""].filter(Boolean).join(" and ")+".");
   var req=(CD.req||[]).map(function(k){return REQ_TXT[k]}).filter(Boolean);
   L.push("","My request");
-  if(req.length)L.push("I ask for "+(req.length>1?req.slice(0,-1).join(", ")+" and "+req[req.length-1]:req[0])+".");
+  if(req.length)L.push("I ask for "+andList(req,"and")+".");
   if(CD.quote)L.push("The repair quote I have received is "+CD.quote+".");
   if(CD.costs)L.push("My extra costs so far come to "+CD.costs+"; receipts are attached.");
   L.push("A wheelchair is not ordinary luggage. Without it I cannot move independently, so I ask you to treat this claim as urgent and to cover the full cost of putting it right.");
   L.push("","Please confirm that you have received this claim and give me a claim reference number.","","Kind regards,",nm);
   [CD.phone,CD.email,CD.addr].filter(Boolean).forEach(function(x){L.push(x)});
   return{subj:subj,body:L.join("\n")}}
+function cLetterIT(){var nm=S.name||"[il tuo nome]",fl=[CD.flight,CD.date?"del "+fmtDate(CD.date):""].filter(Boolean).join(" ")||"[volo]";
+  var subj="Reclamo per carrozzina danneggiata – "+nm+" – "+([CD.flight,fmtDate(CD.date)].filter(Boolean).join(" ")||"volo")+(CD.pir?" – PIR "+CD.pir:"");
+  var parts=(CD.parts||[]).map(function(x){return CLIT[x]||x.toLowerCase()}),L=[];
+  L.push("Gentile Ufficio Reclami Bagagli"+(CD.airline?" di "+CD.airline:"")+",","");
+  L.push("vi scrivo per presentare un reclamo per i danni subiti dal mio ausilio alla mobilità ("+CLIT[TYPE[S.type||"manual"][1]]+"), consegnato sul volo "+fl+(CD.route?" ("+CD.route+")":"")+(CD.pnr?", codice prenotazione "+CD.pnr:"")+". Mi è stato restituito danneggiato"+(CD.recv?" il "+fmtDate(CD.recv):"")+".");
+  if(CD.pir)L.push("Ho segnalato il danno in aeroporto prima di uscire. Riferimento del rapporto PIR (Property Irregularity Report): "+CD.pir+(CD.tag?". Numero di etichetta della carrozzina: "+CD.tag:"")+".");
+  else if(CD.nopir)L.push("Non mi è stato possibile compilare il rapporto PIR in aeroporto, per questo vi segnalo ora il danno per iscritto"+(CD.tag?". Numero di etichetta della carrozzina: "+CD.tag:"")+".");
+  else if(CD.tag)L.push("Numero di etichetta della carrozzina: "+CD.tag+".");
+  L.push("","L'ausilio");
+  L.push("- Modello: "+(make()||CLIT[TYPE[S.type||"manual"][1]])+(CD.sn?", numero di serie "+CD.sn:""));
+  if(CD.year||CD.value)L.push("- Acquistato: "+[CD.year,CD.value?"valore "+CD.value:""].filter(Boolean).join(", "));
+  L.push("","Il danno");
+  if(parts.length)L.push("- Parti danneggiate: "+parts.join(", "));
+  if(CD.desc)L.push("- "+CD.desc.replace(/\n+/g," "));
+  if(CD.use)L.push("- "+USE_IT[CD.use]);
+  var c=photoCounts(),nb=c.nb,na=c.na;
+  if(nb||na)L.push("","Il PDF allegato contiene "+[nb?nb+" foto scattat"+(nb>1?"e":"a")+" prima del volo":"",na?na+" foto scattat"+(na>1?"e":"a")+" dopo la restituzione":""].filter(Boolean).join(" e ")+".");
+  var req=(CD.req||[]).map(function(k){return REQ_IT[k]}).filter(Boolean);
+  L.push("","La mia richiesta");
+  if(req.length)L.push("Chiedo "+andList(req,"e")+".");
+  if(CD.quote)L.push("Il preventivo di riparazione che ho ricevuto è di "+CD.quote+".");
+  if(CD.costs)L.push("Le spese aggiuntive sostenute finora ammontano a "+CD.costs+"; allego le ricevute.");
+  L.push("Una carrozzina non è un normale bagaglio: senza di essa non posso muovermi in autonomia. Vi chiedo quindi di trattare questo reclamo con urgenza e di coprire l'intero costo del ripristino.");
+  L.push("","Vi chiedo di confermare la ricezione di questo reclamo e di comunicarmi un numero di riferimento della pratica.","","Cordiali saluti,",nm);
+  [CD.phone,CD.email,CD.addr].filter(Boolean).forEach(function(x){L.push(x)});
+  return{subj:subj,body:L.join("\n")}}
+[].forEach.call(document.querySelectorAll("[data-clang]"),function(b){b.onclick=function(){cLang=b.dataset.clang;
+  [].forEach.call(document.querySelectorAll("[data-clang]"),function(x){x.setAttribute("aria-pressed",String(x===b))});cRender()};
+  b.setAttribute("aria-pressed",String(b.dataset.clang===cLang))});
 function cChecks(){var na=PHOTOS.filter(function(p){return p.zone==="after"}).length,nb=PHOTOS.filter(function(p){return p.zone==="before"}).length;
-  return[[!!(CD.airline&&CD.flight&&CD.date),"Flight details","need"],[!!(CD.desc||(CD.parts||[]).length),"Damage described","need"],[na>0,"Photos after the flight"+(na?" ("+na+")":""),"need"],
-    [!!(CD.email||CD.phone),"Your email or phone","need"],[nb>0,"Photos before the flight"+(nb?" ("+nb+")":""),"tip"],[!!(CD.pir||CD.nopir),"PIR reference","tip"],[!!CD.to,"Airline claims email","tip"]]}
-function cRender(){$("c-chair").innerHTML='<div><small>From your profile</small><p>'+esc(cChairLine()||"Add your wheelchair in your profile")+'</p></div><a class="btn small ghost" href="#profile">Edit</a>';
-  cDeadline();var L=cLetter();$("c-l-to").textContent=CD.to||"Add the airline's claims email";$("c-l-subj").textContent=L.subj;$("c-l-body").textContent=L.body;
+  return[[!!(CD.airline&&CD.flight&&CD.date),T("Flight details"),"need"],[!!(CD.desc||(CD.parts||[]).length),T("Damage described"),"need"],[na>0,T("Photos after the flight")+(na?" ("+na+")":""),"need"],
+    [!!(CD.email||CD.phone),T("Your email or phone"),"need"],[nb>0,T("Photos before the flight")+(nb?" ("+nb+")":""),"tip"],[!!(CD.pir||CD.nopir),T("PIR reference"),"tip"],[!!CD.to,T("Airline claims email"),"tip"]]}
+function cChairUI(){return [T(TYPE[S.type||"manual"][1]),make(),S.weight?S.weight+" kg":"",dims()].filter(Boolean).join(" · ")}
+function cRender(){$("c-chair").innerHTML='<div><small>'+T("From your profile")+'</small><p>'+esc(cChairUI()||T("Add your wheelchair in your profile"))+'</p></div><a class="btn small ghost" href="#profile">'+T("Edit")+'</a>';
+  cDeadline();var L=cLetter();$("c-l-to").textContent=CD.to||(cLang==="it"?"Aggiungi l'email reclami della compagnia":"Add the airline's claims email");$("c-l-subj").textContent=L.subj;$("c-l-tol").textContent=cLang==="it"?"A":"TO";$("c-l-subjl").textContent=cLang==="it"?"OGGETTO":"SUBJECT";$("c-l-body").textContent=L.body;
   var ch=cChecks(),need=ch.filter(function(c){return c[2]==="need"&&!c[0]}).length;
-  $("c-checks").innerHTML=ch.map(function(c){return'<li class="'+(c[0]?"y":c[2]==="need"?"n":"t")+'"><span class="ck" aria-hidden="true">'+(c[0]?"✓":c[2]==="need"?"!":"·")+'</span>'+esc(c[1])+(c[0]?"":c[2]==="need"?" <em>needed</em>":" <em>recommended</em>")+'</li>'}).join("");
-  var p=$("c-ready");p.className="pill "+(need?"warn":"ok");p.textContent=need?need+" to add":"Ready";
+  $("c-checks").innerHTML=ch.map(function(c){return'<li class="'+(c[0]?"y":c[2]==="need"?"n":"t")+'"><span class="ck" aria-hidden="true">'+(c[0]?"✓":c[2]==="need"?"!":"·")+'</span>'+esc(c[1])+(c[0]?"":c[2]==="need"?" <em>"+T("needed")+"</em>":" <em>"+T("recommended")+"</em>")+'</li>'}).join("");
+  var p=$("c-ready");p.className="pill "+(need?"warn":"ok");p.textContent=need?T("{n} to add",{n:need}):T("Ready");
   var m=$("c-mail");if(!(window.claude&&window.claude.use)&&CD.to){m.hidden=false;m.href="mailto:"+encodeURIComponent(CD.to)+"?subject="+encodeURIComponent(L.subj)+"&body="+encodeURIComponent(L.body)}else m.hidden=true}
 
 /* ---- photos: IndexedDB with in-memory fallback ---- */
@@ -1567,16 +2196,16 @@ function shrink(file){return new Promise(function(res,rej){var fr=new FileReader
   im.onerror=function(){rej(new Error("decode"))};im.src=fr.result};fr.readAsDataURL(file)})}
 function photoMsg(t){$("c-photo-msg").textContent=t}
 function addPhotos(zone,files){var have=PHOTOS.filter(function(p){return p.zone===zone}).length,list=[].slice.call(files||[]).filter(function(f){return /^image\//.test(f.type)||/\.(heic|heif)$/i.test(f.name)});
-  if(!list.length)return;var room=MAXP-have;if(room<=0){photoMsg("You already have 8 photos here. Remove one to add another.");return}
-  var skipped=list.length>room;list=list.slice(0,room);var bad=0;photoMsg("Adding photos…");
+  if(!list.length)return;var room=MAXP-have;if(room<=0){photoMsg(T("You already have 8 photos here. Remove one to add another."));return}
+  var skipped=list.length>room;list=list.slice(0,room);var bad=0;photoMsg(T("Adding photos…"));
   return list.reduce(function(pr,f){return pr.then(function(){return shrink(f).then(function(r){
       var p={id:"p"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),zone:zone,data:r.data,w:r.w,h:r.h,name:f.name,taken:f.lastModified||Date.now()};
       PHOTOS.push(p);return idbDo("readwrite",function(st){return st.put(p)})},function(){bad++})})},Promise.resolve())
   .then(function(){renderPhotos();cRender();
-    photoMsg(bad?bad+" photo"+(bad>1?"s":"")+" could not be read. HEIC photos from iPhone may not open here: set the camera to \"Most compatible\" or pick JPEG copies.":skipped?"Only 8 photos fit per side; the rest were skipped.":"Photos stay on this device and go into the PDF. Up to 8 per side.")})}
+    photoMsg(bad?T(bad>1?"{n} photos could not be read.":"1 photo could not be read.",{n:bad})+" "+T("HEIC photos from iPhone may not open here: set the camera to \"Most compatible\" or pick JPEG copies."):skipped?T("Only 8 photos fit per side; the rest were skipped."):T("Photos stay on this device and go into the PDF. Up to 8 per side."))})}
 function renderPhotos(){[].forEach.call(document.querySelectorAll(".pz"),function(z){var zone=z.dataset.zone,L=PHOTOS.filter(function(p){return p.zone===zone});
   z.querySelector("[data-count]").textContent=L.length+"/"+MAXP;
-  z.querySelector("[data-thumbs]").innerHTML=L.map(function(p){return'<figure class="th"><img src="'+p.data+'" alt="'+(zone==="before"?"Before":"After")+' flight photo"><figcaption>'+new Date(p.taken).toLocaleString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})+'</figcaption><button type="button" class="th-x" data-del="'+p.id+'" aria-label="Remove photo">×</button></figure>'}).join("")})}
+  z.querySelector("[data-thumbs]").innerHTML=L.map(function(p){return'<figure class="th"><img src="'+p.data+'" alt="'+T(zone==="before"?"Before-flight photo":"After-flight photo")+'"><figcaption>'+new Date(p.taken).toLocaleString(FV.locale(),{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})+'</figcaption><button type="button" class="th-x" data-del="'+p.id+'" aria-label="'+T("Remove photo")+'">×</button></figure>'}).join("")})}
 [].forEach.call(document.querySelectorAll('.pz input[type="file"]'),function(inp){inp.addEventListener("change",function(){addPhotos(inp.dataset.zone,inp.files);inp.value=""})});
 [].forEach.call(document.querySelectorAll(".pz .drop"),function(d){var zone=d.closest(".pz").dataset.zone;
   d.addEventListener("dragover",function(e){e.preventDefault();d.classList.add("over")});d.addEventListener("dragleave",function(){d.classList.remove("over")});
@@ -1594,30 +2223,32 @@ $("c-reset").onclick=function(){var b=this;
 function cMsg(t){$("c-msg").textContent=t}
 $("c-copy").onclick=function(){var L=cLetter();copyText("Subject: "+L.subj+"\n\n"+L.body,function(ok){cMsg(ok?"Letter copied with the subject line. Paste it into an email and attach the PDF.":"Copying was blocked. The letter is selected below, so copy it manually.")},$("c-copybox"))};
 function buildClaimPDF(){var J=window.jspdf&&window.jspdf.jsPDF;if(!J)throw new Error("nolib");
-  var d=new J({unit:"mm",format:"a4"}),W=210,M=18,y,L=cLetter();
+  var d=new J({unit:"mm",format:"a4"}),W=210,M=18,y,L=cLetter(),loc=cLang==="it"?"it-IT":"en-GB";
   function head(t){d.setFillColor(17,20,24);d.rect(0,0,W,20,"F");d.setTextColor(255,255,255);d.setFont("helvetica","bold");d.setFontSize(14);d.text(t,M,13);
     d.setFont("helvetica","normal");d.setFontSize(8.5);d.text(lat((S.name||"")+(CD.pir?"  |  PIR "+CD.pir:"")),W-M,13,{align:"right"});y=30}
   function para(t,size,bold){d.setFont("helvetica",bold?"bold":"normal");d.setFontSize(size||10.5);d.setTextColor(17,20,24);
-    d.splitTextToSize(lat(t),W-2*M).forEach(function(line){if(y>280){d.addPage();head("DAMAGED WHEELCHAIR CLAIM")}d.text(line,M,y);y+=(size||10.5)*0.48})}
-  head("DAMAGED WHEELCHAIR CLAIM");
-  d.setFontSize(9);d.setTextColor(90,96,107);d.text(lat(new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})),M,y);y+=6;
-  if(CD.to){d.text(lat("To: "+CD.to),M,y);y+=6}
-  para("Subject: "+L.subj,10.5,true);y+=3;
-  L.body.split("\n").forEach(function(line){if(!line){y+=3;return}para(line,10.5,line==="The wheelchair"||line==="The damage"||line==="My request")});
-  d.addPage();head("CLAIM DETAILS");
+    d.splitTextToSize(lat(t),W-2*M).forEach(function(line){if(y>280){d.addPage();head(CL("DAMAGED WHEELCHAIR CLAIM"))}d.text(line,M,y);y+=(size||10.5)*0.48})}
+  head(CL("DAMAGED WHEELCHAIR CLAIM"));
+  d.setFontSize(9);d.setTextColor(90,96,107);d.text(lat(new Date().toLocaleDateString(loc,{day:"numeric",month:"long",year:"numeric"})),M,y);y+=6;
+  if(CD.to){d.text(lat(CL("To:")+" "+CD.to),M,y);y+=6}
+  para(CL("Subject:")+" "+L.subj,10.5,true);y+=3;
+  var HEADS=["The wheelchair","The damage","My request","L'ausilio","Il danno","La mia richiesta"];
+  L.body.split("\n").forEach(function(line){if(!line){y+=3;return}para(line,10.5,HEADS.indexOf(line)>=0)});
+  d.addPage();head(CL("CLAIM DETAILS"));
+  var chairPDF=[CL(TYPE[S.type||"manual"][1]),make(),S.weight?S.weight+" kg":"",dims()].filter(Boolean).join(" · ");
   var rows=[["Passenger",S.name],["Phone",CD.phone],["Email",CD.email],["Postal address",CD.addr],["Airline",CD.airline],["Flight",[CD.flight,fmtDate(CD.date)].filter(Boolean).join(" · ")],["Route",CD.route],["Booking ref",CD.pnr],["Wheelchair tag",CD.tag],
-    ["Returned damaged on",fmtDate(CD.recv)],["PIR reference",CD.pir||(CD.nopir?"Not filed at the airport":"")],["Wheelchair",cChairLine()],["Serial number",CD.sn],["Year bought",CD.year],["Value",CD.value],
-    ["Damaged parts",(CD.parts||[]).join(", ")],["Description",CD.desc],["Can it be used?",{no:"No",partly:"Only partly",yes:"Yes, with problems"}[CD.use]||""],["Repair quote",CD.quote],["Extra costs so far",CD.costs]];
-  rows.forEach(function(r){var lines=d.splitTextToSize(lat(r[1]||"-"),W-2*M-55),h=Math.max(7,lines.length*4.8+2.5);if(y+h>285){d.addPage();head("CLAIM DETAILS")}
+    ["Returned damaged on",fmtDate(CD.recv)],["PIR reference",CD.pir||(CD.nopir?CL("Not filed at the airport"):"")],["Wheelchair",chairPDF],["Serial number",CD.sn],["Year bought",CD.year],["Value",CD.value],
+    ["Damaged parts",(CD.parts||[]).map(function(x){return CL(x)}).join(", ")],["Description",CD.desc],["Can it be used?",CL({no:"No",partly:"Only partly",yes:"Yes, with problems"}[CD.use]||"")],["Repair quote",CD.quote],["Extra costs so far",CD.costs]];
+  rows.forEach(function(r){r[0]=CL(r[0]);var lines=d.splitTextToSize(lat(r[1]||"-"),W-2*M-55),h=Math.max(7,lines.length*4.8+2.5);if(y+h>285){d.addPage();head(CL("CLAIM DETAILS"))}
     d.setFont("helvetica","normal");d.setFontSize(8.5);d.setTextColor(90,96,107);d.text(lat(r[0]),M,y+4.5);
     d.setFont("helvetica","bold");d.setFontSize(10);d.setTextColor(17,20,24);d.text(lines,M+55,y+4.5);y+=h;d.setDrawColor(201,206,214);d.setLineWidth(.2);d.line(M,y-1,W-M,y-1)});
   [["before","PHOTOS BEFORE THE FLIGHT"],["after","PHOTOS AFTER THE FLIGHT"]].forEach(function(z){var P=PHOTOS.filter(function(p){return p.zone===z[0]});if(!P.length)return;
-    var cw=(W-2*M-8)/2,chh=105;P.forEach(function(p,i){var slot=i%4;if(slot===0){d.addPage();head(z[1])}
+    var cw=(W-2*M-8)/2,chh=105;P.forEach(function(p,i){var slot=i%4;if(slot===0){d.addPage();head(CL(z[1]))}
       var x=M+(slot%2)*(cw+8),yy=30+Math.floor(slot/2)*(chh+16),k=Math.min(cw/p.w,chh/p.h),w=p.w*k,h=p.h*k;
       try{d.addImage(p.data,"JPEG",x+(cw-w)/2,yy+(chh-h)/2,w,h)}catch(e){}
       d.setFont("helvetica","normal");d.setFontSize(8);d.setTextColor(90,96,107);
-      d.text(lat((z[0]==="before"?"Before":"After")+" #"+(i+1)+" - "+new Date(p.taken).toLocaleString("en-GB",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})),x,yy+chh+6)})});
-  var n=d.getNumberOfPages();for(var i=1;i<=n;i++){d.setPage(i);d.setFont("helvetica","normal");d.setFontSize(7.5);d.setTextColor(120,126,136);d.text("Prepared with FreeVel - page "+i+" of "+n,M,292)}
+      d.text(lat(CL(z[0]==="before"?"Before":"After")+" #"+(i+1)+" - "+new Date(p.taken).toLocaleString(loc,{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})),x,yy+chh+6)})});
+  var n=d.getNumberOfPages();for(var i=1;i<=n;i++){d.setPage(i);d.setFont("helvetica","normal");d.setFontSize(7.5);d.setTextColor(120,126,136);d.text(lat(CL("Prepared with FreeVel - page {i} of {n}",{i:i,n:n})),M,292)}
   return d.output("blob")}
 $("c-pdf").onclick=function(){var b=this;b.disabled=true;var blob;
   try{blob=buildClaimPDF()}catch(e){b.disabled=false;cMsg("The PDF could not be created. Use Copy letter instead.");return}
@@ -1637,16 +2268,16 @@ function trVal(n){return (document.querySelector('input[name="'+n+'"]:checked')|
 function airports(){var p=String(S.route||"").split(/\s*(?:→|->|>|–|—|\bto\b|-)\s*/i).map(function(x){return x.trim()}).filter(Boolean);return{from:p[0]||"",to:p[p.length-1]||""}}
 function trLegsUI(){var d=trVal("tdir")||"to";$("leg-to").hidden=d==="from";$("leg-from").hidden=d==="to"}
 function trTitles(){var a=$("t-to-airport").value.trim(),b=$("t-from-airport").value.trim();
-  $("leg-to-title").textContent=a?"To "+a:"To the airport";$("leg-from-title").textContent=b?"From "+b:"From the airport"}
+  $("leg-to-title").textContent=a?T("To {a}",{a:a}):T("To the airport");$("leg-from-title").textContent=b?T("From {a}",{a:b}):T("From the airport")}
 function trHint(){var t=$("t-to-time").value,h=$("t-to-hint");
   if(/^\d\d:\d\d$/.test(t)){var m=(+t.slice(0,2))*60+(+t.slice(3))-120;if(m<0)m+=1440;
-    h.textContent="Departure at "+t+": aim to be at the assistance desk by "+String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")+". We plan the pickup around that and the travel time."}
-  else h.textContent="Assistance desks usually ask you to arrive at least 2 hours before departure. We plan the pickup around that."}
+    h.textContent=T("Departure at {t}: aim to be at the assistance desk by {h}. We plan the pickup around that and the travel time.",{t:t,h:String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")})}
+  else h.textContent=T("Assistance desks usually ask you to arrive at least 2 hours before departure. We plan the pickup around that.")}
 function trChair(){var miss=!S.weight||!dims();
-  var line=[TYPE[S.type||"manual"][1],make(),S.weight?S.weight+" kg":"",dims(),S.fold?"folds":"does not fold"].filter(Boolean).join(" · ");
-  $("t-chair").innerHTML='<div><small>Shared with the driver from your profile</small><p>'+esc(line)+'</p>'+(miss?'<p class="warn-t">Add the weight and size in your profile so we can pick a vehicle that fits.</p>':'')+'</div><a class="btn small ghost" href="#profile">Edit</a>'}
+  var line=[T(TYPE[S.type||"manual"][1]),make(),S.weight?S.weight+" kg":"",dims(),T(S.fold?"folds":"does not fold")].filter(Boolean).join(" · ");
+  $("t-chair").innerHTML='<div><small>'+T("Shared with the driver from your profile")+'</small><p>'+esc(line)+'</p>'+(miss?'<p class="warn-t">'+T("Add the weight and size in your profile so we can pick a vehicle that fits.")+'</p>':'')+'</div><a class="btn small ghost" href="#profile">'+T("Edit")+'</a>'}
 function trContactLabel(){var w=trVal("tway"),i=$("t-contact");
-  $("t-contact-l").textContent=w==="email"?"Email address":w==="whatsapp"?"WhatsApp number":"Phone number";
+  $("t-contact-l").textContent=T(w==="email"?"Email address":w==="whatsapp"?"WhatsApp number":"Phone number");
   i.type=w==="email"?"email":"tel";i.autocomplete=w==="email"?"email":"tel";
   if(!i.dataset.touched)i.value=w==="email"?"":(S.phone||"")}
 function trOpen(){var a=airports();
@@ -1659,6 +2290,8 @@ $("t-to-airport").addEventListener("input",trTitles);$("t-from-airport").addEven
 $("t-to-time").addEventListener("input",trHint);
 function trStatusMsg(t,c){var s=$("tr-status");s.textContent=t;s.className="status "+(c||"")}
 
+var BY={phone:"by phone",whatsapp:"on WhatsApp",email:"by email"};
+function legUI(l){return (l.dir==="to"?T("To {a}",{a:l.airport||T("the airport")}):T("From {a}",{a:l.airport||T("the airport")}))+" · "+fmtDate(l.date)+(l.time?" · "+T(l.dir==="to"?"flight departs {t}":"flight lands {t}",{t:l.time}):"")}
 function legText(l){return (l.dir==="to"?"To "+(l.airport||"airport"):"From "+(l.airport||"airport"))+" · "+fmtDate(l.date)+(l.time?" · flight "+(l.dir==="to"?"departs ":"lands ")+l.time:"")}
 function reqText(q){return ["FreeVel transfer request "+q.id,"Name: "+(q.name||"-"),
   q.legs.map(function(l){return legText(l)+"\n  "+(l.dir==="to"?"Pickup: ":"Drop-off: ")+l.address}).join("\n"),
@@ -1670,11 +2303,10 @@ function saveMy(){save(TRK,MY);if(host.db&&host.uid)return host.db.doc("transfer
 $("trform").addEventListener("submit",function(e){e.preventDefault();var d=trVal("tdir")||"to",legs=[],errs=[];
   ["to","from"].forEach(function(k){if(d!==k&&d!=="both")return;
     var l={dir:k,airport:$("t-"+k+"-airport").value.trim(),date:$("t-"+k+"-date").value,time:$("t-"+k+"-time").value,address:$("t-"+k+"-addr").value.trim()};
-    var w=k==="to"?"the ride to the airport":"the ride from the airport";
-    if(!l.airport)errs.push("the airport for "+w);if(!l.date)errs.push("the date for "+w);if(!l.address)errs.push((k==="to"?"the pickup address":"the drop-off address"));
+    if(!l.airport)errs.push(T(k==="to"?"the departure airport":"the arrival airport"));if(!l.date)errs.push(T(k==="to"?"the date of the ride to the airport":"the date of the ride from the airport"));if(!l.address)errs.push(T(k==="to"?"the pickup address":"the drop-off address"));
     legs.push(l)});
-  var contact=$("t-contact").value.trim();if(!contact)errs.push("how we can reach you");
-  if(errs.length){trStatusMsg("Please add "+errs.join(", ")+".","bad");return}
+  var contact=$("t-contact").value.trim();if(!contact)errs.push(T("how we can reach you"));
+  if(errs.length){trStatusMsg(T("Please add {list}.",{list:errs.join(", ")}),"bad");return}
   var q={id:"T"+Date.now().toString(36).toUpperCase().slice(-6),created:Date.now(),legs:legs,ride:trVal("tride")||"stay",
     pax:Math.max(1,parseInt($("t-pax").value,10)||1),bags:Math.max(0,parseInt($("t-bags").value,10)||0),way:trVal("tway")||"phone",contact:contact,
     notes:$("t-notes").value.trim().slice(0,1000),name:S.name||"",flight:[S.airline,S.flight,S.route].filter(Boolean).join(" · "),
@@ -1683,7 +2315,7 @@ $("trform").addEventListener("submit",function(e){e.preventDefault();var d=trVal
   var b=$("tr-send");b.disabled=true;trStatusMsg("Sending…","");$("tr-copy").hidden=true;
   var url=(window.FREEVEL_CONFIG||{}).transferUrl,online=host.db&&host.uid;
   function done(){MY.requests.unshift(q);save(TRK,MY);renderMyReqs();$("t-notes").value="";
-    trStatusMsg("Request "+q.id+" sent. We will contact you by "+WAY[q.way].toLowerCase()+" within 24 hours.","ok")}
+    trStatusMsg(T("Request {id} sent. We will contact you {by} within 24 hours.",{id:q.id,by:T(BY[q.way])}),"ok")}
   if(online){MY.requests.unshift(q);saveMy().then(function(){MY.requests.shift();done()},function(){MY.requests.shift();trStatusMsg("Sending failed. Check your connection and try again.","bad")}).then(function(){b.disabled=false});return}
   if(url){fetch(url,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({type:"transfer",request:q,text:reqText(q)})})
     .then(function(r){if(!r.ok)throw 0;done()}).catch(function(){trStatusMsg("Sending failed. Check your connection and try again.","bad")}).then(function(){b.disabled=false});return}
@@ -1694,24 +2326,24 @@ $("trform").addEventListener("submit",function(e){e.preventDefault();var d=trVal
 function stOf(q){if(q.cancelled)return"cancelled";var r=REPLIES[q.id]||{};
   if(r.status==="booked"||r.status==="unavailable")return r.status;if(q.accepted)return"accepted";return r.status||"sent"}
 function timeline(st){var idx={sent:0,searching:1,options:2,accepted:2,booked:3}[st];if(idx==null)return"";
-  return'<ol class="tl">'+STEPS.map(function(x,i){return'<li class="'+(i<idx?"done":i===idx?"now":"")+'"><span></span>'+x[1]+'</li>'}).join("")+'</ol>'}
-function renderMyReqs(){var L=MY.requests;$("tr-count").textContent=L.filter(function(q){return!q.cancelled}).length+" active";
+  return'<ol class="tl">'+STEPS.map(function(x,i){return'<li class="'+(i<idx?"done":i===idx?"now":"")+'"><span></span>'+T(x[1])+'</li>'}).join("")+'</ol>'}
+function renderMyReqs(){var L=MY.requests;$("tr-count").textContent=T("{n} active",{n:L.filter(function(q){return!q.cancelled}).length});
   if(!L.length){$("tr-list").innerHTML='<div class="empty-st"><b>No requests yet</b><p class="note">Fill in the form and your requests will appear here with their status.</p></div>';return}
   $("tr-list").innerHTML=L.map(function(q){var st=stOf(q),r=REPLIES[q.id]||{},cls=st==="cancelled"||st==="unavailable"?"off":"";
-    var h='<article class="req '+cls+'"><div class="req-top"><span class="mono req-id">'+esc(q.id)+'</span><span class="pill '+({booked:"ok",options:"warn",accepted:"ok",unavailable:"bad",cancelled:""})[st]+'">'+TR_ST[st]+'</span></div>';
-    h+=q.legs.map(function(l){return'<div class="req-leg"><span class="leg-tag">'+(l.dir==="to"?"TO":"FROM")+'</span><div><b>'+esc(legText(l))+'</b><span>'+esc(l.address)+'</span></div></div>'}).join("");
+    var h='<article class="req '+cls+'"><div class="req-top"><span class="mono req-id">'+esc(q.id)+'</span><span class="pill '+({booked:"ok",options:"warn",accepted:"ok",unavailable:"bad",cancelled:""})[st]+'">'+T(TR_ST[st])+'</span></div>';
+    h+=q.legs.map(function(l){return'<div class="req-leg"><span class="leg-tag">'+(l.dir==="to"?"TO":"FROM")+'</span><div><b>'+esc(legUI(l))+'</b><span>'+esc(l.address)+'</span></div></div>'}).join("");
     h+=timeline(st);
-    if(r.offer&&st!=="cancelled")h+='<div class="offer"><small>'+(st==="booked"?"YOUR BOOKING":"OPTION FROM THE FREEVEL TEAM")+'</small><p>'+esc(r.offer).replace(/\n/g,"<br>")+'</p>'+(r.price?'<b class="price">'+esc(r.price)+'</b>':'')+'</div>';
-    if(st==="sent"||st==="searching")h+='<p class="note">We are looking for a vehicle. You will hear from us by '+esc(WAY[q.way].toLowerCase())+' within 24 hours.</p>';
-    if(st==="unavailable")h+='<p class="note">We could not find an accessible vehicle for this ride. Try other times, or contact the airport\'s assistance service.</p>';
-    var acts="";if(st==="options")acts+='<button class="btn small sign" data-acc="'+esc(q.id)+'"'+(host.db?'':' disabled title="Available when signed in"')+'>Accept this option</button>';
-    if(st!=="cancelled"&&st!=="booked")acts+='<button class="btn small ghost" data-cancel="'+esc(q.id)+'">Cancel request</button>';
+    if(r.offer&&st!=="cancelled")h+='<div class="offer"><small>'+T(st==="booked"?"YOUR BOOKING":"OPTION FROM THE FREEVEL TEAM")+'</small><p>'+esc(r.offer).replace(/\n/g,"<br>")+'</p>'+(r.price?'<b class="price">'+esc(r.price)+'</b>':'')+'</div>';
+    if(st==="sent"||st==="searching")h+='<p class="note">'+esc(T("We are looking for a vehicle. You will hear from us {by} within 24 hours.",{by:T(BY[q.way])}))+'</p>';
+    if(st==="unavailable")h+='<p class="note">'+T("We could not find an accessible vehicle for this ride. Try other times, or contact the airport's assistance service.")+'</p>';
+    var acts="";if(st==="options")acts+='<button class="btn small sign" data-acc="'+esc(q.id)+'"'+(host.db?'':' disabled title="'+T("Available when signed in")+'"')+'>'+T("Accept this option")+'</button>';
+    if(st!=="cancelled"&&st!=="booked")acts+='<button class="btn small ghost" data-cancel="'+esc(q.id)+'">'+T("Cancel request")+'</button>';
     if(acts)h+='<div class="actions">'+acts+'</div>';
     return h+'</article>'}).join("")}
 $("tr-list").addEventListener("click",function(e){var a=e.target.closest("[data-acc]"),c=e.target.closest("[data-cancel]");
   if(a){var q=MY.requests.find(function(x){return x.id===a.dataset.acc});if(!q)return;q.accepted=true;a.disabled=true;
     saveMy().then(renderMyReqs,function(){q.accepted=false;renderMyReqs();trStatusMsg("Could not save. Try again.","bad")})}
-  if(c){if(!c.dataset.armed){c.dataset.armed="1";c.textContent="Confirm cancel";setTimeout(function(){if(c.isConnected){c.dataset.armed="";c.textContent="Cancel request"}},4000);return}
+  if(c){if(!c.dataset.armed){c.dataset.armed="1";c.textContent=T("Confirm cancel");setTimeout(function(){if(c.isConnected){c.dataset.armed="";c.textContent=T("Cancel request")}},4000);return}
     var q2=MY.requests.find(function(x){return x.id===c.dataset.cancel});if(!q2)return;q2.cancelled=true;
     saveMy().then(renderMyReqs,function(){q2.cancelled=false;renderMyReqs();trStatusMsg("Could not cancel. Try again.","bad")})}});
 
@@ -1733,14 +2365,14 @@ function renderTeam(){var items=[];Object.keys(TEAM.reqs).forEach(function(u){(T
   if(!items.length){$("tr-team-list").innerHTML='<p class="note">No requests yet. They appear here as soon as a traveller sends one.</p>';return}
   $("tr-team-list").innerHTML=items.map(function(it){var q=it.q,r=(TEAM.reps[it.u]||{})[q.id]||{},st=q.cancelled?"cancelled":(r.status||"sent");
     var key=esc(it.u)+"|"+esc(q.id);
-    return'<article class="treq'+(q.cancelled?" off":"")+'"><div class="req-top"><span class="mono req-id">'+esc(q.id)+'</span><b>'+esc(q.name||"Traveller")+'</b>'+
-      '<span class="note">'+new Date(q.created).toLocaleString("en-GB",{dateStyle:"medium",timeStyle:"short"})+'</span>'+
-      (q.cancelled?'<span class="pill">Cancelled by traveller</span>':q.accepted?'<span class="pill ok">Traveller accepted</span>':'')+'</div>'+
-      '<div class="treq-body"><div class="treq-info">'+q.legs.map(function(l){return'<p><span class="leg-tag">'+(l.dir==="to"?"TO":"FROM")+'</span> <b>'+esc(legText(l))+'</b><br>'+esc(l.address)+'</p>'}).join("")+
-      '<p><b>Ride:</b> '+(q.ride==="stay"?"stays in wheelchair (ramp or lift van)":"moves to a car seat, chair in the boot")+' · '+q.pax+' people · '+q.bags+' suitcases</p>'+
-      '<p><b>Wheelchair:</b> '+esc(q.chair&&q.chair.line||"-")+'</p>'+(q.flight?'<p><b>Flight:</b> '+esc(q.flight)+'</p>':'')+
-      '<p><b>Contact:</b> '+esc(WAY[q.way]||q.way)+' · <span class="mono">'+esc(q.contact)+'</span></p>'+(q.notes?'<p><b>Notes:</b> '+esc(q.notes)+'</p>':'')+'</div>'+
-      '<div class="treq-form" data-key="'+key+'"><label class="f">Status<select data-f="status">'+["sent","searching","options","booked","unavailable"].map(function(x){return'<option value="'+x+'"'+(x===(r.status||"sent")?" selected":"")+'>'+TR_ST[x]+'</option>'}).join("")+'</select></label>'+
+    return'<article class="treq'+(q.cancelled?" off":"")+'"><div class="req-top"><span class="mono req-id">'+esc(q.id)+'</span><b>'+esc(q.name||T("Traveller"))+'</b>'+
+      '<span class="note">'+new Date(q.created).toLocaleString(FV.locale(),{dateStyle:"medium",timeStyle:"short"})+'</span>'+
+      (q.cancelled?'<span class="pill">'+T("Cancelled by traveller")+'</span>':q.accepted?'<span class="pill ok">'+T("Traveller accepted")+'</span>':'')+'</div>'+
+      '<div class="treq-body"><div class="treq-info">'+q.legs.map(function(l){return'<p><span class="leg-tag">'+(l.dir==="to"?"TO":"FROM")+'</span> <b>'+esc(legUI(l))+'</b><br>'+esc(l.address)+'</p>'}).join("")+
+      '<p><b>'+T("Ride:")+'</b> '+T(q.ride==="stay"?"stays in wheelchair (ramp or lift van)":"moves to a car seat, chair in the boot")+' · '+T("{p} people · {b} suitcases",{p:q.pax,b:q.bags})+'</p>'+
+      '<p><b>'+T("Wheelchair:")+'</b> '+esc(q.chair&&q.chair.line||"-")+'</p>'+(q.flight?'<p><b>'+T("Flight:")+'</b> '+esc(q.flight)+'</p>':'')+
+      '<p><b>'+T("Contact:")+'</b> '+esc(T(WAY[q.way]||q.way))+' · <span class="mono">'+esc(q.contact)+'</span></p>'+(q.notes?'<p><b>'+T("Notes:")+'</b> '+esc(q.notes)+'</p>':'')+'</div>'+
+      '<div class="treq-form" data-key="'+key+'"><label class="f">Status<select data-f="status">'+["sent","searching","options","booked","unavailable"].map(function(x){return'<option value="'+x+'"'+(x===(r.status||"sent")?" selected":"")+'>'+T(TR_ST[x])+'</option>'}).join("")+'</select></label>'+
       '<label class="f">Option for the traveller<textarea data-f="offer" rows="3" placeholder="e.g. Ramp van with Rossi Transfers, pickup 06:30, driver Luca +39 …">'+esc(r.offer||"")+'</textarea></label>'+
       '<label class="f">Price<input data-f="price" type="text" placeholder="e.g. €65" value="'+esc(r.price||"")+'"></label>'+
       '<div class="actions"><button class="btn small" type="button" data-save>Save and notify traveller</button><span class="note" data-msg></span></div></div></div></article>'}).join("")}
@@ -1748,6 +2380,13 @@ $("tr-team-list").addEventListener("click",function(e){var b=e.target.closest("[
   var u=k[0],id=k[1],val={status:box.querySelector('[data-f="status"]').value,offer:box.querySelector('[data-f="offer"]').value.trim().slice(0,2000),price:box.querySelector('[data-f="price"]').value.trim().slice(0,60),t:Date.now()};
   var all=Object.assign({},TEAM.reps[u]||{});all[id]=val;b.disabled=true;var m=box.querySelector("[data-msg]");m.textContent="Saving…";
   host.db.doc("replies/"+u).set({r:all}).then(function(){m.textContent="Saved. The traveller sees it now.";TEAM.reps[u]=all},function(){m.textContent="Could not save. Try again."}).then(function(){b.disabled=false})});
+
+/* ---------- language change: redraw everything that is built by code ---------- */
+window.addEventListener("fv:lang",function(){
+  mailLang=FV.lang==="it"?"it":"en";cLang=mailLang;
+  [].forEach.call(document.querySelectorAll("[data-lang]"),function(x){x.setAttribute("aria-pressed",String(x.dataset.lang===mailLang))});
+  [].forEach.call(document.querySelectorAll("[data-clang]"),function(x){x.setAttribute("aria-pressed",String(x.dataset.clang===cLang))});
+  renderAll();renderCL();renderPhotos();cRender();trTitles();trHint();trChair();trContactLabel();renderMyReqs();if(host.team)renderTeam()});
 
 /* ---------- feedback form ---------- */
 var rating=0;
