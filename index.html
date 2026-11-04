@@ -7,6 +7,14 @@
 <meta name="google-site-verification" content="0z1cz5WHd3Pj6ETIvAIINzapBeERWU1OElrAHkQwp2U" />
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:wght@600;700;800&display=swap">
+<!-- SDK Supabase e Inizializzazione Client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://jbyyrkzheygkgfwdfcuy.supabase.co';
+  const SUPABASE_ANON_KEY = 'INCOLLA_QUI_LA_TUA_PUBLISHABLE_KEY';
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
 <style>
 /* FreeVel styles */
 html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
