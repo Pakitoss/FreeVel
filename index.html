@@ -14,31 +14,35 @@
   const SUPABASE_ANON_KEY = 'sb_publishable_wSr4GS-PhUb1MbVZZPGv8g_tNSVg-fj';
 
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-// Registrazione Utente
+  // Messaggio sotto il form (tipo: 'ok' | 'bad' | vuoto)
+  function authMsg(testo, tipo) {
+    const el = document.getElementById('auth-msg');
+    if (!el) return;
+    el.textContent = testo || '';
+    el.className = 'auth-msg note' + (tipo ? ' ' + tipo : '');
+  }
+
   async function registraUtente() {
-    const email = document.getElementById('auth-email').value;
+    const email = document.getElementById('auth-email').value.trim();
     const password = document.getElementById('auth-password').value;
+    if (!email || !password) return authMsg('Enter both email and password.', 'bad');
 
-    if (!email || !password) return alert('Inserisci sia email che password.');
-
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) alert('Errore di registrazione: ' + error.message);
-    else alert('Registrazione effettuata! Controlla la tua email per confermare l\'account.');
+    authMsg('Creating your account…');
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) authMsg('Sign-up failed: ' + error.message, 'bad');
+    else authMsg('Account created. Check your email to confirm it, then sign in.', 'ok');
   }
 
-  // Login Utente
   async function loginUtente() {
-    const email = document.getElementById('auth-email').value;
+    const email = document.getElementById('auth-email').value.trim();
     const password = document.getElementById('auth-password').value;
+    if (!email || !password) return authMsg('Enter both email and password.', 'bad');
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) alert('Errore di accesso: ' + error.message);
-    else {
-      alert('Accesso effettuato!');
-      controllaSessione();
-    }
+    authMsg('Signing in…');
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) authMsg('Sign-in failed: ' + error.message, 'bad');
+    else { authMsg(''); controllaSessione(); }
   }
-
   // Logout Utente
   async function logoutUtente() {
     await supabase.auth.signOut();
@@ -500,38 +504,24 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 }
 @media (min-width:721px) and (max-width:1240px){nav.tabs .k{display:none}}
 @media (min-width:721px) and (max-width:980px){.me-l{display:none}.me{padding:4px}nav.tabs{justify-content:flex-start}}
+/* ---------- account box (My profile) ---------- */
+.auth{display:grid;gap:4px;border-left:6px solid var(--sign)}
+.auth-head{display:flex;gap:14px;align-items:center}
+.auth-head h2{font-size:26px}
+.auth-ico{flex:none;width:44px;height:44px;border-radius:10px;background:var(--sign);color:var(--sign-ink);display:grid;place-items:center}
+.auth-ico svg{width:24px;height:24px}
+.auth-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.auth-fields .actions{grid-column:1/-1}
+@media (max-width:640px){.auth-fields{grid-template-columns:1fr}}
+.auth-msg{min-height:1.4em;margin-top:10px}
+.auth-msg.ok{color:var(--ok);font-weight:700}
+.auth-msg.bad{color:var(--bad);font-weight:700}
+.auth-user{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
+.auth-user .who{display:grid;gap:4px;min-width:0}
+.auth-user .who strong{font-family:var(--f-display);font-size:24px;font-weight:700;line-height:1.1;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
-
-<!-- AREA PERSONALE FREEVEL -->
-<div id="auth-section" style="background:#0f1b2d; color:#ffffff; padding:16px; border-radius:8px; margin:16px; font-family:sans-serif;">
-  
-  <!-- Form per Login e Registrazione -->
-  <div id="auth-form">
-    <h3 style="margin:0 0 8px 0; color:#ffc72c; font-size:1.1rem;">Area Personale Freevel</h3>
-    <p style="margin:0 0 12px 0; font-size:0.85rem; opacity:0.9;">
-      Accedi o registrati per salvare i dati della tua sedia a rotelle nel cloud e ritrovarli su qualsiasi dispositivo.
-    </p>
-    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-      <input type="email" id="auth-email" placeholder="Email" style="padding:8px 12px; border:1px solid #ccc; border-radius:4px; flex:1; min-width:180px; color:#000;">
-      <input type="password" id="auth-password" placeholder="Password" style="padding:8px 12px; border:1px solid #ccc; border-radius:4px; flex:1; min-width:180px; color:#000;">
-    </div>
-    <div style="display:flex; gap:8px;">
-      <button type="button" onclick="loginUtente()" style="padding:8px 16px; background:#ffc72c; color:#0f1b2d; font-weight:bold; border:none; border-radius:4px; cursor:pointer;">Accedi</button>
-      <button type="button" onclick="registraUtente()" style="padding:8px 16px; background:transparent; color:#ffffff; border:1px solid #ffffff; border-radius:4px; cursor:pointer;">Registrati</button>
-    </div>
-  </div>
-
-  <!-- Box Utente Loggato -->
-  <div id="user-info" style="display:none; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
-    <div>
-      <span style="opacity:0.8; font-size:0.9rem;">Account attivo: </span>
-      <strong id="user-email-label" style="color:#ffc72c;"></strong>
-    </div>
-    <button type="button" onclick="logoutUtente()" style="padding:6px 12px; background:#dc2626; color:#ffffff; border:none; border-radius:4px; cursor:pointer;">Disconnettiti</button>
-  </div>
-
 </div>
 <header class="band gut">
   <div class="wrap">
@@ -739,6 +729,44 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
     <h1 id="t-profile">My profile</h1>
     <p>Everything about you and your wheelchair that stays the same from trip to trip. Fill it in once and every new card uses it.</p>
   </div>
+  <!-- ACCOUNT: login e sincronizzazione cloud -->
+<section class="panel auth" id="auth-section" aria-labelledby="auth-title">
+
+  <div id="auth-form">
+    <div class="auth-head">
+      <span class="auth-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+      </span>
+      <div>
+        <h2 id="auth-title">Your account</h2>
+        <p class="note">Sign in to keep your profile in the cloud and use it on any device.</p>
+      </div>
+    </div>
+
+    <form class="auth-fields" onsubmit="loginUtente();return false" novalidate>
+      <label class="f">Email
+        <input id="auth-email" type="email" autocomplete="email" inputmode="email">
+      </label>
+      <label class="f">Password
+        <input id="auth-password" type="password" autocomplete="current-password">
+      </label>
+      <div class="actions">
+        <button class="btn sign" type="submit">Sign in</button>
+        <button class="btn ghost" type="button" onclick="registraUtente()">Create account</button>
+      </div>
+    </form>
+    <p class="auth-msg note" id="auth-msg" role="status" aria-live="polite"></p>
+  </div>
+
+  <div id="user-info" class="auth-user" style="display:none">
+    <div class="who">
+      <span class="pill ok"><span class="dot" aria-hidden="true"></span>Signed in · cloud sync on</span>
+      <strong id="user-email-label"></strong>
+    </div>
+    <button class="btn small ghost" type="button" onclick="logoutUtente()">Sign out</button>
+  </div>
+
+</section>
   <div class="split">
     <form class="panel form" id="pform" autocomplete="on" novalidate>
       <fieldset>
