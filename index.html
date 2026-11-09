@@ -1216,7 +1216,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 // transferUrl: where transfer requests are sent on the public website
 // (can be the same Formspree endpoint, or a separate form so requests arrive in their own inbox).
 window.FREEVEL_CONFIG = {
-  feedbackUrl: "",
+  feedbackUrl: "",          // ← endpoint Formspree per i feedback (può essere lo stesso dei transfer)
+  saveFeedbackToSupabase: true,   // salva una copia di ogni feedback nella tabella feedback
   transferUrl: "",          // ← incolla qui il tuo endpoint Formspree, es. "https://formspree.io/f/abcdwxyz"
   saveTransfersToSupabase: true   // salva una copia di ogni richiesta nella tabella transfer_requests
 };
@@ -2407,12 +2408,20 @@ function fbFallback(d,why){setStatus(why+" Copy your answer below and send it to
 $("fb-form").addEventListener("submit",function(e){e.preventDefault();var d=fbData(),form=e.target;
   if(!d.rating&&!d.text&&!d.interests.length){setStatus("Pick a rating or write a comment first.","bad");return}
   var url=(window.FREEVEL_CONFIG||{}).feedbackUrl;
-  var useHost=!!(host.db&&host.uid);
-  if(!url&&!useHost){fbFallback(d,"Online sending is not set up yet.");return}
+  var useHost=!!(host.db&&host.uid),sb=window.supabaseClient,cfg=window.FREEVEL_CONFIG||{};
+  var useSb=!!(sb&&cfg.saveFeedbackToSupabase!==false);
+  if(!url&&!useHost&&!useSb){fbFallback(d,"Online sending is not set up yet.");return}
   var b=$("fb-send");b.disabled=true;setStatus("Sending…","");
-  (useHost?host.db.doc("feedback/"+host.uid).set(d):
-   fetch(url,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(d)})
-     .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status)}))
+  var USED={no:"Non ancora",desk:"Sì, al check-in",mail:"Ha inviato il messaggio alla compagnia",pdf:"Ha stampato il PDF"};
+  var mailP=url?fetch(url,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(Object.assign({
+      _subject:"⭐ Feedback FreeVel "+(d.rating?d.rating+"/5":"senza voto")+(d.text?" – "+d.text.slice(0,50):""),
+      voto:d.rating?d.rating+"/5":"-",utilizzo:USED[d.used]||"-",interessi:d.interests.join(", ")||"-",commento:d.text||"-",
+      lingua:FV.lang,inviato:new Date(d.t).toLocaleString("it-IT")},/@/.test(d.contact)?{email:d.contact}:{})) })
+    .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status)}):Promise.reject();
+  var dbP=useHost?host.db.doc("feedback/"+host.uid).set(d):useSb?sb.auth.getUser().then(function(res){var u=res&&res.data&&res.data.user;
+      return sb.from("feedback").insert([{user_id:u?u.id:null,rating:d.rating||null,used:d.used||null,interests:d.interests,comment:d.text||null,contact:d.contact||null,lang:FV.lang}])})
+    .then(function(r){if(r&&r.error)throw r.error}):Promise.reject();
+  Promise.allSettled([mailP,dbP]).then(function(r){if(r[0].status!=="fulfilled"&&r[1].status!=="fulfilled")throw new Error("both failed")})
   .then(function(){
       setStatus("Thank you! Your answer was sent.","ok");$("fb-copy").hidden=true;form.reset();rating=0;
       [].forEach.call($("fb-stars").children,function(x){x.setAttribute("aria-pressed","false")})})
