@@ -17,6 +17,7 @@
 
   // Inizializzazione client con nome univoco per evitare conflitti con la libreria CDN
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  window.supabaseClient = supabaseClient;
 
   // Messaggio sotto il form (tipo: 'ok' | 'bad' | vuoto)
   function authMsg(testo, tipo) {
@@ -1216,7 +1217,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 // (can be the same Formspree endpoint, or a separate form so requests arrive in their own inbox).
 window.FREEVEL_CONFIG = {
   feedbackUrl: "",
-  transferUrl: ""
+  transferUrl: "",          // ← incolla qui il tuo endpoint Formspree, es. "https://formspree.io/f/abcdwxyz"
+  saveTransfersToSupabase: true   // salva una copia di ogni richiesta nella tabella transfer_requests
 };
 </script>
 <script>
@@ -2281,6 +2283,20 @@ function reqText(q){return ["FreeVel transfer request "+q.id,"Name: "+(q.name||"
   "Ride: "+(q.ride==="stay"?"stays in wheelchair (ramp/lift van)":"moves to car seat, wheelchair in boot"),
   "People: "+q.pax+" · Suitcases: "+q.bags,"Wheelchair: "+q.chair.line,(q.flight?"Flight: "+q.flight:""),
   "Contact: "+WAY[q.way]+" "+q.contact,(q.notes?"Notes: "+q.notes:"")].filter(Boolean).join("\n")}
+/* Email body for the team: flat fields so Formspree shows them nicely and "Reply" goes to the traveller when possible. */
+function trMailPayload(q){var p={_subject:"🚐 Nuova richiesta transfer "+q.id+" – "+(q.name||"viaggiatore"),
+  request_id:q.id,name:q.name||"-",contact:WAY[q.way]+": "+q.contact,
+  ride:q.ride==="stay"?"Resta in carrozzina (furgone con rampa/pedana)":"Si sposta su sedile, carrozzina nel bagagliaio",
+  people:q.pax,suitcases:q.bags,wheelchair:q.chair.line,flight:q.flight||"-",notes:q.notes||"-",
+  legs:q.legs.map(function(l){return legText(l)+" | "+(l.dir==="to"?"Ritiro: ":"Arrivo: ")+l.address}).join("\n"),
+  full_text:reqText(q),sent_at:new Date(q.created).toLocaleString("it-IT")};
+  if(q.way==="email"&&/@/.test(q.contact))p.email=q.contact;return p}
+/* Copy in Supabase (table transfer_requests). Works for signed-in users and guests if RLS allows. */
+function trSaveSupabase(q){var sb=window.supabaseClient,cfg=window.FREEVEL_CONFIG||{};
+  if(!sb||cfg.saveTransfersToSupabase===false)return Promise.reject();
+  return sb.auth.getUser().then(function(res){var u=res&&res.data&&res.data.user;
+    return sb.from("transfer_requests").insert([{request_id:q.id,user_id:u?u.id:null,user_email:u?u.email:null,
+      name:q.name,contact_method:q.way,contact:q.contact,payload:q,status:"sent"}])}).then(function(r){if(r&&r.error)throw r.error})}
 function saveMy(){save(TRK,MY);if(host.db&&host.uid)return host.db.doc("transfers/"+host.uid).set({requests:MY.requests,name:S.name||"",t:Date.now()});return Promise.resolve()}
 
 $("trform").addEventListener("submit",function(e){e.preventDefault();var d=trVal("tdir")||"to",legs=[],errs=[];
@@ -2300,8 +2316,14 @@ $("trform").addEventListener("submit",function(e){e.preventDefault();var d=trVal
   function done(){MY.requests.unshift(q);save(TRK,MY);renderMyReqs();$("t-notes").value="";
     trStatusMsg(T("Request {id} sent. We will contact you {by} within 24 hours.",{id:q.id,by:T(BY[q.way])}),"ok")}
   if(online){MY.requests.unshift(q);saveMy().then(function(){MY.requests.shift();done()},function(){MY.requests.shift();trStatusMsg("Sending failed. Check your connection and try again.","bad")}).then(function(){b.disabled=false});return}
-  if(url){fetch(url,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({type:"transfer",request:q,text:reqText(q)})})
-    .then(function(r){if(!r.ok)throw 0;done()}).catch(function(){trStatusMsg("Sending failed. Check your connection and try again.","bad")}).then(function(){b.disabled=false});return}
+  if(url||window.supabaseClient){
+    /* 1) email alert to the FreeVel team (Formspree)  2) copy in Supabase for later automation */
+    var mailP=url?fetch(url,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(trMailPayload(q))})
+      .then(function(r){if(!r.ok)throw 0}):Promise.reject();
+    var dbP=trSaveSupabase(q);
+    Promise.allSettled([mailP,dbP]).then(function(r){
+      if(r[0].status==="fulfilled"||r[1].status==="fulfilled")done();
+      else trStatusMsg("Sending failed. Check your connection and try again.","bad")}).then(function(){b.disabled=false});return}
   MY.requests.unshift(q);save(TRK,MY);renderMyReqs();b.disabled=false;
   trStatusMsg("Saved here, but online sending is not set up yet. Copy the request below and send it to the FreeVel team.","bad");
   var box=$("tr-copy");box.hidden=false;box.value=reqText(q);box.focus();box.select()});
