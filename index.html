@@ -183,6 +183,33 @@ button,input,select,textarea{font:inherit;color:inherit}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
 .logo-mark{display:block;width:60px;height:46px;object-fit:contain}
 .logo-t{display:grid;line-height:1}
+.fit-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:20px;align-items:start}
+@media (max-width:900px){.fit-grid{grid-template-columns:minmax(0,1fr)}}
+.row.r3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.fit-legend ul{list-style:none;padding:0;margin:10px 0 12px;display:grid;gap:10px;font-size:14.5px}
+.fit-legend li{display:grid;gap:4px;justify-items:start}
+.fit-sum{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.fit-sum b{font-family:var(--f-display);font-size:18px}
+.fit-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.fit-al{border:1px solid var(--line);border-left:5px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:8px;background:var(--surface)}
+.fit-al.ok{border-left-color:var(--ok)}.fit-al.warn{border-left-color:var(--warn)}.fit-al.bad{border-left-color:var(--bad)}
+.fit-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fit-top b{font-family:var(--f-display);font-size:17px;color:var(--ink)}
+.fit-top .pax{font-size:12.5px;color:var(--muted);margin-right:auto}
+.fit-why{margin:0;font-size:14.5px;color:var(--ink)}
+.fit-ac{display:flex;flex-wrap:wrap;gap:6px}
+.fit-ac span{font-size:12.5px;padding:3px 9px;border-radius:99px;border:1px solid var(--line);background:var(--field);color:var(--muted)}
+.fit-ac span.ok{color:var(--ok);border-color:currentColor;background:var(--ok-soft)}
+.fit-ac span.warn{color:var(--warn);border-color:currentColor;background:var(--warn-soft)}
+.fit-ac span.bad{color:var(--bad);border-color:currentColor;background:var(--bad-soft)}
+.fit-ac span i{font-style:normal;opacity:.75}
+.fit-empty{display:grid;gap:10px;justify-items:start}
+.fit-src summary{cursor:pointer;font-family:var(--f-display);font-weight:600}
+.fit-src table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:12px}
+.fit-src th,.fit-src td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.fit-src th{font-size:12px;color:var(--muted);font-weight:700}
+.fit-src .tw{overflow-x:auto}
+.fit-src a{color:var(--info)}
 .cookie{position:fixed;left:16px;right:16px;bottom:16px;z-index:50;display:flex;justify-content:center}
 .cookie[hidden]{display:none}
 .cookie-in{max-width:760px;width:100%;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 18px 40px -18px #13294b66;padding:16px 18px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
@@ -598,11 +625,12 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
     </a>
     <nav class="tabs" aria-label="Sections">
       <a href="#card" data-v="card"><span class="k">01</span>My card</a>
-      <a href="#transfers" data-v="transfers"><span class="k">02</span>Transfers</a>
-      <a href="#prep" data-v="prep"><span class="k">03</span>Before you fly</a>
-      <a href="#desk" data-v="desk"><span class="k">04</span>At check-in</a>
-      <a href="#claim" data-v="claim"><span class="k">05</span>Damage claim</a>
-      <a href="#feedback" data-v="feedback"><span class="k">06</span>Feedback</a>
+      <a href="#fit" data-v="fit"><span class="k">02</span>Which airline</a>
+      <a href="#transfers" data-v="transfers"><span class="k">03</span>Transfers</a>
+      <a href="#prep" data-v="prep"><span class="k">04</span>Before you fly</a>
+      <a href="#desk" data-v="desk"><span class="k">05</span>At check-in</a>
+      <a href="#claim" data-v="claim"><span class="k">06</span>Damage claim</a>
+      <a href="#feedback" data-v="feedback"><span class="k">07</span>Feedback</a>
     </nav>
     <a class="me" href="#profile" data-v="profile" aria-label="My profile">
       <span class="avatar empty" id="avatar" aria-hidden="true"></span><span class="me-l">My profile</span>
@@ -696,6 +724,44 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
       <textarea class="copybox" id="copybox" readonly hidden aria-label="Card text"></textarea>
     </aside>
   </div>
+</section>
+
+<!-- ============ 02 WHICH AIRLINE ============ -->
+<section class="view" id="v-fit" aria-labelledby="t-fit" hidden>
+  <div class="lede">
+    <h1 id="t-fit">Which airline fits your wheelchair?</h1>
+    <p>We compare your wheelchair's travel size with the cargo door of the aircraft each airline flies from Italy. The lowest door decides whether it travels upright or gets tipped on its side.</p>
+  </div>
+  <div class="fit-grid">
+    <div class="stack">
+      <div class="panel">
+        <div class="panel-h"><h2>Your wheelchair in travel position</h2></div>
+        <p class="note" style="margin:6px 0 14px">Backrest folded, headrest, joystick and cushion removed. Height is what matters most.</p>
+        <div class="row r3">
+          <label class="f">Height<span class="unit" data-u="cm"><input id="fit-h" data-k="h" type="number" min="0" inputmode="numeric"></span></label>
+          <label class="f">Width<span class="unit" data-u="cm"><input id="fit-w" data-k="w" type="number" min="0" inputmode="numeric"></span></label>
+          <label class="f">Length<span class="unit" data-u="cm"><input id="fit-l" data-k="l" type="number" min="0" inputmode="numeric"></span></label>
+        </div>
+        <p class="note" style="margin-top:10px">These are the same measurements as in your profile: change them here or there.</p>
+      </div>
+      <div class="panel fit-legend">
+        <h3>How to read the result</h3>
+        <ul>
+          <li><span class="pill ok"><span class="dot"></span>Upright</span> It goes through the hold door standing on its wheels. Lowest risk of damage.</li>
+          <li><span class="pill warn"><span class="dot"></span>Only on its side</span> It fits only if staff tip it over. This is how frames, joysticks and wheels get damaged.</li>
+          <li><span class="pill bad"><span class="dot"></span>Does not fit</span> No way through the door, even tipped.</li>
+        </ul>
+        <p class="note">We leave 3 cm of margin for handling. Airlines can change aircraft at short notice: always confirm with the airline when you book.</p>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="panel" id="fit-out" aria-live="polite"></div>
+    </div>
+  </div>
+  <details class="panel fit-src">
+    <summary>Aircraft data and sources</summary>
+    <div id="fit-src"></div>
+  </details>
 </section>
 
 <!-- ============ 02 TRANSFERS ============ -->
@@ -1312,6 +1378,55 @@ var FV_IT = /*DICT*/{
 "After the flight": "Dopo il volo",
 "After-flight photo": "Foto dopo il volo",
 "Airline": "Compagnia aerea",
+"Which airline": "Quale compagnia",
+"Which airline fits your wheelchair?": "Con quale compagnia viaggia meglio la tua carrozzina?",
+"We compare your wheelchair's travel size with the cargo door of the aircraft each airline flies from Italy. The lowest door decides whether it travels upright or gets tipped on its side.": "Confrontiamo le misure di viaggio della tua carrozzina con la porta della stiva degli aerei che ogni compagnia usa dall'Italia. È la porta più bassa a decidere se viaggia in piedi o viene coricata su un fianco.",
+"Your wheelchair in travel position": "La tua carrozzina in configurazione di viaggio",
+"Backrest folded, headrest, joystick and cushion removed. Height is what matters most.": "Schienale abbassato, poggiatesta, joystick e cuscino tolti. La misura che conta di più è l'altezza.",
+"These are the same measurements as in your profile: change them here or there.": "Sono le stesse misure del tuo profilo: puoi cambiarle qui o lì.",
+"How to read the result": "Come leggere il risultato",
+"Upright": "In piedi",
+"It goes through the hold door standing on its wheels. Lowest risk of damage.": "Passa dalla porta della stiva stando sulle ruote. È il caso con meno rischio di danni.",
+"Only on its side": "Solo coricata",
+"It fits only if staff tip it over. This is how frames, joysticks and wheels get damaged.": "Passa solo se il personale la corica su un fianco. È così che si rompono telaio, joystick e ruote.",
+"Does not fit": "Non passa",
+"No way through the door, even tipped.": "Non passa dalla porta nemmeno coricata.",
+"We leave 3 cm of margin for handling. Airlines can change aircraft at short notice: always confirm with the airline when you book.": "Teniamo 3 cm di margine per la movimentazione. Le compagnie possono cambiare aereo all'ultimo momento: conferma sempre con la compagnia quando prenoti.",
+"Aircraft data and sources": "Dati degli aerei e fonti",
+"Upright on all the aircraft it flies from Italy.": "In piedi su tutti gli aerei che usa dall'Italia.",
+"Upright on most flights. Avoid flights with: {ac}.": "In piedi sulla maggior parte dei voli. Evita i voli con: {ac}.",
+"On {ac} it only fits tipped on its side.": "Con {ac} passa solo coricata su un fianco.",
+"It does not fit through the door of the {ac}.": "Non passa dalla porta di: {ac}.",
+"Choose flights operated with {ac}.": "Scegli i voli operati con {ac}.",
+"upright": "in piedi",
+"on its side": "coricata",
+"won't fit": "non passa",
+"some routes": "alcune rotte",
+"Add your wheelchair's size": "Aggiungi le misure della carrozzina",
+"Enter height, width and length in travel position to compare the airlines.": "Inserisci altezza, larghezza e lunghezza in configurazione di viaggio per confrontare le compagnie.",
+"{n} of {t} airlines carry it upright": "{n} compagnie su {t} la trasportano in piedi",
+"Wheelchair {h} cm high, {w} × {l} cm": "Carrozzina alta {h} cm, {w} × {l} cm",
+"On the Boeing 737 it fits only through the front hold door (89 cm): ask staff to load it there.": "Sul Boeing 737 passa solo dalla porta della stiva anteriore (89 cm): chiedi al personale di caricarla lì.",
+"{p} M passengers in Italy": "{p} mln passeggeri in Italia",
+"Lauda Europe flies some Ryanair routes with the A320.": "Lauda Europe opera alcune rotte Ryanair con l'A320.",
+"Many domestic flights use the A220, which has the lowest door here.": "Molti voli nazionali usano l'A220, che ha la porta più bassa di tutti.",
+"Embraer 190 on BA CityFlyer routes from London City.": "Embraer 190 sulle rotte BA CityFlyer da London City.",
+"CityLine regional jets were retired in 2026.": "I jet regionali CityLine sono stati ritirati nel 2026.",
+"Embraer jets on HOP! regional routes.": "Embraer sulle rotte regionali HOP!.",
+"ATR and Embraer aircraft are leased in on some routes.": "Su alcune rotte usa ATR ed Embraer presi in noleggio.",
+"Embraer 195 to Munich and Frankfurt.": "Embraer 195 verso Monaco e Francoforte.",
+"Long-haul flights use the Boeing 787, where chairs travel in a container.": "Sul lungo raggio usa il Boeing 787, dove le carrozzine viaggiano in un container.",
+"KLM Cityhopper Embraer jets fly many routes from Italy to Amsterdam.": "Gli Embraer di KLM Cityhopper operano molte rotte dall'Italia ad Amsterdam.",
+"Aircraft": "Aereo",
+"Door H × W": "Porta A × L",
+"Source": "Fonte",
+"to confirm": "da verificare",
+"Includes the neo versions.": "Comprese le versioni neo.",
+"737-700/-800/-900 and MAX 8. Front hold door 89 cm high, rear door 84 cm.": "737-700/-800/-900 e MAX 8. Porta della stiva anteriore alta 89 cm, posteriore 84 cm.",
+"Also used for the E195-E2, same fuselage: to be confirmed.": "Valore usato anche per l'E195-E2, stessa fusoliera: da verificare.",
+"Front cargo door on the main deck, not under the floor.": "Porta cargo anteriore sul ponte principale, non sotto il pavimento.",
+"Rear cargo door.": "Porta cargo posteriore.",
+"Passengers: {s}. Fleets: public fleet data checked November 2026; airlines marked “to confirm” still need a check.": "Passeggeri: {s}. Flotte: dati pubblici controllati a novembre 2026; da verificare ancora:",
 "Cookies for statistics": "Cookie statistici",
 "We use Google Analytics to count visits and see which features are used. It is off until you accept. We never send your name, contacts, flights or wheelchair details.": "Usiamo Google Analytics per contare le visite e capire quali funzioni vengono usate. È spento finché non accetti. Non inviamo mai nome, contatti, voli o dati della carrozzina.",
 "Reject": "Rifiuta",
@@ -2096,18 +2211,110 @@ function saveBlob(blob,fn,ok,say,b){
 function slug(t){return String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
 
 /* ---------- routing ---------- */
-var VIEWS=["card","transfers","prep","desk","claim","feedback","profile"];
+var VIEWS=["card","fit","transfers","prep","desk","claim","feedback","profile"];
 function route(){var v=location.hash.replace("#",""),anchor=null;
   if(v.indexOf("claim-")===0){anchor=v;v="claim"}
   if(VIEWS.indexOf(v)<0)v="card";
   VIEWS.forEach(function(n){$("v-"+n).hidden=n!==v});
   [].forEach.call(document.querySelectorAll("header [data-v]"),function(a){if(a.dataset.v===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
-  if(v==="desk")renderTag();if(v==="transfers")setTimeout(trOpen,0);
+  if(v==="desk")renderTag();if(v==="fit"){renderFit();renderFitSrc()}if(v==="transfers")setTimeout(trOpen,0);
   if(v==="claim")setTimeout(function(){cOpen();var el=anchor&&$(anchor);if(el)el.scrollIntoView({block:"start"})},0);
   if(!anchor)window.scrollTo(0,0)}
 window.addEventListener("hashchange",route);
 
-function renderAll(){renderTraveller();renderSheet();renderMeter();renderVerdicts();renderMail();if(!$("v-desk").hidden)renderTag()}
+
+/* ================= WHICH AIRLINE (cargo door fit) =================
+   Door = clear opening of the hold door used for checked mobility aids, height x width in cm.
+   AIRLINES: passengers 2025 = ENAC "Dati di traffico 2025", Tav. VET 1 (group brands added up).
+   ck:true marks values still to double-check. Edit here, or later move to a Supabase table. */
+var FIT_SRC={
+  delta:["Delta Air Lines, aircraft bin door dimensions","https://www.delta.com/us/en/accessible-travel-services/overview"],
+  alaska:["Alaska Air Cargo, fleet and capacity","https://www.alaskacargo.com/fleet"],
+  airbus220:["Airbus A220 Airport & Maintenance Planning, Table 10","https://aircraft.airbus.com/sites/g/files/jlcbta126/files/2025-05/A220-ACP-Issue009-00-24Apr2025.PDF"],
+  jal738:["JAL Cargo, Boeing 737-800 door guide","https://www.jal.co.jp/jp/ja/jalcargo/support/aircraft/pdf_sites/DG_737-800.pdf"],
+  jale170:["JAL Cargo, Embraer 170 door guide","https://www.jal.co.jp/jp/ja/jalcargo/support/aircraft/pdf_sites/DG_EMBRAER170.pdf"],
+  jalq400:["JAL Cargo, Dash 8-400 door guide","https://www.jal.co.jp/jp/ja/jalcargo/support/aircraft/pdf_sites/DG_DASH8-400.pdf"],
+  wct:["WheelchairTravel.org, cargo hold dimensions","https://wheelchairtravel.org/air-travel-airplane-cargo-hold-dimensions/"],
+  logc:["Logistics Cluster, aircraft cargo specifications","https://log.logcluster.org/sites/default/files/2022-05/Annex%20-%20Aircraft%20Cargo%20Specifications.pdf"],
+  afkl:["Air France-KLM Group, fleet at 31/12/2025","https://www.airfranceklm.com/en/fleet"],
+  enac:["ENAC, Dati di traffico 2025 (Tav. VET 1)","https://www.enac.gov.it/app/uploads/2026/05/Dati-di-traffico-2025-v.0.7.pdf"]
+};
+var AIRCRAFT={
+  a320:{n:"Airbus A319 / A320 / A321",h:122,w:181,src:["delta","alaska"],note:"Includes the neo versions."},
+  a220:{n:"Airbus A220",h:81,w:110,src:["airbus220"]},
+  b737:{n:"Boeing 737",h:89,w:122,h2:84,src:["jal738","delta"],note:"737-700/-800/-900 and MAX 8. Front hold door 89 cm high, rear door 84 cm."},
+  e170:{n:"Embraer 170 / 175",h:90,w:110,src:["jale170","delta"]},
+  e190:{n:"Embraer 190 / 195",h:89,w:109,src:["wct"],ck:true,note:"Also used for the E195-E2, same fuselage: to be confirmed."},
+  atr:{n:"ATR 72",h:153,w:127,src:["logc"],ck:true,note:"Front cargo door on the main deck, not under the floor."},
+  q400:{n:"De Havilland Dash 8-400",h:143,w:127,src:["jalq400"],note:"Rear cargo door."}
+};
+/* main = types on most flights from Italy; some = types on some routes only */
+var AIRLINES=[
+  {n:"Ryanair",sub:"incl. Malta Air, Buzz, Lauda",pax:64.65,main:["b737"],some:["a320"],nt:"Lauda Europe flies some Ryanair routes with the A320."},
+  {n:"Wizz Air",pax:19.07,main:["a320"]},
+  {n:"easyJet",pax:17.54,main:["a320"]},
+  {n:"ITA Airways",pax:16.65,main:["a320","a220"],nt:"Many domestic flights use the A220, which has the lowest door here."},
+  {n:"Vueling",pax:4.95,main:["a320"]},
+  {n:"Volotea",pax:3.65,main:["a320"]},
+  {n:"British Airways",pax:3.14,main:["a320"],some:["e190"],nt:"Embraer 190 on BA CityFlyer routes from London City."},
+  {n:"Lufthansa",pax:3.12,main:["a320"],nt:"CityLine regional jets were retired in 2026."},
+  {n:"Air France",pax:3.06,main:["a220","a320"],some:["e190","e170"],nt:"Embraer jets on HOP! regional routes.",src:"afkl"},
+  {n:"Aeroitalia",pax:2.92,main:["b737"],some:["atr","e190","e170"],nt:"ATR and Embraer aircraft are leased in on some routes."},
+  {n:"Air Dolomiti",pax:2.81,main:["e190"],nt:"Embraer 195 to Munich and Frankfurt."},
+  {n:"Turkish Airlines",pax:2.35,main:["a320","b737"],ck:true},
+  {n:"Neos",pax:2.28,main:["b737"],nt:"Long-haul flights use the Boeing 787, where chairs travel in a container."},
+  {n:"KLM",pax:2.26,main:["b737","e190"],some:["a320","e170"],nt:"KLM Cityhopper Embraer jets fly many routes from Italy to Amsterdam.",src:"afkl"},
+  {n:"Iberia",pax:2.20,main:["a320"],ck:true},
+  {n:"Eurowings",pax:2.10,main:["a320"],ck:true}
+];
+var FIT_M=3, FIT_RANK={ok:0,warn:1,bad:2,none:3};
+function fitDoor(c,d){var H=d.h-FIT_M,W=d.w-FIT_M;
+  if(c.h<=H&&Math.min(c.w,c.l)<=W)return{s:"ok",rear:d.h2&&c.h>d.h2-FIT_M};
+  var x=[c.h,c.w,c.l];for(var i=0;i<3;i++)for(var j=0;j<3;j++)if(i!==j&&x[i]<=H&&x[j]<=W)return{s:"warn"};
+  return{s:"bad"}}
+function fitAirline(a,c){
+  var main=a.main.map(function(k){return{k:k,r:fitDoor(c,AIRCRAFT[k])}}),
+      some=(a.some||[]).map(function(k){return{k:k,r:fitDoor(c,AIRCRAFT[k])}});
+  var worstMain=main.reduce(function(m,x){return FIT_RANK[x.r.s]>FIT_RANK[m]?x.r.s:m},"ok");
+  var someBad=some.filter(function(x){return x.r.s!=="ok"});
+  var s=worstMain, why;
+  var nm=function(list){return list.map(function(x){return AIRCRAFT[x.k].n}).join(", ")};
+  if(worstMain==="ok"&&!someBad.length)why=T("Upright on all the aircraft it flies from Italy.");
+  else if(worstMain==="ok"){s="ok";why=T("Upright on most flights. Avoid flights with: {ac}.",{ac:nm(someBad)})}
+  else{var low=main.filter(function(x){return x.r.s===worstMain}),ok=main.filter(function(x){return x.r.s==="ok"});
+    why=(worstMain==="warn"?T("On {ac} it only fits tipped on its side.",{ac:nm(low)}):T("It does not fit through the door of the {ac}.",{ac:nm(low)}));
+    if(ok.length){s="warn";why+=" "+T("Choose flights operated with {ac}.",{ac:nm(ok)})}}
+  var score=FIT_RANK[s]*10+main.filter(function(x){return x.r.s!=="ok"}).length*2+someBad.length;
+  return{s:s,why:why,main:main,some:some,score:score}}
+function fitChip(x,secondary){var d=AIRCRAFT[x.k],lab={ok:"upright",warn:"on its side",bad:"won't fit"}[x.r.s];
+  return '<span class="'+x.r.s+'">'+esc(d.n)+' · '+T(lab)+(secondary?' <i>'+T("some routes")+'</i>':'')+'</span>'}
+function renderFit(){var out=$("fit-out");if(!out)return;
+  ["h","w","l"].forEach(function(k){var el=$("fit-"+k);if(el&&document.activeElement!==el)el.value=S[k]==null?"":S[k]});
+  var c={h:+S.h||0,w:+S.w||0,l:+S.l||0};
+  if(!c.h||!c.w||!c.l){out.innerHTML='<div class="fit-empty"><h2>'+T("Add your wheelchair's size")+'</h2><p class="note">'+
+    T("Enter height, width and length in travel position to compare the airlines.")+'</p></div>';return}
+  var res=AIRLINES.map(function(a){return{a:a,r:fitAirline(a,c)}}).sort(function(x,y){return x.r.score-y.r.score||y.a.pax-x.a.pax});
+  var nOk=res.filter(function(x){return x.r.s==="ok"}).length,PILL={ok:"Upright",warn:"Only on its side",bad:"Does not fit"};
+  var rear=res.some(function(x){return x.r.main.concat(x.r.some).some(function(y){return y.r.rear})});
+  out.innerHTML='<div class="fit-sum"><b>'+T("{n} of {t} airlines carry it upright",{n:nOk,t:res.length})+'</b><span class="note">'+
+    T("Wheelchair {h} cm high, {w} × {l} cm",{h:c.h,w:c.w,l:c.l})+'</span></div>'+
+    (rear?'<p class="note" style="margin:-6px 0 12px">'+T("On the Boeing 737 it fits only through the front hold door (89 cm): ask staff to load it there.")+'</p>':'')+
+    '<ol class="fit-list">'+res.map(function(x){var a=x.a,r=x.r;
+      return '<li class="fit-al '+r.s+'"><div class="fit-top"><b>'+esc(a.n)+'</b><span class="pax">'+
+        T("{p} M passengers in Italy",{p:a.pax.toLocaleString(FV.locale(),{maximumFractionDigits:1})})+'</span><span class="pill '+r.s+'"><span class="dot"></span>'+T(PILL[r.s])+'</span></div>'+
+        '<p class="fit-why">'+esc(r.why)+'</p>'+
+        '<div class="fit-ac">'+r.main.map(function(y){return fitChip(y,false)}).join("")+r.some.map(function(y){return fitChip(y,true)}).join("")+'</div>'+
+        (a.nt?'<p class="note" style="margin:0">'+T(a.nt)+'</p>':'')+'</li>'}).join("")+'</ol>';
+  if(window.FV_track&&!renderFit._t){renderFit._t=1;FV_track("airline_fit_check",{fits_upright:nOk})}}
+function renderFitSrc(){var box=$("fit-src");if(!box)return;
+  var L=function(keys){return keys.map(function(k){var s=FIT_SRC[k];return '<a href="'+s[1]+'" target="_blank" rel="noopener">'+esc(s[0])+'</a>'}).join("<br>")};
+  box.innerHTML='<div class="tw"><table><thead><tr><th>'+T("Aircraft")+'</th><th>'+T("Door H × W")+'</th><th>'+T("Source")+'</th></tr></thead><tbody>'+
+    Object.keys(AIRCRAFT).map(function(k){var d=AIRCRAFT[k];return '<tr><td>'+esc(d.n)+(d.note?'<br><span class="note">'+T(d.note)+'</span>':'')+'</td><td>'+d.h+' × '+d.w+' cm'+(d.ck?'<br><span class="pill warn">'+T("to confirm")+'</span>':'')+'</td><td>'+L(d.src)+'</td></tr>'}).join("")+
+    '</tbody></table></div><p class="note" style="margin-top:12px">'+T("Passengers: {s}. Fleets: public fleet data checked November 2026; airlines marked “to confirm” still need a check.",{s:'<a href="'+FIT_SRC.enac[1]+'" target="_blank" rel="noopener">ENAC 2025</a>'})+' '+
+    AIRLINES.filter(function(a){return a.ck}).map(function(a){return esc(a.n)}).join(", ")+'.</p>'}
+window.addEventListener("fv:lang",function(){renderFit();renderFitSrc()});
+
+function renderAll(){renderFit();renderTraveller();renderSheet();renderMeter();renderVerdicts();renderMail();if(!$("v-desk").hidden)renderTag()}
 renderCL();renderAll();route();
 
 /* PDF download works in any normal browser */
