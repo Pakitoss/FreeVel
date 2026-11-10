@@ -36,7 +36,7 @@
       authMsg('Creating your account…');
       const { error } = await supabaseClient.auth.signUp({ email, password });
       if (error) authMsg('Sign-up failed: ' + error.message, 'bad');
-      else authMsg('Account created. Check your email to confirm it, then sign in.', 'ok');
+      else { authMsg('Account created. Check your email to confirm it, then sign in.', 'ok'); window.FV_track && FV_track('sign_up', {method: 'email'}); }
     } catch (e) {
       authMsg('Unexpected error: ' + e.message, 'bad');
       console.error(e);
@@ -52,7 +52,7 @@
       authMsg('Signing in…');
       const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
       if (error) authMsg('Sign-in failed: ' + error.message, 'bad');
-      else { authMsg(''); controllaSessione(); }
+      else { authMsg(''); controllaSessione(); window.FV_track && FV_track('login', {method: 'email'}); }
     } catch (e) {
       authMsg('Unexpected error: ' + e.message, 'bad');
       console.error(e);
@@ -183,6 +183,14 @@ button,input,select,textarea{font:inherit;color:inherit}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
 .logo-mark{display:block;width:60px;height:46px;object-fit:contain}
 .logo-t{display:grid;line-height:1}
+.cookie{position:fixed;left:16px;right:16px;bottom:16px;z-index:50;display:flex;justify-content:center}
+.cookie[hidden]{display:none}
+.cookie-in{max-width:760px;width:100%;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 18px 40px -18px #13294b66;padding:16px 18px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.cookie-in p{margin:0;flex:1 1 320px;font-size:14.5px;color:var(--muted)}
+.cookie-in b{color:var(--ink);font-family:var(--f-display)}
+.cookie-b{display:flex;gap:8px}
+#cookie-link{color:inherit;text-decoration:underline;margin-left:6px}
+#cookie-link[hidden]{display:none}
 .tagline{font-family:var(--f-display);font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--band-muted);margin-top:3px}
 .logo b{font-family:var(--f-display);font-size:24px;font-weight:700;letter-spacing:-.02em}
 .logo small{font-family:var(--f-mono);font-size:10px;color:var(--band-muted);border:1px solid #3f6275;border-radius:4px;padding:1px 5px;margin-left:2px}
@@ -1204,7 +1212,14 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 </div>
 </main>
 
-<footer class="gut"><div class="wrap"><span><b style="color:var(--ink);font-family:var(--f-display)">FreeVel</b> · Always by your side · prototype in testing with early users</span><span>This information does not replace your airline's rules.</span></div></footer>
+<div id="cookie-banner" class="cookie" role="dialog" aria-live="polite" aria-labelledby="cookie-h" hidden>
+  <div class="cookie-in">
+    <p><b id="cookie-h">Cookies for statistics</b><br>
+    <span>We use Google Analytics to count visits and see which features are used. It is off until you accept. We never send your name, contacts, flights or wheelchair details.</span></p>
+    <div class="cookie-b"><button class="btn ghost" type="button" id="cookie-no">Reject</button><button class="btn sign" type="button" id="cookie-yes">Accept</button></div>
+  </div>
+</div>
+<footer class="gut"><div class="wrap"><span><b style="color:var(--ink);font-family:var(--f-display)">FreeVel</b> · Always by your side · prototype in testing with early users</span><span><span>This information does not replace your airline's rules.</span> <a href="javascript:void(0)" id="cookie-link" onclick="FV_cookieSettings()">Cookie settings</a></span></div></footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1219,8 +1234,54 @@ window.FREEVEL_CONFIG = {
   feedbackUrl: "https://formspree.io/f/mzeelnyk",          // ← endpoint Formspree per i feedback (può essere lo stesso dei transfer)
   saveFeedbackToSupabase: true,   // salva una copia di ogni feedback nella tabella feedback
   transferUrl: "https://formspree.io/f/mzeelnyk",          // ← incolla qui il tuo endpoint Formspree, es. "https://formspree.io/f/abcdwxyz"
-  saveTransfersToSupabase: true   // salva una copia di ogni richiesta nella tabella transfer_requests
+  saveTransfersToSupabase: true,  // salva una copia di ogni richiesta nella tabella transfer_requests
+  // Google Analytics 4 e Google Tag Manager. Si attivano SOLO dopo che l'utente accetta i cookie.
+  // Usa UNO dei due: con GTM, configura GA4 dentro GTM e lascia gaId vuoto (altrimenti conti tutto due volte).
+  gaId:  "G-W5VBKQEW7G",   // ← ID di misurazione GA4, es. "G-AB12CD34EF"
+  gtmId: ""    // ← ID contenitore Tag Manager, es. "GTM-ABC1234"
 };
+</script>
+<script>
+/* ================= ANALYTICS + COOKIE CONSENT =================
+   Nothing from Google loads until the visitor presses "Accept". The choice is kept on the device
+   (localStorage "fv-consent") and can be changed from the "Cookie settings" link in the footer.
+   Events never contain names, contacts, flight numbers or wheelchair/health details. */
+(function(){
+  var cfg=window.FREEVEL_CONFIG||{},KEY="fv-consent",loaded=false;
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments)}window.gtag=window.gtag||gtag;
+  gtag("consent","default",{analytics_storage:"denied",ad_storage:"denied",ad_user_data:"denied",ad_personalization:"denied"});
+  function get(){try{return localStorage.getItem(KEY)}catch(e){return null}}
+  function set(v){try{localStorage.setItem(KEY,v)}catch(e){}}
+  function addScript(src){var s=document.createElement("script");s.async=true;s.src=src;document.head.appendChild(s)}
+  function load(){if(loaded||(!cfg.gaId&&!cfg.gtmId))return;loaded=true;
+    gtag("consent","update",{analytics_storage:"granted"});
+    if(cfg.gtmId){dataLayer.push({"gtm.start":Date.now(),event:"gtm.js"});addScript("https://www.googletagmanager.com/gtm.js?id="+encodeURIComponent(cfg.gtmId))}
+    if(cfg.gaId){addScript("https://www.googletagmanager.com/gtag/js?id="+encodeURIComponent(cfg.gaId));gtag("js",new Date());
+      gtag("config",cfg.gaId,{send_page_view:false})}
+    page()}
+  function page(){if(!loaded)return;var v=(location.hash.replace("#","")||"card").replace(/^claim-.*/,"claim");
+    var p={page_title:"FreeVel · "+v,page_location:location.origin+location.pathname+"#"+v,page_path:"/"+v};
+    if(cfg.gaId)gtag("event","page_view",p);
+    if(cfg.gtmId)dataLayer.push(Object.assign({event:"fv_page_view"},p))}
+  /* FV_track("transfer_request",{legs:2}) — safe to call anytime; ignored without consent */
+  window.FV_track=function(name,params){if(!loaded)return;params=params||{};
+    if(cfg.gaId)gtag("event",name,params);
+    if(cfg.gtmId)dataLayer.push(Object.assign({event:name},params))};
+  window.addEventListener("hashchange",page);
+  function banner(show){var b=document.getElementById("cookie-banner");if(b)b.hidden=!show}
+  window.FV_cookieSettings=function(){banner(true)};
+  document.addEventListener("DOMContentLoaded",function(){
+    var b=document.getElementById("cookie-banner");if(!b)return;
+    if(!cfg.gaId&&!cfg.gtmId){var l=document.getElementById("cookie-link");if(l)l.hidden=true;return}
+    var c=get();if(c==="yes")load();else if(c!=="no")banner(true);
+    document.getElementById("cookie-yes").onclick=function(){set("yes");banner(false);load()};
+    document.getElementById("cookie-no").onclick=function(){var was=get()==="yes";set("no");banner(false);
+      if(was){gtag("consent","update",{analytics_storage:"denied"});location.reload()}};
+    document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("#pdf,#c-pdf");
+      if(t)FV_track(t.id==="pdf"?"card_pdf_download":"claim_pdf_download")});
+  });
+})();
 </script>
 <script>
 /* ================= LANGUAGE (EN / IT) =================
@@ -1251,6 +1312,11 @@ var FV_IT = /*DICT*/{
 "After the flight": "Dopo il volo",
 "After-flight photo": "Foto dopo il volo",
 "Airline": "Compagnia aerea",
+"Cookies for statistics": "Cookie statistici",
+"We use Google Analytics to count visits and see which features are used. It is off until you accept. We never send your name, contacts, flights or wheelchair details.": "Usiamo Google Analytics per contare le visite e capire quali funzioni vengono usate. È spento finché non accetti. Non inviamo mai nome, contatti, voli o dati della carrozzina.",
+"Reject": "Rifiuta",
+"Accept": "Accetta",
+"Cookie settings": "Impostazioni cookie",
 "Always by your side": "Sempre al tuo fianco",
 "· Always by your side · prototype in testing with early users": "· Sempre al tuo fianco · prototipo in prova con i primi utenti",
 "Airline claims email": "Email reclami della compagnia",
@@ -2314,7 +2380,7 @@ $("trform").addEventListener("submit",function(e){e.preventDefault();var d=trVal
     accepted:false,cancelled:false};
   var b=$("tr-send");b.disabled=true;trStatusMsg("Sending…","");$("tr-copy").hidden=true;
   var url=(window.FREEVEL_CONFIG||{}).transferUrl,online=host.db&&host.uid;
-  function done(){MY.requests.unshift(q);save(TRK,MY);renderMyReqs();$("t-notes").value="";
+  function done(){window.FV_track&&FV_track("transfer_request",{legs:q.legs.length,ride:q.ride,people:+q.pax||1});MY.requests.unshift(q);save(TRK,MY);renderMyReqs();$("t-notes").value="";
     trStatusMsg(T("Request {id} sent. We will contact you {by} within 24 hours.",{id:q.id,by:T(BY[q.way])}),"ok")}
   if(online){MY.requests.unshift(q);saveMy().then(function(){MY.requests.shift();done()},function(){MY.requests.shift();trStatusMsg("Sending failed. Check your connection and try again.","bad")}).then(function(){b.disabled=false});return}
   if(url||window.supabaseClient){
@@ -2423,7 +2489,7 @@ $("fb-form").addEventListener("submit",function(e){e.preventDefault();var d=fbDa
     .then(function(r){if(r&&r.error)throw r.error}):Promise.reject();
   Promise.allSettled([mailP,dbP]).then(function(r){if(r[0].status!=="fulfilled"&&r[1].status!=="fulfilled")throw new Error("both failed")})
   .then(function(){
-      setStatus("Thank you! Your answer was sent.","ok");$("fb-copy").hidden=true;form.reset();rating=0;
+      window.FV_track&&FV_track("feedback_sent",{rating:d.rating||0,interests:d.interests.length});setStatus("Thank you! Your answer was sent.","ok");$("fb-copy").hidden=true;form.reset();rating=0;
       [].forEach.call($("fb-stars").children,function(x){x.setAttribute("aria-pressed","false")})})
   .catch(function(){fbFallback(d,"Sending failed.")})
   .then(function(){b.disabled=false})});
