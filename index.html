@@ -248,6 +248,12 @@ button,input,select,textarea{font:inherit;color:inherit}
 #sync-msg.ok{color:var(--ok)}#sync-msg.bad{color:var(--bad)}
 /* ---------- lean home + app-style bottom bar ---------- */
 .hello{display:grid;gap:2px}
+.checkin{display:grid;gap:14px;scroll-margin-top:90px}
+.checkin-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.checkin-head h2{font-size:22px}
+.checkin-head .note{margin:2px 0 0}
+.checkin .desk-wrap{justify-items:stretch}
+.checkin .tag{max-width:none}
 .hello-hi{margin:0;font-size:20px;color:var(--muted)}
 .hello-hi .hi-name{color:var(--teal);font-family:var(--f-display);font-weight:700}
 .hello-name{display:flex;align-items:center;gap:10px;margin:10px 0 0;font-weight:700;font-size:15px;color:var(--muted)}
@@ -750,10 +756,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
       <a href="#card" data-v="card"><span class="k">01</span>My card</a>
       <a href="#fit" data-v="fit"><span class="k">02</span>Which airline</a>
       <a href="#transfers" data-v="transfers"><span class="k">03</span>Transfers</a>
-      <a href="#prep" data-v="prep"><span class="k">04</span>Before you fly</a>
-      <a href="#desk" data-v="desk"><span class="k">05</span>At check-in</a>
-      <a href="#claim" data-v="claim"><span class="k">06</span>Damage claim</a>
-      <a href="#feedback" data-v="feedback"><span class="k">07</span>Feedback</a>
+      <a href="#claim" data-v="claim"><span class="k">04</span>Damage claim</a>
+      <a href="#feedback" data-v="feedback"><span class="k">05</span>Feedback</a>
     </nav>
     <a class="me" href="#profile" data-v="profile" aria-label="My profile">
       <span class="avatar empty" id="avatar" aria-hidden="true"></span><span class="me-l">My profile</span>
@@ -782,6 +786,21 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
     <label class="hello-name" id="hello-name"><span>What's your name?</span><input data-k="name" id="hello-name-in" type="text" autocomplete="given-name"></label>
   </div>
   <div class="hero" id="hero" aria-live="polite"></div>
+  <section class="checkin" id="checkin" aria-labelledby="t-desk" hidden>
+    <div class="checkin-head">
+      <div>
+        <h2 id="t-desk">At the check-in desk</h2>
+        <p class="note">Turn the screen toward the agent.</p>
+      </div>
+      <div class="actions">
+        <button class="btn sign" type="button" id="fs">Full screen</button>
+        <a class="btn ghost" href="#claim-before">Add before-flight photos</a>
+      </div>
+    </div>
+    <div class="desk-wrap" id="desk-wrap">
+      <article class="tag" id="tag" aria-label="Card for staff" data-noi18n></article>
+    </div>
+  </section>
 
 
   <div class="cats" role="list" aria-label="Card type">
@@ -842,7 +861,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
       </div>
       <div class="sheet" id="sheet" aria-live="polite" data-noi18n></div>
       <div class="actions">
-        <a class="btn sign" href="#desk">Show at check-in</a>
+        <button class="btn sign" type="button" onclick="FV_showCheckin()">Show at check-in</button>
         <button class="btn" type="button" id="pdf" hidden>Download PDF</button>
         <button class="btn ghost" type="button" id="copy">Copy text</button>
       </div>
@@ -1140,24 +1159,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 </section>
 
 <!-- ============ 02 DESK ============ -->
-<section class="view" id="v-desk" aria-labelledby="t-desk" hidden>
-  <div class="lede">
-    <h1 id="t-desk">At the check-in desk</h1>
-    <p>Turn the screen toward the agent.</p>
-  </div>
-  <div class="actions">
-    <button class="btn sign" type="button" id="fs">Full screen</button>
-    <a class="btn ghost" href="#card">Edit trip</a>
-    <a class="btn ghost" href="#profile">Edit profile</a>
-    <a class="btn ghost" href="#claim-before">Add before-flight photos</a>
-  </div>
-  <div class="desk-wrap" id="desk-wrap">
-    <article class="tag" id="tag" aria-label="Card for staff" data-noi18n></article>
-  </div>
-</section>
 
 <!-- ============ 03 VIAGGIO ============ -->
-<section class="view" id="v-prep" aria-labelledby="t-prep" hidden>
+<section class="view" id="v-prep" data-retired aria-labelledby="t-prep" hidden>
   <div class="lede">
     <h1 id="t-prep">Before you fly</h1>
     <p>Checks and messages ready to send to your airline.</p>
@@ -1418,11 +1422,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
   <a href="#card" data-v="card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>Card</span></a>
   <a href="#fit" data-v="fit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 13.5 21 7.5c.9-.3 1.4.8.6 1.3L6.5 17.5 3 15.5Z"/><path d="m9 11-3-4 2-.6 5 2.6"/><path d="M3 21h18"/></svg><span>Airlines</span></a>
   <a href="#transfers" data-v="transfers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16V8a2 2 0 0 1 2-2h10l4 4v6"/><path d="M3 16h18"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><span>Transfer</span></a>
-  <a href="#desk" data-v="desk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3M21 14v.01M14 21h7v-4"/></svg><span>Check-in</span></a>
+  <a href="#claim" data-v="claim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><span>Claim</span></a>
   <button type="button" id="bnav-more" aria-expanded="false" aria-controls="bnav-menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span>More</span></button>
   <div class="bnav-menu" id="bnav-menu" hidden>
-    <a href="#prep" data-v="prep">Before you fly</a>
-    <a href="#claim" data-v="claim">Damage claim</a>
     <a href="#feedback" data-v="feedback">Feedback</a>
     <a href="#profile" data-v="profile">My profile</a>
   </div>
@@ -1520,6 +1522,7 @@ var FV_IT = /*DICT*/{
 "After the flight": "Dopo il volo",
 "After-flight photo": "Foto dopo il volo",
 "Airline": "Compagnia aerea",
+"Claim": "Reclamo",
 "Hi": "Ciao",
 "What's your name?": "Come ti chiami?",
 "Your name": "Il tuo nome",
@@ -2242,6 +2245,9 @@ function battUI(){if(!powered())return"";var t=BT[S.bt]?T(BT[S.bt][1]):"";
 
 
 /* ---------- home greeting + hero ---------- */
+window.FV_showCheckin=function(){if(location.hash!=="#card"&&location.hash!=="")location.hash="card";
+  setTimeout(function(){var c=$("checkin");if(!c)return;c.scrollIntoView({behavior:"smooth",block:"start"});var f=$("fs");if(f)f.click()},60)};
+
 var HERO_IC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 13.5 21 7.5c.9-.3 1.4.8.6 1.3L6.5 17.5 3 15.5Z"/><path d="m9 11-3-4 2-.6 5 2.6"/></svg>';
 function renderHero(){var box=$("hero"),hi=$("hello-hi");if(!box)return;
   var first=String(S.name||"").trim().split(/\s+/)[0];
@@ -2253,12 +2259,13 @@ function renderHero(){var box=$("hero"),hi=$("hello-hi");if(!box)return;
   var prof=["name","weight","h"].every(function(k){return String(S[k]||"").trim()}),
       trip=["airline","flight","date"].every(function(k){return String(S[k]||"").trim()});
   var steps='<ol class="hero-steps"><li class="'+(prof?'done':'')+'">'+T("1 Profile")+'</li><li class="'+(trip?'done':'')+'">'+T("2 Flight")+'</li><li>'+T("3 Show at check-in")+'</li></ol>';
+  var ck=$("checkin");if(ck)ck.hidden=!prof;
   if(!prof){box.innerHTML='<p class="hero-k">'+T("Start here")+'</p><div class="hero-box"><span class="hero-ic">'+HERO_IC+'</span><div><b>'+T("Create your profile")+'</b><small>'+T("About 2 minutes, no account needed")+'</small></div></div>'+steps+
     '<div class="hero-cta"><a class="btn sign" href="#profile">'+T("Start")+'</a><a class="btn ghost" href="#fit">'+T("Which airline fits?")+'</a></div>';return}
   if(!trip){box.innerHTML='<p class="hero-k">'+T("Next step")+'</p><div class="hero-box"><span class="hero-ic">'+HERO_IC+'</span><div><b>'+T("Add your flight")+'</b><small>'+T("Airline, flight number and date")+'</small></div></div>'+steps+
     '<div class="hero-cta"><a class="btn sign" href="#tform">'+T("Add flight")+'</a><a class="btn ghost" href="#fit">'+T("Which airline fits?")+'</a></div>';return}
   box.innerHTML='<p class="hero-k">'+T("Your next flight")+'</p><div class="hero-box"><span class="hero-ic">'+HERO_IC+'</span><div><b>'+esc(S.airline)+' · '+esc(S.flight)+'</b><small>'+esc(S.date)+(S.route?' · '+esc(S.route):'')+'</small></div></div>'+steps+
-    '<div class="hero-cta"><a class="btn sign" href="#desk">'+T("Show at check-in")+'</a><a class="btn ghost" href="#transfers">'+T("Book a transfer")+'</a></div>'}
+    '<div class="hero-cta"><button class="btn sign" type="button" onclick="FV_showCheckin()">'+T("Show at check-in")+'</button><a class="btn ghost" href="#transfers">'+T("Book a transfer")+'</a></div>'}
 window.addEventListener("fv:lang",renderHero);
 document.addEventListener("DOMContentLoaded",function(){var m=$("bnav-more"),menu=$("bnav-menu");if(!m)return;
   m.onclick=function(){var open=menu.hidden;menu.hidden=!open;m.setAttribute("aria-expanded",open)};
@@ -2450,13 +2457,15 @@ function saveBlob(blob,fn,ok,say,b){
 function slug(t){return String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
 
 /* ---------- routing ---------- */
-var VIEWS=["card","fit","transfers","prep","desk","claim","feedback","profile"];
+var VIEWS=["card","fit","transfers","claim","feedback","profile"];
 function route(){var v=location.hash.replace("#",""),anchor=null;
   if(v.indexOf("claim-")===0){anchor=v;v="claim"}
+  if(v==="desk"){v="card";setTimeout(function(){var c=$("checkin");if(c&&!c.hidden)c.scrollIntoView({behavior:"smooth",block:"start"})},50)}
+  if(v==="prep")v="card";
   if(VIEWS.indexOf(v)<0)v="card";
   VIEWS.forEach(function(n){$("v-"+n).hidden=n!==v});
   [].forEach.call(document.querySelectorAll("header [data-v],#bnav [data-v]"),function(a){if(a.dataset.v===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
-  if(v==="desk")renderTag();if(v==="fit"){renderFit();renderFitSrc()}if(v==="transfers")setTimeout(trOpen,0);
+  if(v==="card")renderTag();if(v==="fit"){renderFit();renderFitSrc()}if(v==="transfers")setTimeout(trOpen,0);
   if(v==="claim")setTimeout(function(){cOpen();var el=anchor&&$(anchor);if(el)el.scrollIntoView({block:"start"})},0);
   if(!anchor)window.scrollTo(0,0)}
 window.addEventListener("hashchange",route);
@@ -2553,7 +2562,7 @@ function renderFitSrc(){var box=$("fit-src");if(!box)return;
     AIRLINES.filter(function(a){return a.ck}).map(function(a){return esc(a.n)}).join(", ")+'.</p>'}
 window.addEventListener("fv:lang",function(){renderFit();renderFitSrc()});
 
-function renderAll(){renderFit();renderHero();renderTraveller();renderSheet();renderMeter();renderVerdicts();renderMail();if(!$("v-desk").hidden)renderTag()}
+function renderAll(){renderFit();renderHero();renderTraveller();renderSheet();renderMeter();renderVerdicts();renderMail();if(!$("v-card").hidden)renderTag()}
 renderCL();renderAll();route();
 
 /* PDF download works in any normal browser */
