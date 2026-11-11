@@ -248,7 +248,11 @@ button,input,select,textarea{font:inherit;color:inherit}
 #sync-msg.ok{color:var(--ok)}#sync-msg.bad{color:var(--bad)}
 /* ---------- lean home + app-style bottom bar ---------- */
 .hello{display:grid;gap:2px}
-.hello-hi{margin:0;font-size:17px;color:var(--muted)}
+.hello-hi{margin:0;font-size:20px;color:var(--muted)}
+.hello-hi .hi-name{color:var(--teal);font-family:var(--f-display);font-weight:700}
+.hello-name{display:flex;align-items:center;gap:10px;margin:10px 0 0;font-weight:700;font-size:15px;color:var(--muted)}
+.hello-name input{min-height:42px;padding:8px 14px;border:1.5px solid var(--line);border-radius:99px;background:var(--surface);font-size:16px;flex:1;min-width:0;max-width:240px}
+.hello-name input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px #2aa39a33}
 .hello h1{font-size:clamp(26px,3.6vw,38px);line-height:1.15;font-weight:700;color:var(--ink);max-width:22ch}
 .hero{background:var(--navy);color:#fff;border-radius:24px;padding:22px 22px 24px;display:grid;gap:14px;box-shadow:0 18px 40px -24px #13294b99}
 .hero-k{margin:0;font-family:var(--f-display);font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9fe0d4}
@@ -775,6 +779,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
   <div class="hello">
     <p class="hello-hi" id="hello-hi">Hi,</p>
     <h1 id="t-card">ready for your next flight? <span aria-hidden="true">✈️</span></h1>
+    <label class="hello-name" id="hello-name"><span>What's your name?</span><input data-k="name" id="hello-name-in" type="text" autocomplete="given-name"></label>
   </div>
   <div class="hero" id="hero" aria-live="polite"></div>
 
@@ -1515,6 +1520,9 @@ var FV_IT = /*DICT*/{
 "After the flight": "Dopo il volo",
 "After-flight photo": "Foto dopo il volo",
 "Airline": "Compagnia aerea",
+"Hi": "Ciao",
+"What's your name?": "Come ti chiami?",
+"Your name": "Il tuo nome",
 "Accounts are not available right now. Check your connection and reload the page.": "Gli account non sono disponibili in questo momento. Controlla la connessione e ricarica la pagina.",
 "Wrong email or password.": "Email o password errati.",
 "Confirm your email first: open the link we sent you, then sign in.": "Prima conferma l'email: apri il link che ti abbiamo inviato, poi accedi.",
@@ -2237,7 +2245,11 @@ function battUI(){if(!powered())return"";var t=BT[S.bt]?T(BT[S.bt][1]):"";
 var HERO_IC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 13.5 21 7.5c.9-.3 1.4.8.6 1.3L6.5 17.5 3 15.5Z"/><path d="m9 11-3-4 2-.6 5 2.6"/></svg>';
 function renderHero(){var box=$("hero"),hi=$("hello-hi");if(!box)return;
   var first=String(S.name||"").trim().split(/\s+/)[0];
-  hi.textContent=first?T("Hi {name},",{name:first}):T("Hi,");
+  hi.innerHTML=first?esc(T("Hi"))+' <b class="hi-name">'+esc(first)+'</b> <span aria-hidden="true">👋</span>':esc(T("Hi,"));
+  var hn=$("hello-name"),hin=$("hello-name-in"),typing=document.activeElement===hin;
+  if(hn)hn.hidden=!!first&&!typing;
+  [].forEach.call(document.querySelectorAll('[data-k="name"]'),function(x){if(x!==document.activeElement)x.value=S.name||""});
+  if(hin&&!hin._fv){hin._fv=1;hin.addEventListener("blur",function(){setTimeout(renderHero,0)});hin.addEventListener("keydown",function(e){if(e.key==="Enter")hin.blur()})}
   var prof=["name","weight","h"].every(function(k){return String(S[k]||"").trim()}),
       trip=["airline","flight","date"].every(function(k){return String(S[k]||"").trim()});
   var steps='<ol class="hero-steps"><li class="'+(prof?'done':'')+'">'+T("1 Profile")+'</li><li class="'+(trip?'done':'')+'">'+T("2 Flight")+'</li><li>'+T("3 Show at check-in")+'</li></ol>';
