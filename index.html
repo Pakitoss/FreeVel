@@ -140,17 +140,15 @@
   // Keeps this device and the account in step: the most recent copy wins
   async function sincronizza(user) {
     cloudUser = user;
-    if (typeof S === 'undefined' || !S) return;
+    const st = window.FV_state; if (!st) return;
+    const S = st.get(); if (!S) return;
     syncMsg('Syncing…');
     const { data, error } = await supabaseClient.from('user_sheets').select('sheet_data').eq('user_id', user.id).maybeSingle();
     if (error) { console.error('Cloud load failed:', error.message); syncMsg('Cloud sync is not working: ' + error.message, 'bad'); return; }
     const cloud = data && data.sheet_data;
     const hasData = function (o) { return o && Object.keys(o).some(function (k) { return k !== '_t' && String(o[k] == null ? '' : o[k]).trim(); }); };
     if (hasData(cloud) && (!hasData(S) || (cloud._t || 0) >= (S._t || 0))) {
-      S = cloud;
-      window.FV_noPush = true; try { persist(); } finally { window.FV_noPush = false; }
-      if (typeof fill === 'function') fill();
-      if (typeof renderAll === 'function') renderAll();
+      st.set(cloud);
       syncMsg('Profile loaded from your account.', 'ok');
     } else if (hasData(S)) {
       await pushNow();
@@ -160,7 +158,8 @@
   }
 
   async function pushNow() {
-    if (!cloudUser || typeof S === 'undefined' || !S) return;
+    const S = window.FV_state && window.FV_state.get();
+    if (!cloudUser || !S) return;
     const { error } = await supabaseClient.from('user_sheets').upsert([{ user_id: cloudUser.id, sheet_data: S }], { onConflict: 'user_id' });
     if (error) { console.error('Cloud save failed:', error.message); syncMsg('Not saved to your account: ' + error.message, 'bad'); }
     else syncMsg('Saved to your account.', 'ok');
@@ -2176,6 +2175,9 @@ fill();
 inputs.forEach(function(el){
   var ev=(el.tagName==="SELECT"||el.type==="checkbox")?"change":"input";
   el.addEventListener(ev,function(){var k=el.dataset.k;S[k]=el.type==="checkbox"?el.checked:(k==="pnr"?el.value.toUpperCase():el.value);persist();renderAll()})});
+/* bridge for the account script (it lives outside this scope) */
+window.FV_state={get:function(){return S},
+  set:function(o){S=o&&typeof o==="object"?o:{};var t=S._t;window.FV_noPush=true;try{persist()}finally{window.FV_noPush=false}if(t)S._t=t;fill();renderAll()}};
 function persist(){S._t=Date.now();var p={},t={};
   for(var k in S){(TRIP_KEYS.indexOf(k)>=0?t:p)[k]=S[k]}
   save(PKEY,p);save(TKEY,t);if(window.FV_cloudPush)FV_cloudPush()}
