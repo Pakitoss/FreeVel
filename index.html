@@ -178,6 +178,41 @@ button,input,select,textarea{font:inherit;color:inherit}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
 .logo-mark{display:block;width:60px;height:46px;object-fit:contain}
 .logo-t{display:grid;line-height:1}
+/* ---------- lean home + app-style bottom bar ---------- */
+.hello{display:grid;gap:2px}
+.hello-hi{margin:0;font-size:17px;color:var(--muted)}
+.hello h1{font-size:clamp(26px,3.6vw,38px);line-height:1.15;font-weight:700;color:var(--ink);max-width:22ch}
+.hero{background:var(--navy);color:#fff;border-radius:24px;padding:22px 22px 24px;display:grid;gap:14px;box-shadow:0 18px 40px -24px #13294b99}
+.hero-k{margin:0;font-family:var(--f-display);font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9fe0d4}
+.hero-box{background:#fffdf8;color:var(--ink);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:14px}
+.hero-ic{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#e4efe9;color:var(--ok)}
+.hero-ic svg{width:22px;height:22px}
+.hero-box b{font-family:var(--f-display);font-size:17px;display:block}
+.hero-box small{color:var(--muted);font-size:14px}
+.hero-steps{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+.hero-steps li{font-size:14px;font-weight:700;padding:6px 12px;border-radius:99px;background:#ffffff1a;color:#fff}
+.hero-steps li.done{background:#9fe0d4;color:var(--navy)}
+.hero-cta{display:flex;flex-wrap:wrap;gap:10px}
+.hero .btn.ghost{background:transparent;color:#fff;border-color:#ffffff59}
+.bnav{display:none}
+@media (max-width:720px){
+  header nav.tabs{display:none!important}
+  .band .wrap{flex-wrap:nowrap!important;gap:10px!important}
+  .logo small{display:none}
+  .lang{order:2;margin-left:auto}
+  .me{order:3!important}
+  main{padding-bottom:110px}
+  .bnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:40;background:#fffdf8f2;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:22px;padding:6px;box-shadow:0 12px 32px -12px #5a42204d}
+  .bnav>a,.bnav>button{display:grid;justify-items:center;gap:3px;padding:8px 2px;border-radius:16px;color:var(--muted);text-decoration:none;font:600 11.5px var(--f-display);background:none;border:0;cursor:pointer}
+  .bnav svg{width:22px;height:22px}
+  .bnav>a[aria-current="page"]{background:#e4efe9;color:var(--navy)}
+  .bnav-menu{position:absolute;right:6px;bottom:calc(100% + 8px);background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:6px;display:grid;min-width:200px;box-shadow:0 12px 32px -12px #5a42204d}
+  .bnav-menu[hidden]{display:none}
+  .bnav-menu a{padding:12px 14px;border-radius:10px;color:var(--ink);text-decoration:none;font-weight:700}
+  .bnav-menu a[aria-current="page"]{background:#e4efe9}
+  .cookie{bottom:96px}
+}
+
 .intro{display:grid;gap:20px;padding:28px}
 .intro-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
 .intro-eyebrow{margin:0 0 6px;font-family:var(--f-display);font-size:12.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--teal)}
@@ -669,37 +704,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 
 <!-- ============ 01 MY CARD (this trip) ============ -->
 <section class="view" id="v-card" aria-labelledby="t-card">
-  <div class="lede">
-    <h1 id="t-card">Fly with your wheelchair without explaining it all again at the desk.</h1>
-    <p>Your profile is saved once. For each trip, add the flight and FreeVel builds a handling card for airport and airline staff, with the right IATA codes, a QR code and a printable PDF.</p>
+  <div class="hello">
+    <p class="hello-hi" id="hello-hi">Hi,</p>
+    <h1 id="t-card">ready for your next flight? <span aria-hidden="true">✈️</span></h1>
   </div>
-  <section class="panel intro" id="intro" aria-labelledby="intro-t">
-    <div class="intro-head">
-      <div>
-        <p class="intro-eyebrow">How FreeVel works</p>
-        <h2 id="intro-t">Everything you need to fly with a wheelchair, in one place.</h2>
-      </div>
-      <button class="btn small ghost" type="button" id="intro-hide">Hide guide</button>
-    </div>
-    <ul class="intro-feats">
-      <li><span class="if-ic" aria-hidden="true"></span><b>Handling card</b><span>One card with your wheelchair's details and the right IATA codes, to show at check-in or print as PDF.</span></li>
-      <li><span class="if-ic" aria-hidden="true"></span><b>Which airline</b><span>See which airlines can load your wheelchair upright, before you book.</span></li>
-      <li><span class="if-ic" aria-hidden="true"></span><b>Accessible transfers</b><span>Ask for a vehicle with a ramp to and from the airport.</span></li>
-      <li><span class="if-ic" aria-hidden="true"></span><b>Damage claim</b><span>If something breaks, get a claim letter ready to send.</span></li>
-    </ul>
-    <h3 class="intro-sub">Create your profile in 4 steps</h3>
-    <ol class="intro-steps">
-      <li><b>Open My profile</b><span>Use the button at the top right. No account is needed: your data stays on this device. Create a free account with email and password only if you want it on other devices too.</span></li>
-      <li><b>Tell us about you and your wheelchair</b><span>Your name, a phone number and the assistance you need. Then the wheelchair: type, make, weight and size measured in travel position, backrest folded.</span></li>
-      <li><b>Add battery and handling notes</b><span>For power wheelchairs: battery type and watt-hours, written on its label, and how to switch it off. Add how staff should handle it. The progress bar shows what is still missing.</span></li>
-      <li><b>Add your flight</b><span>Back on My card, enter airline, flight number and date. Your card is ready to show at the desk or download as PDF.</span></li>
-    </ol>
-    <div class="intro-cta">
-      <a class="btn sign" href="#profile">Create my profile</a>
-      <a class="btn ghost" href="#fit">Check which airline fits</a>
-    </div>
-  </section>
-  <p class="intro-show" id="intro-show" hidden><button class="linkish" type="button" id="intro-open">How FreeVel works</button></p>
+  <div class="hero" id="hero" aria-live="polite"></div>
 
 
   <div class="cats" role="list" aria-label="Card type">
@@ -774,7 +783,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 <section class="view" id="v-fit" aria-labelledby="t-fit" hidden>
   <div class="lede">
     <h1 id="t-fit">Which airline fits your wheelchair?</h1>
-    <p>We compare your wheelchair's travel size with the cargo door of the aircraft each airline flies from Italy. The lowest door decides whether it travels upright or gets tipped on its side.</p>
+    <p>Your wheelchair vs the cargo door of every airline.</p>
   </div>
   <div class="fit-grid">
     <div class="stack">
@@ -812,7 +821,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 <section class="view" id="v-transfers" aria-labelledby="t-transfers" hidden>
   <div class="lede">
     <h1 id="t-transfers">Airport transfers</h1>
-    <p>Request a wheelchair-accessible ride to or from the airport. During the pilot our team searches for options by hand and replies within 24 hours. Nothing is booked or charged until you accept an option.</p>
+    <p>A ride with a ramp. We reply within 24 hours, you pay nothing until you accept.</p>
   </div>
 
   <ol class="how" aria-label="How it works">
@@ -904,7 +913,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 <section class="view" id="v-profile" aria-labelledby="t-profile" hidden>
   <div class="lede">
     <h1 id="t-profile">My profile</h1>
-    <p>Everything about you and your wheelchair that stays the same from trip to trip. Fill it in once and every new card uses it.</p>
+    <p>Fill it in once, it's used for every trip.</p>
   </div>
   <!-- ACCOUNT: login e sincronizzazione cloud -->
 <section class="panel auth" id="auth-section" aria-labelledby="auth-title">
@@ -1058,7 +1067,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 <section class="view" id="v-desk" aria-labelledby="t-desk" hidden>
   <div class="lede">
     <h1 id="t-desk">At the check-in desk</h1>
-    <p>Turn your screen toward the agent. The QR code holds the full card as text.</p>
+    <p>Turn the screen toward the agent.</p>
   </div>
   <div class="actions">
     <button class="btn sign" type="button" id="fs">Full screen</button>
@@ -1075,7 +1084,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 <section class="view" id="v-prep" aria-labelledby="t-prep" hidden>
   <div class="lede">
     <h1 id="t-prep">Before you fly</h1>
-    <p>Checks and messages built from your card. Airline rules vary, so always confirm with yours.</p>
+    <p>Checks and messages ready to send to your airline.</p>
   </div>
   <div class="grid2">
     <div class="stack">
@@ -1122,7 +1131,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 <section class="view" id="v-claim" aria-labelledby="t-claim" hidden>
   <div class="lede">
     <h1 id="t-claim">Damaged wheelchair claim</h1>
-    <p>Fill in the form, add photos from before and after the flight, and FreeVel writes the claim letter for you. Download it as a PDF with the photos and send it to the airline's claims department.</p>
+    <p>Add photos, get the claim letter ready to send.</p>
   </div>
 
   <div class="deadline" id="c-deadline"></div>
@@ -1260,7 +1269,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 <section class="view" id="v-feedback" aria-labelledby="t-feedback" hidden>
   <div class="lede">
     <h1 id="t-feedback">Help us build FreeVel</h1>
-    <p>You're one of the first people to try it. Two minutes of answers tell us what to keep, what to change and what to build next.</p>
+    <p>Two minutes that help us build what you need.</p>
   </div>
   <div class="grid2">
     <form class="panel form" id="fb-form" novalidate>
@@ -1329,6 +1338,19 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
     <div class="cookie-b"><button class="btn ghost" type="button" id="cookie-no">Reject</button><button class="btn sign" type="button" id="cookie-yes">Accept</button></div>
   </div>
 </div>
+<nav class="bnav" id="bnav" aria-label="Sections">
+  <a href="#card" data-v="card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>Card</span></a>
+  <a href="#fit" data-v="fit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 13.5 21 7.5c.9-.3 1.4.8.6 1.3L6.5 17.5 3 15.5Z"/><path d="m9 11-3-4 2-.6 5 2.6"/><path d="M3 21h18"/></svg><span>Airlines</span></a>
+  <a href="#transfers" data-v="transfers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16V8a2 2 0 0 1 2-2h10l4 4v6"/><path d="M3 16h18"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><span>Transfer</span></a>
+  <a href="#desk" data-v="desk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3M21 14v.01M14 21h7v-4"/></svg><span>Check-in</span></a>
+  <button type="button" id="bnav-more" aria-expanded="false" aria-controls="bnav-menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span>More</span></button>
+  <div class="bnav-menu" id="bnav-menu" hidden>
+    <a href="#prep" data-v="prep">Before you fly</a>
+    <a href="#claim" data-v="claim">Damage claim</a>
+    <a href="#feedback" data-v="feedback">Feedback</a>
+    <a href="#profile" data-v="profile">My profile</a>
+  </div>
+</nav>
 <footer class="gut"><div class="wrap"><span><b style="color:var(--ink);font-family:var(--f-display)">FreeVel</b> · Always by your side · prototype in testing with early users</span><span><span>This information does not replace your airline's rules.</span> <a href="javascript:void(0)" id="cookie-link" onclick="FV_cookieSettings()">Cookie settings</a></span></div></footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
@@ -1422,6 +1444,34 @@ var FV_IT = /*DICT*/{
 "After the flight": "Dopo il volo",
 "After-flight photo": "Foto dopo il volo",
 "Airline": "Compagnia aerea",
+"Your wheelchair vs the cargo door of every airline.": "La tua carrozzina e la porta della stiva di ogni compagnia.",
+"A ride with a ramp. We reply within 24 hours, you pay nothing until you accept.": "Un mezzo con rampa. Rispondiamo entro 24 ore, non paghi nulla finché non accetti.",
+"Checks and messages ready to send to your airline.": "Controlli e messaggi pronti da inviare alla compagnia.",
+"Turn the screen toward the agent.": "Gira lo schermo verso l'operatore.",
+"Add photos, get the claim letter ready to send.": "Aggiungi le foto, ottieni la lettera di reclamo pronta.",
+"Two minutes that help us build what you need.": "Due minuti che ci aiutano a costruire ciò che ti serve.",
+"Fill it in once, it's used for every trip.": "Compilalo una volta, vale per ogni viaggio.",
+"Hi,": "Ciao,",
+"Hi {name},": "Ciao {name},",
+"ready for your next flight?": "pronto per il prossimo volo?",
+"1 Profile": "1 Profilo",
+"2 Flight": "2 Volo",
+"3 Show at check-in": "3 Mostra al check-in",
+"Start here": "Inizia da qui",
+"Create your profile": "Crea il tuo profilo",
+"About 2 minutes, no account needed": "Circa 2 minuti, senza account",
+"Start": "Inizia",
+"Which airline fits?": "Quale compagnia va bene?",
+"Next step": "Prossimo passo",
+"Airline, flight number and date": "Compagnia, numero del volo e data",
+"Add flight": "Aggiungi il volo",
+"Your next flight": "Il tuo prossimo volo",
+"Book a transfer": "Prenota un transfer",
+"Airlines": "Compagnie",
+"Card": "Scheda",
+"Transfer": "Transfer",
+"Check-in": "Check-in",
+"More": "Altro",
 "How FreeVel works": "Come funziona FreeVel",
 "Everything you need to fly with a wheelchair, in one place.": "Tutto quello che serve per volare con la carrozzina, in un unico posto.",
 "Hide guide": "Nascondi la guida",
@@ -2090,21 +2140,33 @@ function battUI(){if(!powered())return"";var t=BT[S.bt]?T(BT[S.bt][1]):"";
   var q=S.wh?((S.bn?S.bn+" × ":"")+S.wh+" Wh"):(S.bn?T(S.bn=="1"?"{n} battery":"{n} batteries",{n:S.bn}):"");
   return [t,q].filter(Boolean).join(", ")}
 
-/* ---------- intro guide (My card) ---------- */
-(function(){var KEY="fv-intro";function get(){try{return localStorage.getItem(KEY)}catch(e){return null}}
-  function set(v){try{localStorage.setItem(KEY,v)}catch(e){}}
-  function show(on){var a=document.getElementById("intro"),b=document.getElementById("intro-show");if(!a||!b)return;a.hidden=!on;b.hidden=on}
-  document.addEventListener("DOMContentLoaded",function(){show(get()!=="hidden");
-    var x=document.getElementById("intro-hide"),o=document.getElementById("intro-open");
-    if(x)x.onclick=function(){set("hidden");show(false)};
-    if(o)o.onclick=function(){set("shown");show(true);document.getElementById("intro").scrollIntoView({behavior:"smooth",block:"start"})}})})();
+
+/* ---------- home greeting + hero ---------- */
+var HERO_IC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 13.5 21 7.5c.9-.3 1.4.8.6 1.3L6.5 17.5 3 15.5Z"/><path d="m9 11-3-4 2-.6 5 2.6"/></svg>';
+function renderHero(){var box=$("hero"),hi=$("hello-hi");if(!box)return;
+  var first=String(S.name||"").trim().split(/\s+/)[0];
+  hi.textContent=first?T("Hi {name},",{name:first}):T("Hi,");
+  var prof=["name","weight","h"].every(function(k){return String(S[k]||"").trim()}),
+      trip=["airline","flight","date"].every(function(k){return String(S[k]||"").trim()});
+  var steps='<ol class="hero-steps"><li class="'+(prof?'done':'')+'">'+T("1 Profile")+'</li><li class="'+(trip?'done':'')+'">'+T("2 Flight")+'</li><li>'+T("3 Show at check-in")+'</li></ol>';
+  if(!prof){box.innerHTML='<p class="hero-k">'+T("Start here")+'</p><div class="hero-box"><span class="hero-ic">'+HERO_IC+'</span><div><b>'+T("Create your profile")+'</b><small>'+T("About 2 minutes, no account needed")+'</small></div></div>'+steps+
+    '<div class="hero-cta"><a class="btn sign" href="#profile">'+T("Start")+'</a><a class="btn ghost" href="#fit">'+T("Which airline fits?")+'</a></div>';return}
+  if(!trip){box.innerHTML='<p class="hero-k">'+T("Next step")+'</p><div class="hero-box"><span class="hero-ic">'+HERO_IC+'</span><div><b>'+T("Add your flight")+'</b><small>'+T("Airline, flight number and date")+'</small></div></div>'+steps+
+    '<div class="hero-cta"><a class="btn sign" href="#tform">'+T("Add flight")+'</a><a class="btn ghost" href="#fit">'+T("Which airline fits?")+'</a></div>';return}
+  box.innerHTML='<p class="hero-k">'+T("Your next flight")+'</p><div class="hero-box"><span class="hero-ic">'+HERO_IC+'</span><div><b>'+esc(S.airline)+' · '+esc(S.flight)+'</b><small>'+esc(S.date)+(S.route?' · '+esc(S.route):'')+'</small></div></div>'+steps+
+    '<div class="hero-cta"><a class="btn sign" href="#desk">'+T("Show at check-in")+'</a><a class="btn ghost" href="#transfers">'+T("Book a transfer")+'</a></div>'}
+window.addEventListener("fv:lang",renderHero);
+document.addEventListener("DOMContentLoaded",function(){var m=$("bnav-more"),menu=$("bnav-menu");if(!m)return;
+  m.onclick=function(){var open=menu.hidden;menu.hidden=!open;m.setAttribute("aria-expanded",open)};
+  [].forEach.call(menu.querySelectorAll("a"),function(a){a.addEventListener("click",function(){menu.hidden=true;m.setAttribute("aria-expanded","false")})});
+  window.addEventListener("hashchange",function(){menu.hidden=true;m.setAttribute("aria-expanded","false")})});
 /* ---------- traveller summary (My card) + avatar ---------- */
 function initials(){var n=String(S.name||"").trim().split(/\s+/).filter(Boolean);
   return n.length?(n[0][0]+(n.length>1?n[n.length-1][0]:"")).toUpperCase():""}
 function renderTraveller(){var ini=initials(),av=$("avatar");
   av.textContent=ini;av.classList.toggle("empty",!ini);
   var has=["name","weight","notes","brand"].some(function(k){return String(S[k]||"").trim()});
-  if(!has){$("traveller").innerHTML='<div class="tv-empty"><h3>Set up your profile first</h3><p class="note">Your details and your wheelchair\'s specs are saved once and reused on every trip.</p><a class="btn sign" href="#profile">Create my profile</a></div>';return}
+  $("traveller").hidden=!has;if(!has){$("traveller").innerHTML='<div class="tv-empty"><h3>Set up your profile first</h3><p class="note">Your details and your wheelchair\'s specs are saved once and reused on every trip.</p><a class="btn sign" href="#profile">Create my profile</a></div>';return}
   var pw=powered(),chair=[T(TYPE[S.type||"manual"][1]),make(),S.weight?S.weight+" kg":""].filter(Boolean).join(" · ");
   var batt=pw?(battUI()||T("Battery details missing")):"";
   $("traveller").innerHTML='<div class="tv"><span class="avatar lg'+(ini?'':' empty')+'" aria-hidden="true">'+esc(ini)+'</span>'+
@@ -2289,7 +2351,7 @@ function route(){var v=location.hash.replace("#",""),anchor=null;
   if(v.indexOf("claim-")===0){anchor=v;v="claim"}
   if(VIEWS.indexOf(v)<0)v="card";
   VIEWS.forEach(function(n){$("v-"+n).hidden=n!==v});
-  [].forEach.call(document.querySelectorAll("header [data-v]"),function(a){if(a.dataset.v===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  [].forEach.call(document.querySelectorAll("header [data-v],#bnav [data-v]"),function(a){if(a.dataset.v===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
   if(v==="desk")renderTag();if(v==="fit"){renderFit();renderFitSrc()}if(v==="transfers")setTimeout(trOpen,0);
   if(v==="claim")setTimeout(function(){cOpen();var el=anchor&&$(anchor);if(el)el.scrollIntoView({block:"start"})},0);
   if(!anchor)window.scrollTo(0,0)}
@@ -2387,7 +2449,7 @@ function renderFitSrc(){var box=$("fit-src");if(!box)return;
     AIRLINES.filter(function(a){return a.ck}).map(function(a){return esc(a.n)}).join(", ")+'.</p>'}
 window.addEventListener("fv:lang",function(){renderFit();renderFitSrc()});
 
-function renderAll(){renderFit();renderTraveller();renderSheet();renderMeter();renderVerdicts();renderMail();if(!$("v-desk").hidden)renderTag()}
+function renderAll(){renderFit();renderHero();renderTraveller();renderSheet();renderMeter();renderVerdicts();renderMail();if(!$("v-desk").hidden)renderTag()}
 renderCL();renderAll();route();
 
 /* PDF download works in any normal browser */
