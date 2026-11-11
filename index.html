@@ -21,118 +21,176 @@
 <script>
   const SUPABASE_URL = 'https://jbyyrkzheykgfwkdfcuy.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_wSr4GS-PhUb1MbVZZPGv8g_tNSVg-fj';
+  // Where Supabase sends people back after the confirmation or reset email (must be listed in Supabase > Auth > URL Configuration)
+  const AUTH_REDIRECT = location.origin + location.pathname;
 
-  // Inizializzazione client con nome univoco per evitare conflitti con la libreria CDN
-  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // If the library did not load (offline, blocked), the rest of the site keeps working without accounts
+  const supabaseClient = window.supabase
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } })
+    : null;
   window.supabaseClient = supabaseClient;
 
-  // Messaggio sotto il form (tipo: 'ok' | 'bad' | vuoto)
+  let cloudUser = null, pushTimer = null, inRecovery = false;
+
+  function authWhenReady(fn) { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn); else fn(); }
+  function authEl(id) { return document.getElementById(id); }
+
+  // Message under the form (type: 'ok' | 'bad' | empty)
   function authMsg(testo, tipo) {
-    const el = document.getElementById('auth-msg');
-    if (!el) return;
-    el.textContent = testo || '';
-    el.className = 'auth-msg note' + (tipo ? ' ' + tipo : '');
+    const m = authEl('auth-msg'); if (!m) return;
+    m.textContent = testo || '';
+    m.className = 'auth-msg note' + (tipo ? ' ' + tipo : '');
+  }
+  function syncMsg(testo, tipo) {
+    const m = authEl('sync-msg'); if (!m) return;
+    m.textContent = testo || '';
+    m.className = 'note' + (tipo ? ' ' + tipo : '');
+  }
+  function authReady() {
+    if (supabaseClient) return true;
+    authMsg('Accounts are not available right now. Check your connection and reload the page.', 'bad');
+    return false;
+  }
+  function creds() {
+    return { email: (authEl('auth-email').value || '').trim(), password: authEl('auth-password').value || '' };
+  }
+  function friendly(err) {
+    const t = String(err && err.message || err || '');
+    if (/invalid login credentials/i.test(t)) return 'Wrong email or password.';
+    if (/email not confirmed/i.test(t)) return 'Confirm your email first: open the link we sent you, then sign in.';
+    if (/already registered/i.test(t)) return 'An account with this email already exists. Sign in instead.';
+    if (/password should be at least/i.test(t)) return 'The password must be at least 6 characters.';
+    if (/rate limit|too many/i.test(t)) return 'Too many attempts. Wait a minute and try again.';
+    if (/failed to fetch|network/i.test(t)) return 'No connection. Check your internet and try again.';
+    return 'Something went wrong: ' + t;
   }
 
   async function registraUtente() {
+    if (!authReady()) return;
+    const { email, password } = creds();
+    if (!email || !password) return authMsg('Enter both email and password.', 'bad');
+    if (password.length < 6) return authMsg('The password must be at least 6 characters.', 'bad');
+    authMsg('Creating your account…');
     try {
-      const email = document.getElementById('auth-email').value.trim();
-      const password = document.getElementById('auth-password').value;
-      if (!email || !password) return authMsg('Enter both email and password.', 'bad');
-
-      authMsg('Creating your account…');
-      const { error } = await supabaseClient.auth.signUp({ email, password });
-      if (error) authMsg('Sign-up failed: ' + error.message, 'bad');
-      else { authMsg('Account created. Check your email to confirm it, then sign in.', 'ok'); window.FV_track && FV_track('sign_up', {method: 'email'}); }
-    } catch (e) {
-      authMsg('Unexpected error: ' + e.message, 'bad');
-      console.error(e);
-    }
+      const { data, error } = await supabaseClient.auth.signUp({ email, password, options: { emailRedirectTo: AUTH_REDIRECT } });
+      if (error) return authMsg(friendly(error), 'bad');
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0)
+        return authMsg('An account with this email already exists. Sign in instead.', 'bad');
+      window.FV_track && FV_track('sign_up', { method: 'email' });
+      if (data.session) authMsg('Account created. You are signed in.', 'ok');
+      else authMsg('Account created. Check your email to confirm it, then sign in.', 'ok');
+    } catch (e) { authMsg(friendly(e), 'bad'); console.error(e); }
   }
 
   async function loginUtente() {
+    if (!authReady()) return;
+    if (inRecovery) return setNewPassword();
+    const { email, password } = creds();
+    if (!email || !password) return authMsg('Enter both email and password.', 'bad');
+    authMsg('Signing in…');
     try {
-      const email = document.getElementById('auth-email').value.trim();
-      const password = document.getElementById('auth-password').value;
-      if (!email || !password) return authMsg('Enter both email and password.', 'bad');
-
-      authMsg('Signing in…');
       const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-      if (error) authMsg('Sign-in failed: ' + error.message, 'bad');
-      else { authMsg(''); controllaSessione(); window.FV_track && FV_track('login', {method: 'email'}); }
-    } catch (e) {
-      authMsg('Unexpected error: ' + e.message, 'bad');
-      console.error(e);
-    }
+      if (error) return authMsg(friendly(error), 'bad');
+      authMsg('');
+      window.FV_track && FV_track('login', { method: 'email' });
+    } catch (e) { authMsg(friendly(e), 'bad'); console.error(e); }
   }
 
-  // Logout Utente
+  async function resetPassword() {
+    if (!authReady()) return;
+    const { email } = creds();
+    if (!email) return authMsg('Enter your email first, then press Forgot password.', 'bad');
+    authMsg('Sending…');
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: AUTH_REDIRECT });
+    if (error) return authMsg(friendly(error), 'bad');
+    authMsg('If an account exists for this email, we sent a link to choose a new password.', 'ok');
+  }
+
+  async function setNewPassword() {
+    const { password } = creds();
+    if (password.length < 6) return authMsg('The password must be at least 6 characters.', 'bad');
+    const { error } = await supabaseClient.auth.updateUser({ password });
+    if (error) return authMsg(friendly(error), 'bad');
+    inRecovery = false;
+    authMsg('New password saved.', 'ok');
+    const { data } = await supabaseClient.auth.getSession();
+    aggiornaUI(data.session ? data.session.user : null);
+  }
+
   async function logoutUtente() {
+    if (!supabaseClient) return;
+    clearTimeout(pushTimer);
     await supabaseClient.auth.signOut();
-    controllaSessione();
   }
 
-  // Controllo sessione all'avvio
-  async function controllaSessione() {
-    const { data: { user } } = await supabaseClient.auth.getUser();
+  // Shows the sign-in form or the signed-in box
+  function aggiornaUI(user) {
+    authWhenReady(function () {
+      const form = authEl('auth-form'), info = authEl('user-info');
+      const showForm = !user || inRecovery;
+      if (form) form.style.display = showForm ? 'block' : 'none';
+      if (info) info.style.display = showForm ? 'none' : 'block';
+      const label = authEl('user-email-label'); if (label) label.textContent = user ? user.email : '';
+      const np = authEl('auth-newpass'), sg = authEl('auth-signin'), rg = authEl('auth-register'), fg = authEl('auth-forgot');
+      if (np) np.hidden = !inRecovery;
+      [sg, rg, fg].forEach(function (b) { if (b) b.hidden = inRecovery; });
+    });
+  }
 
-    const authForm = document.getElementById('auth-form');
-    const userInfo = document.getElementById('user-info');
-
-    if (user) {
-      if (authForm) authForm.style.display = 'none';
-      if (userInfo) userInfo.style.display = 'block';
-      const label = document.getElementById('user-email-label');
-      if (label) label.textContent = user.email;
-      caricaDatiDalCloud(user.id);
+  // Keeps this device and the account in step: the most recent copy wins
+  async function sincronizza(user) {
+    cloudUser = user;
+    const st = window.FV_state; if (!st) return;
+    const S = st.get(); if (!S) return;
+    syncMsg('Syncing…');
+    const { data, error } = await supabaseClient.from('user_sheets').select('sheet_data').eq('user_id', user.id).maybeSingle();
+    if (error) { console.error('Cloud load failed:', error.message); syncMsg('Cloud sync is not working: ' + error.message, 'bad'); return; }
+    const cloud = data && data.sheet_data;
+    const hasData = function (o) { return o && Object.keys(o).some(function (k) { return k !== '_t' && String(o[k] == null ? '' : o[k]).trim(); }); };
+    if (hasData(cloud) && (!hasData(S) || (cloud._t || 0) >= (S._t || 0))) {
+      st.set(cloud);
+      syncMsg('Profile loaded from your account.', 'ok');
+    } else if (hasData(S)) {
+      await pushNow();
     } else {
-      if (authForm) authForm.style.display = 'block';
-      if (userInfo) userInfo.style.display = 'none';
+      syncMsg('Your profile will be saved to your account as you fill it in.', 'ok');
     }
   }
 
-  // Salva la scheda su Supabase
-  async function salvaSchedaCloud(datiScheda) {
-    const { data: { user } } = await supabaseClient.auth.getUser();
-
-    if (!user) {
-      localStorage.setItem('freevel_sheet', JSON.stringify(datiScheda));
-      alert('Scheda salvata nel browser locale. Accedi per sincronizzarla sul tuo account!');
-      return;
-    }
-
-    const { error } = await supabaseClient
-      .from('user_sheets')
-      .upsert([{ user_id: user.id, sheet_data: datiScheda }], { onConflict: 'user_id' });
-
-    if (error) alert('Errore durante il salvataggio sul cloud: ' + error.message);
-    else alert('Scheda salvata con successo nella tua Area Personale!');
+  async function pushNow() {
+    const S = window.FV_state && window.FV_state.get();
+    if (!cloudUser || !S) return;
+    const { error } = await supabaseClient.from('user_sheets').upsert([{ user_id: cloudUser.id, sheet_data: S }], { onConflict: 'user_id' });
+    if (error) { console.error('Cloud save failed:', error.message); syncMsg('Not saved to your account: ' + error.message, 'bad'); }
+    else syncMsg('Saved to your account.', 'ok');
   }
+  // Called by persist() every time the profile or trip changes
+  window.FV_cloudPush = function () {
+    if (!cloudUser || window.FV_noPush) return;
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(pushNow, 1200);
+  };
 
-  // Carica la scheda dal cloud e ripopola il form
-  async function caricaDatiDalCloud(userId) {
-    const { data, error } = await supabaseClient
-      .from('user_sheets')
-      .select('sheet_data')
-      .eq('user_id', userId)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Errore nel caricamento dal cloud:', error.message);
-      return;
-    }
-
-    if (data && data.sheet_data) {
-      if (typeof S !== 'undefined') {
-        S = data.sheet_data;
-        if (typeof fill === 'function') fill();
-        if (typeof renderAll === 'function') renderAll();
+  if (supabaseClient) {
+    supabaseClient.auth.onAuthStateChange(function (event, session) {
+      const user = session ? session.user : null;
+      if (event === 'PASSWORD_RECOVERY') {
+        inRecovery = true;
+        authWhenReady(function () {
+          if (location.hash !== '#profile') location.hash = 'profile';
+          const em = authEl('auth-email'); if (em && user) em.value = user.email;
+          authMsg('Choose a new password, then press Save new password.', 'ok');
+        });
       }
-    }
+      if (event === 'SIGNED_OUT') { cloudUser = null; syncMsg(''); }
+      aggiornaUI(user);
+      // Supabase advises not to call it again inside this callback, so the sync runs right after
+      if (user && (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && cloudUser === null)
+        setTimeout(function () { authWhenReady(function () { sincronizza(user); }); }, 0);
+    });
+  } else {
+    aggiornaUI(null);
   }
-
-  // Esegui il controllo sessione all'apertura della pagina
-  document.addEventListener('DOMContentLoaded', controllaSessione);
 </script>
 <style>
 /* FreeVel styles */
@@ -185,6 +243,9 @@ button,input,select,textarea{font:inherit;color:inherit}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
 .logo-mark{display:block;width:60px;height:46px;object-fit:contain}
 .logo-t{display:grid;line-height:1}
+#auth-forgot{margin-top:10px;font-size:14.5px}
+#sync-msg{margin:4px 0 0}
+#sync-msg.ok{color:var(--ok)}#sync-msg.bad{color:var(--bad)}
 /* ---------- lean home + app-style bottom bar ---------- */
 .hello{display:grid;gap:2px}
 .hello-hi{margin:0;font-size:17px;color:var(--muted)}
@@ -944,9 +1005,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
         <input id="auth-password" type="password" autocomplete="current-password">
       </label>
       <div class="actions">
-        <button class="btn sign" type="submit">Sign in</button>
-        <button class="btn ghost" type="button" onclick="registraUtente()">Create account</button>
+        <button class="btn sign" type="submit" id="auth-signin">Sign in</button>
+        <button class="btn ghost" type="button" id="auth-register" onclick="registraUtente()">Create account</button>
+        <button class="btn sign" type="submit" id="auth-newpass" hidden>Save new password</button>
       </div>
+      <button class="linkish" type="button" id="auth-forgot" onclick="resetPassword()">Forgot password?</button>
     </form>
     <p class="auth-msg note" id="auth-msg" role="status" aria-live="polite"></p>
   </div>
@@ -955,6 +1018,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
     <div class="who">
       <span class="pill ok"><span class="dot" aria-hidden="true"></span>Signed in · cloud sync on</span>
       <strong id="user-email-label"></strong>
+      <p class="note" id="sync-msg" role="status" aria-live="polite"></p>
     </div>
     <button class="btn small ghost" type="button" onclick="logoutUtente()">Sign out</button>
   </div>
@@ -1451,6 +1515,24 @@ var FV_IT = /*DICT*/{
 "After the flight": "Dopo il volo",
 "After-flight photo": "Foto dopo il volo",
 "Airline": "Compagnia aerea",
+"Accounts are not available right now. Check your connection and reload the page.": "Gli account non sono disponibili in questo momento. Controlla la connessione e ricarica la pagina.",
+"Wrong email or password.": "Email o password errati.",
+"Confirm your email first: open the link we sent you, then sign in.": "Prima conferma l'email: apri il link che ti abbiamo inviato, poi accedi.",
+"An account with this email already exists. Sign in instead.": "Esiste già un account con questa email. Accedi.",
+"The password must be at least 6 characters.": "La password deve avere almeno 6 caratteri.",
+"Too many attempts. Wait a minute and try again.": "Troppi tentativi. Aspetta un minuto e riprova.",
+"No connection. Check your internet and try again.": "Nessuna connessione. Controlla internet e riprova.",
+"Account created. You are signed in.": "Account creato. Hai effettuato l'accesso.",
+"Enter your email first, then press Forgot password.": "Inserisci prima la tua email, poi premi Password dimenticata.",
+"If an account exists for this email, we sent a link to choose a new password.": "Se esiste un account con questa email, ti abbiamo inviato un link per scegliere una nuova password.",
+"New password saved.": "Nuova password salvata.",
+"Choose a new password, then press Save new password.": "Scegli una nuova password, poi premi Salva nuova password.",
+"Syncing…": "Sincronizzazione…",
+"Profile loaded from your account.": "Profilo caricato dal tuo account.",
+"Your profile will be saved to your account as you fill it in.": "Il profilo verrà salvato nel tuo account mentre lo compili.",
+"Saved to your account.": "Salvato nel tuo account.",
+"Forgot password?": "Password dimenticata?",
+"Save new password": "Salva nuova password",
 "Your wheelchair vs the cargo door of every airline.": "La tua carrozzina e la porta della stiva di ogni compagnia.",
 "A ride with a ramp. We reply within 24 hours, you pay nothing until you accept.": "Un mezzo con rampa. Rispondiamo entro 24 ore, non paghi nulla finché non accetti.",
 "Checks and messages ready to send to your airline.": "Controlli e messaggi pronti da inviare alla compagnia.",
@@ -2093,9 +2175,12 @@ fill();
 inputs.forEach(function(el){
   var ev=(el.tagName==="SELECT"||el.type==="checkbox")?"change":"input";
   el.addEventListener(ev,function(){var k=el.dataset.k;S[k]=el.type==="checkbox"?el.checked:(k==="pnr"?el.value.toUpperCase():el.value);persist();renderAll()})});
+/* bridge for the account script (it lives outside this scope) */
+window.FV_state={get:function(){return S},
+  set:function(o){S=o&&typeof o==="object"?o:{};var t=S._t;window.FV_noPush=true;try{persist()}finally{window.FV_noPush=false}if(t)S._t=t;fill();renderAll()}};
 function persist(){S._t=Date.now();var p={},t={};
   for(var k in S){(TRIP_KEYS.indexOf(k)>=0?t:p)[k]=S[k]}
-  save(PKEY,p);save(TKEY,t)}
+  save(PKEY,p);save(TKEY,t);if(window.FV_cloudPush)FV_cloudPush()}
 
 /* Wh calculator */
 function calc(){var v=parseFloat($("c-v").value),a=parseFloat($("c-ah").value);
