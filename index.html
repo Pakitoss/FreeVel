@@ -743,6 +743,30 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 @media (min-width:901px) and (max-width:1299px){.side{top:calc(env(safe-area-inset-top,0px) + 124px)}}
 @media (max-width:1299px){.pz{scroll-margin-top:130px}}
 @media (max-width:480px){.me-l{display:none}.me{padding:4px}}
+
+/* ---------- handling sheet behind an icon tile + dialog ---------- */
+.doc-tile{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;width:100%;text-align:left;cursor:pointer;color:var(--ink);font:inherit;padding:16px 18px}
+.doc-tile:hover{border-color:var(--ink)}
+.doc-ic{width:48px;height:48px;border-radius:14px;background:var(--sign);color:var(--sign-ink);display:grid;place-items:center}
+.doc-ic svg{width:28px;height:28px}
+.doc-t{display:grid;gap:2px;min-width:0}
+.doc-t b{font-family:var(--f-display);font-size:17px}
+.doc-t span{font-size:14px;color:var(--muted)}
+.doc-go{font-size:22px;font-weight:700}
+.sheet-dlg{border:0;padding:0;border-radius:20px;background:var(--surface);color:var(--ink);width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 48px);box-shadow:0 30px 70px -30px #13294bb3}
+.sheet-dlg[open]{display:flex;flex-direction:column}
+.sheet-dlg::backdrop{background:#13294b8c}
+.sheet-dlg-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px 12px;border-bottom:1px solid var(--line)}
+.sheet-dlg-head h2{font-size:20px}
+.dlg-x{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:var(--field);color:var(--ink);font-size:24px;line-height:1;cursor:pointer;flex:none}
+.dlg-x:hover{border-color:var(--ink)}
+.sheet-dlg-body{overflow:auto;padding:16px 18px;background:var(--bg);flex:1 1 auto;min-height:0}
+.sheet-dlg-foot{display:grid;gap:8px;padding:14px 18px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
+@media (max-width:720px){
+  .sheet-dlg{width:100vw;max-width:100vw;max-height:92vh;margin:auto 0 0;border-radius:20px 20px 0 0}
+  .sheet-dlg-foot .actions .btn{flex:1 1 auto}
+}
+@media (prefers-reduced-motion:no-preference){.sheet-dlg[open]{animation:dlg-in .18s ease-out}@keyframes dlg-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}}
 </style>
 </head>
 <body>
@@ -846,29 +870,45 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
           <button class="btn small ghost" type="button" id="newtrip">Start a new trip</button>
         </div>
       </form>
-      <a class="panel promo" href="#transfers">
-        <span class="promo-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16V8a2 2 0 0 1 2-2h9l4 4h1a2 2 0 0 1 2 2v4"/><path d="M3 16h18"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/><path d="M14 6v4h4"/></svg></span>
-        <span class="promo-t"><b>Need a ride to or from the airport?</b><span>Request a wheelchair-accessible transfer. We find options for you.</span></span>
-        <span class="promo-go" aria-hidden="true">→</span>
-      </a>
     </div>
 
-    <aside class="side" aria-label="Card preview">
+    <aside class="side" aria-label="Documents and transfers">
       <div class="panel meter" id="meter" hidden>
         <div class="meter-top"><span class="muted" style="font-size:14px">Card completeness</span><b id="m-pct">0%</b></div>
         <div class="bar"><i id="m-bar" style="width:0"></i></div>
         <div class="missing" id="m-miss"></div>
       </div>
+      <button class="panel doc-tile" type="button" id="sheet-open" aria-haspopup="dialog" aria-controls="sheet-dlg">
+        <span class="doc-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><circle cx="11" cy="10.6" r=".9" fill="currentColor" stroke="none"/><path d="M11 12.4v2.6h3l1.4 2.3"/><path d="M9.6 13.8a2.6 2.6 0 1 0 3.8 3"/></svg></span>
+        <span class="doc-t"><b>Wheelchair handling sheet</b><span>For airport and airline staff. Open it to download the PDF or copy the text.</span></span>
+        <span class="doc-go" aria-hidden="true">→</span>
+      </button>
+      <a class="panel promo" href="#transfers">
+        <span class="promo-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16V8a2 2 0 0 1 2-2h9l4 4h1a2 2 0 0 1 2 2v4"/><path d="M3 16h18"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/><path d="M14 6v4h4"/></svg></span>
+        <span class="promo-t"><b>Need a ride to or from the airport?</b><span>Request a wheelchair-accessible transfer. We find options for you.</span></span>
+        <span class="promo-go" aria-hidden="true">→</span>
+      </a>
+    </aside>
+  </div>
+
+  <dialog class="sheet-dlg" id="sheet-dlg" aria-labelledby="sheet-dlg-t">
+    <div class="sheet-dlg-head">
+      <h2 id="sheet-dlg-t">Wheelchair handling sheet</h2>
+      <button class="dlg-x" type="button" id="sheet-close" aria-label="Close">×</button>
+    </div>
+    <div class="sheet-dlg-body">
       <div class="sheet" id="sheet" aria-live="polite" data-noi18n></div>
+    </div>
+    <div class="sheet-dlg-foot">
       <div class="actions">
-        <button class="btn sign" type="button" onclick="FV_showCheckin()">Show at check-in</button>
+        <button class="btn sign" type="button" id="sheet-checkin">Show at check-in</button>
         <button class="btn" type="button" id="pdf" hidden>Download PDF</button>
         <button class="btn ghost" type="button" id="copy">Copy text</button>
       </div>
       <p class="note" id="msg">The A4 PDF is ready to print and keep in your hand luggage.</p>
       <textarea class="copybox" id="copybox" readonly hidden aria-label="Card text"></textarea>
-    </aside>
-  </div>
+    </div>
+  </dialog>
 </section>
 
 <!-- ============ 02 WHICH AIRLINE ============ -->
@@ -1497,6 +1537,10 @@ window.FREEVEL_CONFIG = {
    - Elements marked data-noi18n are never touched (staff card, letters, user content).
    To add a translation: add "English text": "Testo italiano" to FV_IT below. */
 var FV_IT = /*DICT*/{
+"Wheelchair handling sheet":"Scheda per il personale",
+"For airport and airline staff. Open it to download the PDF or copy the text.":"Per il personale dell'aeroporto e della compagnia aerea. Aprila per scaricare il PDF o copiare il testo.",
+"Close":"Chiudi",
+"Documents and transfers":"Documenti e trasferimenti",
 "1 photo could not be read.": "Non è stato possibile leggere 1 foto.",
 "7 days": "7 giorni",
 "A loan wheelchair meanwhile": "Una carrozzina sostitutiva nel frattempo",
@@ -2241,6 +2285,16 @@ function battUI(){if(!powered())return"";var t=BT[S.bt]?T(BT[S.bt][1]):"";
 
 
 /* ---------- home greeting + hero ---------- */
+
+/* ---------- handling sheet dialog ---------- */
+(function(){var d=$("sheet-dlg"),o=$("sheet-open");if(!d||!o)return;
+  function open(){renderSheet();if(d.showModal){try{d.showModal()}catch(e){d.setAttribute("open","")}}else d.setAttribute("open","")}
+  function close(){if(d.close)d.close();else d.removeAttribute("open");o.focus()}
+  o.addEventListener("click",open);$("sheet-close").addEventListener("click",close);
+  d.addEventListener("click",function(e){if(e.target===d)close()});
+  $("sheet-checkin").addEventListener("click",function(){close();FV_showCheckin()});
+  if(location.hash==="#sheet"){location.hash="card";setTimeout(open,0)}
+})();
 window.FV_showCheckin=function(){if(location.hash!=="#card"&&location.hash!=="")location.hash="card";
   setTimeout(function(){var c=$("checkin");if(!c)return;c.scrollIntoView({behavior:"smooth",block:"start"});var f=$("fs");if(f)f.click()},60)};
 
