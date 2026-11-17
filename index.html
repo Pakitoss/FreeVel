@@ -205,7 +205,8 @@ img{max-width:100%}
   --grad:linear-gradient(135deg,#2aa39a 0%,#7cc0e8 100%);
   --band:#fcf8f1; --band-ink:#13294b; --band-muted:#5d6272;
   --btn:#13294b; --btn-ink:#ffffff;
-  --ok:#1d8178; --ok-soft:#dcf2ef; --warn:#8f4f00; --warn-soft:#fdf0d8; --bad:#a52019; --bad-soft:#fbe5e3; --info:#1f5f99; --info-soft:#e3f1fb;
+  --teal-ink:#1a7068; --field-line:#8f8574;
+  --ok:#176b62; --ok-soft:#dcf2ef; --warn:#8f4f00; --warn-soft:#fdf0d8; --bad:#a52019; --bad-soft:#fbe5e3; --info:#1f5f99; --info-soft:#e3f1fb;
   --paper:#ffffff; --paper-ink:#111418; --paper-muted:#5a606b; --paper-line:#c9ced6;
   --f-display:"Poppins",system-ui,sans-serif;
   --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -217,6 +218,7 @@ img{max-width:100%}
   --bg:#0b1630; --surface:#122247; --ink:#eaf1f8; --muted:#a3b4cc; --line:#243a66; --field:#0e1c3c;
   --band:#081127; --band-ink:#eef4fa; --band-muted:#8ea3c2;
   --btn:#f5a742; --btn-ink:#13294b;
+  --teal-ink:#5fcdbf; --field-line:#5f78a6;
   --ok:#5fcdbf; --ok-soft:#10343a; --warn:#f3b45a; --warn-soft:#33240c; --bad:#ff8a80; --bad-soft:#3a1513; --info:#8fcaf0; --info-soft:#12284a;
   color-scheme:dark}
 
@@ -255,9 +257,9 @@ button,input,select,textarea{font:inherit;color:inherit}
 .checkin .desk-wrap{justify-items:stretch}
 .checkin .tag{max-width:none}
 .hello-hi{margin:0;font-size:20px;color:var(--muted)}
-.hello-hi .hi-name{color:var(--teal);font-family:var(--f-display);font-weight:700}
+.hello-hi .hi-name{color:var(--teal-ink);font-family:var(--f-display);font-weight:700}
 .hello-name{display:flex;align-items:center;gap:10px;margin:10px 0 0;font-weight:700;font-size:15px;color:var(--muted)}
-.hello-name input{min-height:42px;padding:8px 14px;border:1.5px solid var(--line);border-radius:99px;background:var(--surface);font-size:16px;flex:1;min-width:0;max-width:240px}
+.hello-name input{min-height:42px;padding:8px 14px;border:1.5px solid var(--field-line);border-radius:99px;background:var(--surface);font-size:16px;flex:1;min-width:0;max-width:240px}
 .hello-name input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px #2aa39a33}
 .hello h1{font-size:clamp(26px,3.6vw,38px);line-height:1.15;font-weight:700;color:var(--ink);max-width:22ch}
 .hero{background:var(--navy);color:#fff;border-radius:24px;padding:22px 22px 24px;display:grid;gap:14px;box-shadow:0 18px 40px -24px #13294b99}
@@ -281,7 +283,7 @@ button,input,select,textarea{font:inherit;color:inherit}
   .me{order:3!important}
   main{padding-bottom:110px}
   .bnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:40;background:#fffdf8f2;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:22px;padding:6px;box-shadow:0 12px 32px -12px #5a42204d}
-  .bnav>a,.bnav>button{display:grid;justify-items:center;gap:3px;padding:8px 2px;border-radius:16px;color:var(--muted);text-decoration:none;font:600 11.5px var(--f-display);background:none;border:0;cursor:pointer}
+  .bnav>a,.bnav>button{display:grid;justify-items:center;gap:3px;padding:8px 2px;border-radius:16px;color:var(--muted);text-decoration:none;font:600 12.5px var(--f-display);background:none;border:0;cursor:pointer}
   .bnav svg{width:22px;height:22px}
   .bnav>a[aria-current="page"]{background:#e4efe9;color:var(--navy)}
   .bnav-menu{position:absolute;right:6px;bottom:calc(100% + 8px);background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:6px;display:grid;min-width:200px;box-shadow:0 12px 32px -12px #5a42204d}
@@ -293,7 +295,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 
 .intro{display:grid;gap:20px;padding:28px}
 .intro-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
-.intro-eyebrow{margin:0 0 6px;font-family:var(--f-display);font-size:12.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--teal)}
+.intro-eyebrow{margin:0 0 6px;font-family:var(--f-display);font-size:12.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-ink)}
 .intro-head h2{font-size:clamp(20px,2.4vw,26px);line-height:1.25;max-width:32ch}
 .intro-feats{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .intro-feats li{display:grid;gap:6px;align-content:start;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--field)}
@@ -310,7 +312,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .intro-steps li>span{color:var(--muted);font-size:15px;line-height:1.5}
 .intro-cta{display:flex;flex-wrap:wrap;gap:10px}
 .intro-show{margin:0}
-.linkish{background:none;border:0;padding:0;color:var(--teal);font-weight:700;text-decoration:underline;cursor:pointer}
+.linkish{background:none;border:0;padding:0;color:var(--teal-ink);font-weight:700;text-decoration:underline;cursor:pointer}
 @media (max-width:900px){.intro-feats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:520px){.intro{padding:20px}.intro-feats{grid-template-columns:minmax(0,1fr)}.intro-head{flex-direction:column}}
 .fit-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:20px;align-items:start}
@@ -390,7 +392,7 @@ main{padding-block:28px 56px}
 .cat svg{width:18px;height:18px}
 .cat.on{background:var(--navy);color:#fff;border-color:var(--navy);cursor:default}
 .cat.on svg{color:var(--orange)}
-.cat small{font-family:var(--f-mono);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;opacity:.8}
+.cat small{font-family:var(--f-mono);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em}
 .cat:not(.on):hover{border-color:var(--muted);color:var(--ink)}
 
 /* ---------- form ---------- */
@@ -405,7 +407,7 @@ legend .n{background:var(--grad);color:#fff;border-radius:99px;padding:1px 8px}
 .row.r4{grid-template-columns:repeat(auto-fit,minmax(96px,1fr))}
 .f{display:grid;gap:5px;font-size:14px;font-weight:700;color:var(--ink);min-width:0}
 .f .h{font-weight:400;color:var(--muted);font-size:13px}
-.f input,.f select,.f textarea{width:100%;min-height:46px;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--field);font-weight:400;font-size:16px}
+.f input,.f select,.f textarea{width:100%;min-height:46px;padding:10px 12px;border:1.5px solid var(--field-line);border-radius:12px;background:var(--field);font-weight:400;font-size:16px}
 .f textarea{min-height:88px;resize:vertical}
 .f input:focus,.f select:focus,.f textarea:focus{border-color:var(--teal);outline:none;box-shadow:0 0 0 3px #2aa39a40}
 .unit{position:relative}
@@ -415,7 +417,7 @@ legend .n{background:var(--grad);color:#fff;border-radius:99px;padding:1px 8px}
 .chk input{width:22px;height:22px;margin:0;flex:none;accent-color:var(--ink)}
 :root[data-theme="dark"] .chk input{accent-color:var(--sign)}
 .calc{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px;color:var(--muted);background:var(--field);border:1px dashed var(--line);border-radius:9px;padding:10px 12px}
-.calc input{width:86px;min-height:38px;padding:6px 8px;border:1.5px solid var(--line);border-radius:7px;background:var(--surface)}
+.calc input{width:86px;min-height:38px;padding:6px 8px;border:1.5px solid var(--field-line);border-radius:7px;background:var(--surface)}
 .form-foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding-top:16px;border-top:1px solid var(--line)}
 .sync{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
 
@@ -853,6 +855,12 @@ nav.tabs a{transition:background-color .2s,color .2s}
 @media (max-width:720px){
   .bnav{box-shadow:0 18px 40px -16px #13294b66}
   .bnav>a{transition:background-color .2s,color .2s}
+  /* compact cookie banner: less of the page covered, big full-width buttons */
+  .cookie{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+  .cookie-in{padding:12px 14px;gap:10px}
+  .cookie-in p{flex-basis:100%;font-size:13.5px;line-height:1.45}
+  .cookie-b{width:100%}
+  .cookie-b .btn{flex:1 1 0}
 }
 :root[data-theme="dark"] .bnav{background:color-mix(in srgb,var(--surface) 92%,transparent)}
 
@@ -2418,6 +2426,7 @@ function renderHero(){var box=$("hero"),hi=$("hello-hi");if(!box)return;
       trip=["airline","flight","date"].every(function(k){return String(S[k]||"").trim()});
   var steps='<ol class="hero-steps"><li class="'+(prof?'done':'')+'">'+T("1 Profile")+'</li><li class="'+(trip?'done':'')+'">'+T("2 Flight")+'</li><li>'+T("3 Show at check-in")+'</li></ol>';
   var ck=$("checkin");if(ck)ck.hidden=!prof;
+  var tf=$("tform");if(tf)tf.hidden=!prof; /* one clear starting point: the trip form appears once the profile exists */
   if(!prof){box.innerHTML='<p class="hero-k">'+T("Start here")+'</p><div class="hero-box"><span class="hero-ic">'+HERO_IC+'</span><div><b>'+T("Create your profile")+'</b><small>'+T("About 2 minutes, no account needed")+'</small></div></div>'+steps+
     '<div class="hero-cta"><a class="btn sign" href="#profile">'+T("Start")+'</a><a class="btn ghost" href="#fit">'+T("Which airline fits?")+'</a></div>';return}
   if(!trip){box.innerHTML='<p class="hero-k">'+T("Next step")+'</p><div class="hero-box"><span class="hero-ic">'+HERO_IC+'</span><div><b>'+T("Add your flight")+'</b><small>'+T("Airline, flight number and date")+'</small></div></div>'+steps+
