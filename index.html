@@ -767,6 +767,114 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
   .sheet-dlg-foot .actions .btn{flex:1 1 auto}
 }
 @media (prefers-reduced-motion:no-preference){.sheet-dlg[open]{animation:dlg-in .18s ease-out}@keyframes dlg-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}}
+
+/* =====================================================================
+   Depth & motion layer — sits on top of the base styles above.
+   All movement lives inside prefers-reduced-motion:no-preference, and the
+   global reduced-motion rule near the top still switches everything off.
+   ===================================================================== */
+:root{--ease:cubic-bezier(.2,.8,.2,1);--lift:0 2px 4px #5a42200d,0 22px 44px -26px #13294b47}
+:root[data-theme="dark"]{--lift:0 2px 4px #0006,0 22px 44px -26px #000c}
+
+/* soft ambient light behind the page instead of a flat fill */
+body{background:
+  radial-gradient(900px 520px at 100% -8%,#7cc0e82b,transparent 62%),
+  radial-gradient(720px 480px at -12% 28%,#2aa39a1c,transparent 62%),
+  radial-gradient(640px 420px at 85% 108%,#f5a7421c,transparent 62%),
+  var(--bg);background-attachment:fixed}
+
+/* header gets a touch of depth */
+.band{box-shadow:0 8px 24px -22px #13294b59}
+nav.tabs a{transition:background-color .2s,color .2s}
+.me,.lang-btn{transition:border-color .2s,box-shadow .2s}
+.me:hover{box-shadow:0 6px 16px -10px #13294b59}
+
+/* greeting */
+.hello h1 span[aria-hidden]{display:inline-block}
+
+/* ---------- hero: night-sky gradient, glow and a dotted flight path ---------- */
+.hero{position:relative;isolation:isolate;overflow:hidden;
+  background:
+    radial-gradient(420px 260px at 104% -12%,#2aa39a5c,transparent 70%),
+    radial-gradient(380px 240px at -8% 118%,#f5a74238,transparent 70%),
+    linear-gradient(160deg,#1a3762 0%,#13294b 52%,#0d1d38 100%);
+  box-shadow:inset 0 1px 0 #ffffff1a,0 30px 60px -30px #13294bb3}
+.hero::before{content:"";position:absolute;z-index:-1;pointer-events:none;top:-26px;right:-6px;width:min(440px,92%);aspect-ratio:420/170;opacity:.6;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 170' fill='none'%3E%3Cpath d='M6 164C110 158 214 96 300 58' stroke='%239fe0d4' stroke-width='2.2' stroke-linecap='round' stroke-dasharray='1 9'/%3E%3Cg transform='translate(334 44) rotate(-24)'%3E%3Cpath d='M2 0C2-1.6 0-2.4-6-2.4L-15-12h-4l4 9.6h-9l-4-4h-3l2.6 6.4L-31.4 6.4h3l4-4h9l-4 9.6h4L-6 2.4C0 2.4 2 1.6 2 0Z' fill='%23f5a742'/%3E%3C/g%3E%3Ccircle cx='392' cy='112' r='1.6' fill='%23ffffff66'/%3E%3Ccircle cx='238' cy='148' r='1.2' fill='%23ffffff4d'/%3E%3Ccircle cx='404' cy='18' r='1.4' fill='%23ffffff59'/%3E%3Ccircle cx='190' cy='22' r='1.1' fill='%23ffffff40'/%3E%3C/svg%3E") center/contain no-repeat}
+.hero-k{display:flex;align-items:center;gap:8px}
+.hero-k::before{content:"";width:8px;height:8px;border-radius:50%;background:#9fe0d4;box-shadow:0 0 0 4px #9fe0d42e}
+.hero-box{box-shadow:0 14px 28px -18px #000000b3;transition:transform .3s var(--ease),box-shadow .3s}
+:root[data-theme="dark"] .hero-box{background:#1b2f58;box-shadow:inset 0 1px 0 #ffffff14,0 14px 28px -18px #000000b3}
+.hero-ic{position:relative;background:var(--grad);color:#fff}
+.hero-ic::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid #2aa39a;opacity:0}
+
+/* ---------- 1 → 2 → 3 as a real progress track ---------- */
+.hero-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+.hero-steps li{position:relative;background:none;border-radius:0;padding:26px 4px 0;text-align:center;font-size:13.5px;line-height:1.3;color:#ffffffb3;text-wrap:balance}
+.hero-steps li::before{content:"";position:absolute;z-index:1;top:6px;left:50%;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:#13294b;border:2px solid #ffffff59;box-sizing:border-box}
+.hero-steps li::after{content:"";position:absolute;top:13px;right:50%;width:100%;height:2px;background:#ffffff2e}
+.hero-steps li:first-child::after{display:none}
+.hero-steps li.done{background:none;color:#9fe0d4}
+.hero-steps li.done::before{background:#9fe0d4 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.2l2.3 2.3 4.7-5' stroke='%2313294b' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat;border-color:#9fe0d4}
+.hero-steps li.done::after{background:#9fe0d4}
+.hero-steps li:first-child:not(.done),.hero-steps li.done+li:not(.done){color:#fff}
+.hero-steps li:first-child:not(.done)::before,.hero-steps li.done+li:not(.done)::before{background:var(--orange);border-color:var(--orange);box-shadow:0 0 0 5px #f5a74238}
+.hero-steps li.done+li:not(.done)::after{background:linear-gradient(90deg,#9fe0d4,#ffffff2e)}
+
+/* ---------- buttons: tactile press + a light sweep on the main action ---------- */
+.btn{transition:transform .18s var(--ease),box-shadow .22s,filter .2s,background-color .2s,border-color .2s}
+.btn:not([disabled]):hover{transform:translateY(-1px)}
+.btn:not([disabled]):active{transform:translateY(0) scale(.97)}
+.btn.sign{position:relative;overflow:hidden;background:linear-gradient(180deg,#ffb95c 0%,#f5a742 100%);box-shadow:inset 0 1px 0 #ffffff66,0 8px 18px -8px #f08c2eb3}
+.btn.sign:not([disabled]):hover{box-shadow:inset 0 1px 0 #ffffff66,0 12px 24px -8px #f08c2ecc}
+.btn.sign::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 30%,#ffffff8c 50%,transparent 70%);transform:translateX(-130%)}
+.hero .btn.ghost:hover{background:#ffffff14;border-color:#ffffffa6}
+
+/* ---------- cards: a bit of elevation, and the clickable ones lift ---------- */
+.panel{box-shadow:var(--lift)}
+.doc-tile,.promo{transition:transform .3s var(--ease),box-shadow .3s,border-color .2s}
+.doc-tile:hover,.promo:hover{transform:translateY(-3px);box-shadow:0 2px 4px #5a42200d,0 28px 50px -26px #13294b66}
+.doc-go,.promo-go{transition:transform .3s var(--ease)}
+.doc-tile:hover .doc-go,.promo:hover .promo-go{transform:translateX(4px)}
+.doc-ic{background:linear-gradient(145deg,#ffc36e,#f39a35);box-shadow:inset 0 1px 0 #ffffff80,0 8px 16px -10px #f08c2ecc}
+.promo-ic{box-shadow:0 8px 16px -10px #2aa39acc}
+.promo{background:linear-gradient(135deg,var(--surface) 60%,color-mix(in srgb,var(--teal) 9%,var(--surface)))}
+
+/* category chips */
+.cat{transition:border-color .2s,color .2s,transform .2s var(--ease),box-shadow .2s}
+.cat:not(.on):hover{transform:translateY(-1px)}
+.cat.on{background:linear-gradient(135deg,#1d3c6a,#13294b);box-shadow:0 10px 20px -12px #13294bb3}
+
+/* form fields: smooth focus ring */
+.f input,.f select,.f textarea,.hello-name input{transition:border-color .2s,box-shadow .2s,background-color .2s}
+.f input:focus,.f select:focus,.f textarea:focus{background:var(--surface)}
+
+/* bottom bar on phones: floating glass */
+@media (max-width:720px){
+  .bnav{box-shadow:0 18px 40px -16px #13294b66}
+  .bnav>a{transition:background-color .2s,color .2s}
+}
+:root[data-theme="dark"] .bnav{background:color-mix(in srgb,var(--surface) 92%,transparent)}
+
+/* ---------- motion (only for people who have not asked to reduce it) ---------- */
+@media (prefers-reduced-motion:no-preference){
+  .view>*:not(dialog){animation:fv-up .6s var(--ease) both}
+  .view>*:nth-child(2){animation-delay:.06s}
+  .view>*:nth-child(3){animation-delay:.12s}
+  .view>*:nth-child(4){animation-delay:.18s}
+  .view>*:nth-child(5){animation-delay:.24s}
+  .view>*:nth-child(n+6){animation-delay:.3s}
+  .hello h1 span[aria-hidden]{animation:fv-fly 5s ease-in-out infinite}
+  .hero::before{animation:fv-drift 9s ease-in-out infinite}
+  .hero-ic::after{animation:fv-ring 2.6s var(--ease) infinite}
+  .hero-steps li:first-child:not(.done)::before,.hero-steps li.done+li:not(.done)::before{animation:fv-beacon 2.2s ease-in-out infinite}
+  .btn.sign:not([disabled]):hover::after{transform:translateX(130%);transition:transform .7s var(--ease)}
+}
+@keyframes fv-up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes fv-fly{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(4px,-5px) rotate(-6deg)}}
+@keyframes fv-drift{0%,100%{transform:translate(0,0)}50%{transform:translate(-8px,4px)}}
+@keyframes fv-ring{0%{opacity:.7;transform:scale(.85)}80%,100%{opacity:0;transform:scale(1.35)}}
+@keyframes fv-beacon{0%,100%{box-shadow:0 0 0 5px #f5a74238}50%{box-shadow:0 0 0 9px #f5a74214}}
 </style>
 </head>
 <body>
