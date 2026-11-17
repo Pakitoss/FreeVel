@@ -839,6 +839,12 @@ nav.tabs a{transition:background-color .2s,color .2s}
 .promo-ic{box-shadow:0 8px 16px -10px #2aa39acc}
 .promo{background:linear-gradient(135deg,var(--surface) 60%,color-mix(in srgb,var(--teal) 9%,var(--surface)))}
 
+/* QR code inside the handling-sheet dialog */
+.sheet-qr{display:grid;justify-items:center;gap:8px;padding:14px;border:1px solid var(--line);border-radius:16px;background:#fff;color:#13294b;text-align:center}
+.sheet-qr canvas{display:block;max-width:100%;image-rendering:pixelated}
+.sheet-qr span{font-size:14px;font-weight:700;max-width:30ch}
+@media (prefers-reduced-motion:no-preference){.sheet-qr:not([hidden]){animation:fv-up .3s var(--ease) both}}
+
 /* hero card is itself a link to the next step */
 a.hero-box{text-decoration:none;cursor:pointer}
 a.hero-box>div{flex:1;min-width:0}
@@ -1024,12 +1030,11 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
     </div>
     <div class="sheet-dlg-foot">
       <div class="actions">
-        <button class="btn sign" type="button" id="sheet-checkin">Show at check-in</button>
+        <button class="btn sign" type="button" id="sheet-qr-btn" aria-expanded="false" aria-controls="sheet-qr">Show QR code</button>
         <button class="btn" type="button" id="pdf" hidden>Download PDF</button>
-        <button class="btn ghost" type="button" id="copy">Copy text</button>
       </div>
+      <div class="sheet-qr" id="sheet-qr" hidden></div>
       <p class="note" id="msg">The A4 PDF is ready to print and keep in your hand luggage.</p>
-      <textarea class="copybox" id="copybox" readonly hidden aria-label="Card text"></textarea>
     </div>
   </dialog>
 </section>
@@ -2145,7 +2150,12 @@ var FV_IT = /*DICT*/{
 "The A4 PDF is ready to print and keep in your hand luggage.": "Il PDF in formato A4 è pronto da stampare e da tenere nel bagaglio a mano.",
 "The IATA code the airline puts on your booking.": "Il codice IATA che la compagnia aerea inserisce nella tua prenotazione.",
 "The PDF could not be created. Use Copy letter instead.": "Non è stato possibile creare il PDF. Usa «Copia lettera».",
-"The PDF could not be created. Use Copy text, or show the card from your phone.": "Non è stato possibile creare il PDF. Usa «Copia testo» o mostra la scheda dal telefono.",
+"The PDF could not be created. Show the QR code, or show the card from your phone.": "Non è stato possibile creare il PDF. Mostra il QR code o mostra la scheda dal telefono.",
+"Show QR code": "Mostra QR code",
+"Hide QR code": "Nascondi QR code",
+"QR code of the handling sheet": "QR code della scheda per il personale",
+"Staff can scan it to read the full sheet": "Il personale può inquadrarlo per leggere la scheda completa",
+"The QR code could not be created. Download the PDF instead.": "Non è stato possibile creare il QR code. Scarica il PDF.",
 "The Wh rating is missing. It is the first thing staff ask for with lithium batteries. Find it on the label, or calculate it as volts × Ah.": "Manca la capacità in Wh. È il primo dato che il personale chiede per le batterie al litio. La trovi sull'etichetta, oppure calcolala come volt × Ah.",
 "The battery is removable (per the manufacturer)": "La batteria è rimovibile (secondo il produttore)",
 "The download did not start. Use Copy instead.": "Il download non è partito. Usa la copia del testo.",
@@ -2415,7 +2425,18 @@ function battUI(){if(!powered())return"";var t=BT[S.bt]?T(BT[S.bt][1]):"";
   function close(){if(d.close)d.close();else d.removeAttribute("open");o.focus()}
   o.addEventListener("click",open);$("sheet-close").addEventListener("click",close);
   d.addEventListener("click",function(e){if(e.target===d)close()});
-  $("sheet-checkin").addEventListener("click",function(){close();FV_showCheckin()});
+  /* QR code of the full sheet, shown on demand so staff can scan it from the phone */
+  var qb=$("sheet-qr-btn"),qs=$("sheet-qr");
+  function qrHide(){qs.hidden=true;qs.innerHTML="";qb.setAttribute("aria-expanded","false");qb.textContent=T("Show QR code")}
+  qb.addEventListener("click",function(){if(!qs.hidden){qrHide();return}
+    /* drawn at the exact size it is shown (whole pixels per module) so phones scan it reliably */
+    var c=qrCanvas(plain(true),Math.max(180,Math.min(400,(qs.parentNode.clientWidth||320)-32)));
+    if(!c){msg(T("The QR code could not be created. Download the PDF instead."));return}
+    c.setAttribute("role","img");c.setAttribute("aria-label",T("QR code of the handling sheet"));
+    qs.innerHTML="";qs.appendChild(c);qs.insertAdjacentHTML("beforeend","<span>"+esc(T("Staff can scan it to read the full sheet"))+"</span>");
+    qs.hidden=false;qb.setAttribute("aria-expanded","true");qb.textContent=T("Hide QR code");
+    try{qs.scrollIntoView({block:"nearest"})}catch(e){}});
+  d.addEventListener("close",qrHide);window.addEventListener("fv:lang",qrHide);
   if(location.hash==="#sheet"){location.hash="card";setTimeout(open,0)}
 })();
 window.FV_showCheckin=function(){if(location.hash!=="#card"&&location.hash!=="")location.hash="card";
@@ -2568,7 +2589,6 @@ function renderMail(){var m=mail();$("mail-subj").textContent=m.subj;$("mail-bod
 function copyText(text,okFn,box){function fallback(){if(box){box.hidden=false;box.value=text;box.focus();box.select()}okFn(false)}
   try{navigator.clipboard.writeText(text).then(function(){if(box)box.hidden=true;okFn(true)},fallback)}catch(e){fallback()}}
 function msg(m){$("msg").textContent=m}
-$("copy").onclick=function(){copyText(plain(false),function(ok){msg(ok?"Text copied. Paste it into an email or your notes.":"Copying was blocked. The text is selected below, so copy it manually.")},$("copybox"))};
 $("mail-copy").onclick=function(){var m=mail();copyText(m.subj+"\n\n"+m.body,function(ok){$("mail-msg").textContent=ok?"Message copied, with the subject line.":"Copying was blocked. Select the text above and copy it manually."},null)};
 
 /* ---------- checklist ---------- */
@@ -2614,7 +2634,7 @@ function buildPDF(){var J=window.jspdf&&window.jspdf.jsPDF;if(!J)throw new Error
   d.setFont("helvetica","normal");d.setFontSize(7.5);d.setTextColor(120,126,136);d.text(lat("FreeVel (MVP) - "+"generated "+new Date().toLocaleDateString("en-GB")+" - always check your airline's rules."),M,292);
   return d.output("blob")}
 $("pdf").onclick=function(){var b=this;b.disabled=true;var blob;
-  try{blob=buildPDF()}catch(e){b.disabled=false;msg("The PDF could not be created. Use Copy text, or show the card from your phone.");return}
+  try{blob=buildPDF()}catch(e){b.disabled=false;msg("The PDF could not be created. Show the QR code, or show the card from your phone.");return}
   var fn="wheelchair-card"+(S.name?"-"+S.name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""):"")+".pdf";
   saveBlob(blob,fn,"PDF ready. Print it on A4 and keep it in your hand luggage.",msg,b)};
 /* Saves a file: Claude's download prompt inside Claude, a normal browser download elsewhere. */
