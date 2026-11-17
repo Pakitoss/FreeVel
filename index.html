@@ -258,9 +258,6 @@ button,input,select,textarea{font:inherit;color:inherit}
 .checkin .tag{max-width:none}
 .hello-hi{margin:0;font-size:20px;color:var(--muted)}
 .hello-hi .hi-name{color:var(--teal-ink);font-family:var(--f-display);font-weight:700}
-.hello-name{display:flex;align-items:center;gap:10px;margin:10px 0 0;font-weight:700;font-size:15px;color:var(--muted)}
-.hello-name input{min-height:42px;padding:8px 14px;border:1.5px solid var(--field-line);border-radius:99px;background:var(--surface);font-size:16px;flex:1;min-width:0;max-width:240px}
-.hello-name input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px #2aa39a33}
 .hello h1{font-size:clamp(26px,3.6vw,38px);line-height:1.15;font-weight:700;color:var(--ink);max-width:22ch}
 .hero{background:var(--navy);color:#fff;border-radius:24px;padding:22px 22px 24px;display:grid;gap:14px;box-shadow:0 18px 40px -24px #13294b99}
 .hero-k{margin:0;font-family:var(--f-display);font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9fe0d4}
@@ -842,13 +839,25 @@ nav.tabs a{transition:background-color .2s,color .2s}
 .promo-ic{box-shadow:0 8px 16px -10px #2aa39acc}
 .promo{background:linear-gradient(135deg,var(--surface) 60%,color-mix(in srgb,var(--teal) 9%,var(--surface)))}
 
+/* hero card is itself a link to the next step */
+a.hero-box{text-decoration:none;cursor:pointer}
+a.hero-box>div{flex:1;min-width:0}
+.hero-go{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--orange);color:var(--navy);font-size:19px;font-weight:700;transition:transform .3s var(--ease)}
+a.hero-box:hover{transform:translateY(-2px);box-shadow:0 20px 34px -18px #000000cc}
+a.hero-box:hover .hero-go{transform:translateX(3px)}
+a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
+
+/* when nothing is in the left column yet (no profile), the side cards take its place */
+.split:not(:has(>.stack>:not([hidden])))>.stack{display:none}
+.split:not(:has(>.stack>:not([hidden])))>.side{grid-column:1;position:static}
+
 /* category chips */
 .cat{transition:border-color .2s,color .2s,transform .2s var(--ease),box-shadow .2s}
 .cat:not(.on):hover{transform:translateY(-1px)}
 .cat.on{background:linear-gradient(135deg,#1d3c6a,#13294b);box-shadow:0 10px 20px -12px #13294bb3}
 
 /* form fields: smooth focus ring */
-.f input,.f select,.f textarea,.hello-name input{transition:border-color .2s,box-shadow .2s,background-color .2s}
+.f input,.f select,.f textarea{transition:border-color .2s,box-shadow .2s,background-color .2s}
 .f input:focus,.f select:focus,.f textarea:focus{background:var(--surface)}
 
 /* bottom bar on phones: floating glass */
@@ -856,8 +865,7 @@ nav.tabs a{transition:background-color .2s,color .2s}
   .bnav{box-shadow:0 18px 40px -16px #13294b66}
   .bnav>a{transition:background-color .2s,color .2s}
   /* compact cookie banner: less of the page covered, big full-width buttons */
-  .cookie{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
-  .cookie-in{padding:12px 14px;gap:10px}
+  .cookie{bottom:calc(92px + env(safe-area-inset-bottom,0px))}  .cookie-in{padding:12px 14px;gap:10px}
   .cookie-in p{flex-basis:100%;font-size:13.5px;line-height:1.45}
   .cookie-b{width:100%}
   .cookie-b .btn{flex:1 1 0}
@@ -923,7 +931,6 @@ nav.tabs a{transition:background-color .2s,color .2s}
   <div class="hello">
     <p class="hello-hi" id="hello-hi">Hi,</p>
     <h1 id="t-card">ready for your next flight? <span aria-hidden="true">✈️</span></h1>
-    <label class="hello-name" id="hello-name"><span>What's your name?</span><input data-k="name" id="hello-name-in" type="text" autocomplete="given-name"></label>
   </div>
   <div class="hero" id="hero" aria-live="polite"></div>
   <section class="checkin" id="checkin" aria-labelledby="t-desk" hidden>
@@ -2418,18 +2425,16 @@ var HERO_IC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 function renderHero(){var box=$("hero"),hi=$("hello-hi");if(!box)return;
   var first=String(S.name||"").trim().split(/\s+/)[0];
   hi.innerHTML=first?esc(T("Hi"))+' <b class="hi-name">'+esc(first)+'</b> <span aria-hidden="true">👋</span>':esc(T("Hi,"));
-  var hn=$("hello-name"),hin=$("hello-name-in"),typing=document.activeElement===hin;
-  if(hn)hn.hidden=!!first&&!typing;
-  [].forEach.call(document.querySelectorAll('[data-k="name"]'),function(x){if(x!==document.activeElement)x.value=S.name||""});
-  if(hin&&!hin._fv){hin._fv=1;hin.addEventListener("blur",function(){setTimeout(renderHero,0)});hin.addEventListener("keydown",function(e){if(e.key==="Enter")hin.blur()})}
+  /* the name is entered once, in the profile; the greeting simply picks it up */
   var prof=["name","weight","h"].every(function(k){return String(S[k]||"").trim()}),
       trip=["airline","flight","date"].every(function(k){return String(S[k]||"").trim()});
   var steps='<ol class="hero-steps"><li class="'+(prof?'done':'')+'">'+T("1 Profile")+'</li><li class="'+(trip?'done':'')+'">'+T("2 Flight")+'</li><li>'+T("3 Show at check-in")+'</li></ol>';
   var ck=$("checkin");if(ck)ck.hidden=!prof;
   var tf=$("tform");if(tf)tf.hidden=!prof; /* one clear starting point: the trip form appears once the profile exists */
-  if(!prof){box.innerHTML='<p class="hero-k">'+T("Start here")+'</p><div class="hero-box"><span class="hero-ic">'+HERO_IC+'</span><div><b>'+T("Create your profile")+'</b><small>'+T("About 2 minutes, no account needed")+'</small></div></div>'+steps+
+  var GO='<span class="hero-go" aria-hidden="true">→</span>';
+  if(!prof){box.innerHTML='<p class="hero-k">'+T("Start here")+'</p><a class="hero-box is-link" href="#profile"><span class="hero-ic">'+HERO_IC+'</span><div><b>'+T("Create your profile")+'</b><small>'+T("About 2 minutes, no account needed")+'</small></div>'+GO+'</a>'+steps+
     '<div class="hero-cta"><a class="btn sign" href="#profile">'+T("Start")+'</a><a class="btn ghost" href="#fit">'+T("Which airline fits?")+'</a></div>';return}
-  if(!trip){box.innerHTML='<p class="hero-k">'+T("Next step")+'</p><div class="hero-box"><span class="hero-ic">'+HERO_IC+'</span><div><b>'+T("Add your flight")+'</b><small>'+T("Airline, flight number and date")+'</small></div></div>'+steps+
+  if(!trip){box.innerHTML='<p class="hero-k">'+T("Next step")+'</p><a class="hero-box is-link" href="#tform"><span class="hero-ic">'+HERO_IC+'</span><div><b>'+T("Add your flight")+'</b><small>'+T("Airline, flight number and date")+'</small></div>'+GO+'</a>'+steps+
     '<div class="hero-cta"><a class="btn sign" href="#tform">'+T("Add flight")+'</a><a class="btn ghost" href="#fit">'+T("Which airline fits?")+'</a></div>';return}
   box.innerHTML='<p class="hero-k">'+T("Your next flight")+'</p><div class="hero-box"><span class="hero-ic">'+HERO_IC+'</span><div><b>'+esc(S.airline)+' · '+esc(S.flight)+'</b><small>'+esc(S.date)+(S.route?' · '+esc(S.route):'')+'</small></div></div>'+steps+
     '<div class="hero-cta"><button class="btn sign" type="button" onclick="FV_showCheckin()">'+T("Show at check-in")+'</button><a class="btn ghost" href="#transfers">'+T("Book a transfer")+'</a></div>'}
