@@ -837,6 +837,8 @@ nav.tabs a{transition:background-color .2s,color .2s}
 .doc-tile:hover .doc-go,.promo:hover .promo-go{transform:translateX(4px)}
 .doc-ic{background:linear-gradient(145deg,#ffc36e,#f39a35);box-shadow:inset 0 1px 0 #ffffff80,0 8px 16px -10px #f08c2ecc}
 .promo-ic{box-shadow:0 8px 16px -10px #2aa39acc}
+.promo-fit .promo-ic{background:linear-gradient(145deg,#2a4a7a,#13294b);box-shadow:0 8px 16px -10px #13294bcc}
+.promo-fit{background:linear-gradient(135deg,var(--surface) 60%,color-mix(in srgb,var(--sky) 12%,var(--surface)))}
 .promo{background:linear-gradient(135deg,var(--surface) 60%,color-mix(in srgb,var(--teal) 9%,var(--surface)))}
 
 /* QR code inside the handling-sheet dialog */
@@ -966,7 +968,6 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
 
   <div class="split">
     <div class="stack">
-      <div class="panel traveller" id="traveller" aria-live="polite"></div>
       <form class="panel form" id="tform" autocomplete="on" novalidate>
         <fieldset>
         <legend><span class="n">1</span>This trip</legend>
@@ -1009,12 +1010,17 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
       </div>
       <button class="panel doc-tile" type="button" id="sheet-open" aria-haspopup="dialog" aria-controls="sheet-dlg">
         <span class="doc-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><circle cx="11" cy="10.6" r=".9" fill="currentColor" stroke="none"/><path d="M11 12.4v2.6h3l1.4 2.3"/><path d="M9.6 13.8a2.6 2.6 0 1 0 3.8 3"/></svg></span>
-        <span class="doc-t"><b>Wheelchair handling sheet</b><span>For airport and airline staff. Open it to download the PDF or copy the text.</span></span>
+        <span class="doc-t"><b>Wheelchair handling sheet</b><span>For airport and airline staff. Open it to download the PDF or show the QR code.</span></span>
         <span class="doc-go" aria-hidden="true">→</span>
       </button>
       <a class="panel promo" href="#transfers">
         <span class="promo-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16V8a2 2 0 0 1 2-2h9l4 4h1a2 2 0 0 1 2 2v4"/><path d="M3 16h18"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/><path d="M14 6v4h4"/></svg></span>
         <span class="promo-t"><b>Need a ride to or from the airport?</b><span>Request a wheelchair-accessible transfer. We find options for you.</span></span>
+        <span class="promo-go" aria-hidden="true">→</span>
+      </a>
+      <a class="panel promo promo-fit" href="#fit">
+        <span class="promo-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="8" width="19" height="8" rx="1.5"/><path d="M6.5 8v3M10 8v4.5M13.5 8v3M17 8v4.5"/></svg></span>
+        <span class="promo-t"><b>Check your airline's size limits</b><span>Compare your wheelchair's weight and size with each airline's limits.</span></span>
         <span class="promo-go" aria-hidden="true">→</span>
       </a>
     </aside>
@@ -1666,7 +1672,9 @@ window.FREEVEL_CONFIG = {
    To add a translation: add "English text": "Testo italiano" to FV_IT below. */
 var FV_IT = /*DICT*/{
 "Wheelchair handling sheet":"Scheda per il personale",
-"For airport and airline staff. Open it to download the PDF or copy the text.":"Per il personale dell'aeroporto e della compagnia aerea. Aprila per scaricare il PDF o copiare il testo.",
+"For airport and airline staff. Open it to download the PDF or show the QR code.":"Per il personale dell'aeroporto e della compagnia aerea. Aprila per scaricare il PDF o mostrare il QR code.",
+"Check your airline's size limits":"Verifica le dimensioni per la compagnia",
+"Compare your wheelchair's weight and size with each airline's limits.":"Confronta peso e misure della carrozzina con i limiti di ogni compagnia aerea.",
 "Close":"Chiudi",
 "Documents and transfers":"Documenti e trasferimenti",
 "1 photo could not be read.": "Non è stato possibile leggere 1 foto.",
@@ -2469,6 +2477,7 @@ function initials(){var n=String(S.name||"").trim().split(/\s+/).filter(Boolean)
   return n.length?(n[0][0]+(n.length>1?n[n.length-1][0]:"")).toUpperCase():""}
 function renderTraveller(){var ini=initials(),av=$("avatar");
   av.textContent=ini;av.classList.toggle("empty",!ini);
+  if(!$("traveller"))return; /* summary card removed from the home: the avatar in the header is enough */
   var has=["name","weight","notes","brand"].some(function(k){return String(S[k]||"").trim()});
   $("traveller").hidden=!has;if(!has){$("traveller").innerHTML='<div class="tv-empty"><h3>Set up your profile first</h3><p class="note">Your details and your wheelchair\'s specs are saved once and reused on every trip.</p><a class="btn sign" href="#profile">Create my profile</a></div>';return}
   var pw=powered(),chair=[T(TYPE[S.type||"manual"][1]),make(),S.weight?S.weight+" kg":""].filter(Boolean).join(" · ");
