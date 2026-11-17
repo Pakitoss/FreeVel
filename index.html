@@ -752,18 +752,17 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 .doc-t b{font-family:var(--f-display);font-size:17px}
 .doc-t span{font-size:14px;color:var(--muted)}
 .doc-go{font-size:22px;font-weight:700}
-.sheet-dlg{border:0;padding:0;border-radius:20px;background:var(--surface);color:var(--ink);width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 48px);box-shadow:0 30px 70px -30px #13294bb3}
-.sheet-dlg[open]{display:flex;flex-direction:column}
-.sheet-dlg::backdrop{background:#13294b8c}
-.sheet-dlg-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px 12px;border-bottom:1px solid var(--line)}
-.sheet-dlg-head h2{font-size:20px}
-.dlg-x{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:var(--field);color:var(--ink);font-size:24px;line-height:1;cursor:pointer;flex:none}
-.dlg-x:hover{border-color:var(--ink)}
-.sheet-dlg-body{overflow:auto;padding:16px 18px;background:var(--bg);flex:1 1 auto;min-height:0}
-.sheet-dlg-foot{display:grid;gap:8px;padding:14px 18px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
-@media (max-width:720px){
-  .sheet-dlg{width:100vw;max-width:100vw;max-height:92vh;margin:auto 0 0;border-radius:20px 20px 0 0}
-  .sheet-dlg-foot .actions .btn{flex:1 1 auto}
+a.doc-tile{text-decoration:none}
+.card-page{display:grid;grid-template-columns:minmax(0,640px) minmax(260px,1fr);grid-template-rows:auto 1fr;grid-template-areas:"sheet act" "sheet fix";gap:16px 24px;align-items:start}
+.card-page>.sheet{grid-area:sheet}
+.card-act{grid-area:act}
+.card-fix{grid-area:fix;display:grid;gap:6px}
+.stack-actions{display:grid;gap:10px}
+.stack-actions .btn{width:100%}
+@media (max-width:900px){
+  .card-page{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"act" "sheet" "fix"}
+  .stack-actions{grid-template-columns:1fr 1fr}
+  .stack-actions .btn:first-child{grid-column:1/-1}
 }
 @media (prefers-reduced-motion:no-preference){.sheet-dlg[open]{animation:dlg-in .18s ease-out}@keyframes dlg-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}}
 
@@ -789,7 +788,7 @@ nav.tabs a{transition:background-color .2s,color .2s}
 .me:hover{box-shadow:0 6px 16px -10px #13294b59}
 
 /* greeting */
-.hello h1 span[aria-hidden]{display:inline-block}
+.hello h1 .plane{display:inline-block}
 
 /* ---------- hero: night-sky gradient, glow and a dotted flight path ---------- */
 .hero{position:relative;isolation:isolate;overflow:hidden;
@@ -888,7 +887,7 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
   .view>*:nth-child(4){animation-delay:.18s}
   .view>*:nth-child(5){animation-delay:.24s}
   .view>*:nth-child(n+6){animation-delay:.3s}
-  .hello h1 span[aria-hidden]{animation:fv-fly 5s ease-in-out infinite}
+  .hello h1 .plane{animation:fv-fly 5s ease-in-out infinite}
   .hero::before{animation:fv-drift 9s ease-in-out infinite}
   .hero-ic::after{animation:fv-ring 2.6s var(--ease) infinite}
   .hero-steps li:first-child:not(.done)::before,.hero-steps li.done+li:not(.done)::before{animation:fv-beacon 2.2s ease-in-out infinite}
@@ -899,12 +898,134 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
 @keyframes fv-drift{0%,100%{transform:translate(0,0)}50%{transform:translate(-8px,4px)}}
 @keyframes fv-ring{0%{opacity:.7;transform:scale(.85)}80%,100%{opacity:0;transform:scale(1.35)}}
 @keyframes fv-beacon{0%,100%{box-shadow:0 0 0 5px #f5a74238}50%{box-shadow:0 0 0 9px #f5a74214}}
+
+
+/* ---------- home: centred welcome, big Start here button, trip behind a button ---------- */
+.hello{justify-items:center;text-align:center;gap:6px}
+.hello-hi,.hello h1{font-family:var(--f-display);font-weight:700;color:var(--ink)}
+.hello-hi{font-size:clamp(20px,2.4vw,26px);color:var(--muted)}
+.hello-hi .hi-name{font-family:inherit}
+.hello h1{margin-inline:auto}
+.hello-name{justify-content:center}
+.hero.hero-start{justify-items:center;text-align:center;padding:34px 22px 30px;gap:16px}
+.hero-start .hero-steps{justify-content:center}
+.start-sub{margin:0;color:#d7e3ee;font-size:15px}
+.start-alt{color:#9fe0d4;font-weight:700;font-size:15px;text-underline-offset:3px}
+
+/* Star border button: a light travels around the edge.
+   Effect inspired by "StarBorder" and "ShinyText" from React Bits (https://github.com/DavidHDev/react-bits),
+   Copyright (c) 2026 David Haz, MIT + Commons Clause. Rewritten here in plain CSS. */
+@property --star-a{syntax:"<angle>";inherits:false;initial-value:0deg}
+.star-btn{position:relative;display:inline-grid;place-items:center;isolation:isolate;padding:3px;border-radius:99px;text-decoration:none;
+  background:conic-gradient(from var(--star-a),transparent 0 62%,#ffd27a 72%,#fff 76%,#ffd27a 80%,transparent 90% 100%),#ffffff2e;
+  animation:star-orbit 3.2s linear infinite;box-shadow:0 18px 40px -16px #f5a742aa}
+.star-btn-in{display:inline-flex;align-items:center;gap:14px;padding:20px 46px;border-radius:99px;background:var(--sign);color:var(--sign-ink);
+  font:800 clamp(22px,3vw,28px)/1 var(--f-display);letter-spacing:.01em;transition:transform .15s ease}
+.star-btn:hover .star-btn-in{transform:translateY(-1px)}
+.star-btn:hover .star-arrow{transform:translateX(4px)}
+.star-arrow{transition:transform .15s ease}
+.star-btn:focus-visible{outline:3px solid #fff;outline-offset:4px}
+.shiny{background:linear-gradient(110deg,var(--sign-ink) 40%,#ffffff 50%,var(--sign-ink) 60%) 0 0/250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 3.2s linear infinite}
+@keyframes star-orbit{to{--star-a:360deg}}
+@keyframes shine{from{background-position:150% 0}to{background-position:-100% 0}}
+@media (prefers-reduced-motion:reduce){.star-btn,.shiny{animation:none}.shiny{color:var(--sign-ink);background:none}}
+
+/* "New trip" button */
+.trip-toggle{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:14px;width:100%;padding:16px 18px;border-radius:var(--r);
+  border:2px dashed var(--line);background:var(--surface);color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.trip-toggle:hover{border-color:var(--ink)}
+.trip-toggle[aria-expanded="true"]{border-style:solid;border-color:var(--ink)}
+.tt-ic{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--sign);color:var(--sign-ink)}
+.tt-ic svg{width:22px;height:22px}
+.tt-t{display:grid;gap:1px;min-width:0}
+.tt-t b{font-family:var(--f-display);font-size:18px}
+.tt-t small{color:var(--muted);font-size:14px}
+.tt-chev{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);position:relative}
+.tt-chev::before,.tt-chev::after{content:"";position:absolute;left:50%;top:50%;width:14px;height:2px;background:currentColor;border-radius:2px;transform:translate(-50%,-50%)}
+.tt-chev::after{transform:translate(-50%,-50%) rotate(90deg);transition:transform .2s ease}
+.trip-toggle[aria-expanded="true"] .tt-chev::after{transform:translate(-50%,-50%) rotate(0deg)}
+
+/* ---------- welcome animation ----------
+   Inspired by "Blur Text" and "Gradient Text" from React Bits (https://github.com/DavidHDev/react-bits),
+   Copyright (c) 2026 David Haz, MIT + Commons Clause. Rewritten here in plain CSS. */
+.hello h1{font-size:clamp(30px,4.4vw,50px);line-height:1.1;letter-spacing:-.01em;max-width:none}
+.bw{display:inline-block;opacity:0;filter:blur(10px);transform:translateY(-14px) scale(1.04);
+  animation:blur-in .75s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:calc(var(--i) * 90ms + 120ms)}
+@keyframes blur-in{60%{opacity:.9;filter:blur(2px);transform:translateY(2px) scale(.99)}to{opacity:1;filter:blur(0);transform:none}}
+.hello-hi{animation:blur-in .7s cubic-bezier(.2,.7,.2,1) both}
+.gt{background:linear-gradient(90deg,var(--teal),#5aa9e6,var(--sign),var(--teal)) 0 0/300% 100%;-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;animation:gt-move 7s linear infinite}
+@keyframes gt-move{to{background-position:300% 0}}
+.wave{display:inline-block;transform-origin:70% 80%;animation:wave 1.4s ease-in-out .9s 2}
+@keyframes wave{0%,100%{transform:rotate(0)}15%{transform:rotate(16deg)}30%{transform:rotate(-8deg)}45%{transform:rotate(14deg)}60%{transform:rotate(-4deg)}75%{transform:rotate(10deg)}}
+@media (prefers-reduced-motion:reduce){.bw,.hello-hi{animation:none;opacity:1;filter:none;transform:none}.gt,.wave{animation:none}}
+
+/* ---------- feedback invitation at the bottom of the home page ---------- */
+.fb-cta{position:relative;display:grid;justify-items:center;text-align:center;gap:10px;margin-top:12px;padding:34px 22px 30px;border-radius:24px;background:var(--surface);isolation:isolate}
+.fb-cta::before{content:"";position:absolute;inset:0;padding:2px;border-radius:inherit;z-index:-1;
+  background:linear-gradient(90deg,var(--teal),#5aa9e6,var(--sign),var(--teal)) 0 0/300% 100%;animation:gt-move 9s linear infinite;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.fb-cta-ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:#e4efe9;color:var(--teal)}
+.fb-cta-ic svg{width:26px;height:26px}
+.fb-cta h2{font-size:clamp(22px,2.6vw,28px)}
+.fb-cta p{margin:0;max-width:52ch;color:var(--muted)}
+.fb-cta-btn{margin-top:6px;min-height:52px;padding:12px 26px;font-size:17px}
+@media (prefers-reduced-motion:reduce){.fb-cta::before{animation:none}}
+
+/* ---------- Transfers page ---------- */
+.lede-center{justify-items:center;text-align:center;margin-inline:auto}
+.lede-center h1{font-size:clamp(32px,4.6vw,52px);line-height:1.08;letter-spacing:-.01em}
+.lede-center p{max-width:56ch}
+.lede-fade{opacity:0;animation:blur-in .8s cubic-bezier(.2,.7,.2,1) .45s forwards}
+.how-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin:4px 0 0;padding:0;list-style:none;counter-reset:none}
+.how-cards li{position:relative;display:grid;justify-items:center;align-content:start;text-align:center;gap:6px;padding:26px 18px 22px;border-radius:22px;background:var(--surface);
+  border:1px solid var(--line);box-shadow:0 14px 34px -26px #13294b80;transition:transform .2s ease,box-shadow .2s ease;
+  opacity:0;animation:blur-in .7s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:calc(var(--d) * 120ms + 300ms)}
+.how-cards li:hover{transform:translateY(-3px);box-shadow:0 20px 40px -24px #13294b99}
+.how-cards .how-ic{width:62px;height:62px;border-radius:20px;display:grid;place-items:center;color:#fff;margin-bottom:6px;
+  background:linear-gradient(135deg,var(--teal),#5aa9e6);box-shadow:0 10px 22px -12px var(--teal)}
+.how-cards li:nth-child(2) .how-ic{background:linear-gradient(135deg,#5aa9e6,var(--navy,#13294b))}
+.how-cards li:nth-child(3) .how-ic{background:linear-gradient(135deg,var(--sign),#e8873a);color:var(--sign-ink)}
+.how-cards .how-ic svg{width:30px;height:30px}
+.how-cards .how-n{position:absolute;top:14px;left:14px;width:28px;height:28px;font-size:14px}
+.how-cards b{font-family:var(--f-display);font-size:18px}
+.how-cards .how-t{font-size:14.5px;color:var(--muted);max-width:26ch}
+@media (min-width:721px){.how-cards li:not(:last-child)::after{content:"→";position:absolute;right:-19px;top:50%;transform:translateY(-50%);
+  width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--bg);color:var(--muted);font-weight:700;z-index:1}}
+@media (max-width:720px){.how-cards{grid-template-columns:minmax(0,1fr);gap:12px}.how-cards li{grid-template-columns:auto minmax(0,1fr);justify-items:start;text-align:left;column-gap:14px;padding:16px}
+  .how-cards .how-ic{grid-row:span 2;width:52px;height:52px;margin:0}.how-cards .how-n{display:none}}
+@media (prefers-reduced-motion:reduce){.how-cards li,.lede-fade{animation:none;opacity:1}}
+.ride-cta{display:grid;justify-items:center;gap:10px;padding:10px 0 4px;text-align:center}
+.ride-cta .star-btn{border:0;cursor:pointer;font:inherit}
+.ride-sub{margin:0;color:var(--muted);font-size:15px}
+.tr-flow{display:grid;gap:22px;max-width:820px;width:100%;margin-inline:auto}
+.wz-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 6px;padding:0;list-style:none}
+.wz-steps li{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;background:var(--field);color:var(--muted);font-weight:700;font-size:14px;min-width:0}
+.wz-steps li span{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--line);color:var(--ink);font-size:13px}
+.wz-steps li.now{background:var(--sign);color:var(--sign-ink)}
+.wz-steps li.now span{background:var(--sign-ink);color:var(--sign)}
+.wz-steps li.done{color:var(--ink)}
+.wz-steps li.done span{background:var(--ok);color:#fff}
+@media (max-width:520px){.wz-steps li{font-size:0;justify-content:center;gap:0}.wz-steps li span{font-size:13px}}
+.tr-wizard fieldset:not([hidden]){animation:blur-in .5s cubic-bezier(.2,.7,.2,1) both}
+.wz-next{display:flex;justify-content:flex-end;padding-top:4px}
+.wz-err{margin:0;color:var(--bad);font-weight:700;font-size:14px}
+.wz-err:empty{display:none}
+.tr-mine{scroll-margin-top:120px}
+@media (prefers-reduced-motion:reduce){.tr-wizard fieldset{animation:none!important}}
+
+/* date and time fields never wider than their column on phones */
+.f input[type=date],.f input[type=time]{min-width:0;max-width:100%;width:100%}
+
+/* Start here box inside the night-sky hero: centred button, full-width timeline */
+.hero-start .hero-steps{width:min(620px,100%);justify-self:center}
+.hero-start .star-btn{margin-top:4px}
 </style>
 </head>
 <body>
 <header class="band gut">
   <div class="wrap">
-    <a class="logo" href="#card" aria-label="FreeVel, home">
+    <a class="logo" href="#home" aria-label="FreeVel, home">
       <img class="logo-mark" id="logo-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgOTIiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZ2EiIHgxPSIwIiB5MT0iMSIgeDI9IjAiIHkyPSIwIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMyYWEzOWEiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM4ZmQwZjAiLz48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0iZ2IiIHgxPSIwIiB5MT0iMSIgeDI9IjAiIHkyPSIwIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM0N2I1YWMiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNiNmRmZjUiLz48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0iZ28iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmI3NGQiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmMDhjMmUiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48Zz48cGF0aCBkPSJNNTQsNzIgUTUwLjEsMzAuNSAxOCw0IFEzMS4xLDQwLjYgNTQsNzJaIiBmaWxsPSJ1cmwoI2dhKSIgb3BhY2l0eT0iLjk1Ii8+PHBhdGggZD0iTTU0LDcyIFE0Mi4wLDM0LjQgNiwxOCBRMjUuOCw0OC43IDU0LDcyWiIgZmlsbD0idXJsKCNnYikiIG9wYWNpdHk9Ii45NSIvPjxwYXRoIGQ9Ik01NCw3MiBRMzcuMSw0MC44IDIsMzYgUTI0LjgsNTguNiA1NCw3MloiIGZpbGw9InVybCgjZ2EpIiBvcGFjaXR5PSIuOTUiLz48cGF0aCBkPSJNNTQsNzIgUTM4LjEsNDguMiAxMCw1NCBRMjkuOSw2OC4yIDU0LDcyWiIgZmlsbD0idXJsKCNnYikiIG9wYWNpdHk9Ii45NSIvPjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMjAsMCkgc2NhbGUoLTEsMSkiPjxwYXRoIGQ9Ik01NCw3MiBRNTAuMSwzMC41IDE4LDQgUTMxLjEsNDAuNiA1NCw3MloiIGZpbGw9InVybCgjZ2EpIiBvcGFjaXR5PSIuOTUiLz48cGF0aCBkPSJNNTQsNzIgUTQyLjAsMzQuNCA2LDE4IFEyNS44LDQ4LjcgNTQsNzJaIiBmaWxsPSJ1cmwoI2diKSIgb3BhY2l0eT0iLjk1Ii8+PHBhdGggZD0iTTU0LDcyIFEzNy4xLDQwLjggMiwzNiBRMjQuOCw1OC42IDU0LDcyWiIgZmlsbD0idXJsKCNnYSkiIG9wYWNpdHk9Ii45NSIvPjxwYXRoIGQ9Ik01NCw3MiBRMzguMSw0OC4yIDEwLDU0IFEyOS45LDY4LjIgNTQsNzJaIiBmaWxsPSJ1cmwoI2diKSIgb3BhY2l0eT0iLjk1Ii8+PC9nPjxwYXRoIGQ9Ik0zNCwzOCBRNTIsNTAgNjAsODYgUTY4LDUwIDg2LDM4IFE3MCw0NiA2MCw2MiBRNTAsNDYgMzQsMzhaIiBmaWxsPSJ1cmwoI2dvKSIvPjxjaXJjbGUgY3g9IjYwIiBjeT0iMjIiIHI9IjEwIiBmaWxsPSJ1cmwoI2dvKSIvPjwvc3ZnPg==" alt="" width="52" height="40">
       <span class="logo-t"><b>FreeVel</b><span class="tagline">Always by your side</span></span><small>MVP</small>
     </a>
@@ -935,10 +1056,11 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
 <div class="wrap">
 
 <!-- ============ 01 MY CARD (this trip) ============ -->
-<section class="view" id="v-card" aria-labelledby="t-card">
+<!-- ============ HOME (logo) ============ -->
+<section class="view" id="v-home" aria-labelledby="t-home">
   <div class="hello">
-    <p class="hello-hi" id="hello-hi">Hi,</p>
-    <h1 id="t-card">ready for your next flight? <span aria-hidden="true">✈️</span></h1>
+    <p class="hello-hi" id="hello-hi" data-noi18n>Hi,</p>
+    <h1 id="t-home" data-noi18n>ready for your next flight? <span aria-hidden="true">✈️</span></h1>
   </div>
   <div class="hero" id="hero" aria-live="polite"></div>
   <section class="checkin" id="checkin" aria-labelledby="t-desk" hidden>
@@ -968,7 +1090,12 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
 
   <div class="split">
     <div class="stack">
-      <form class="panel form" id="tform" autocomplete="on" novalidate>
+      <button class="trip-toggle" type="button" id="trip-toggle" aria-expanded="false" aria-controls="tform">
+        <span class="tt-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 13.5 21 7.5c.9-.3 1.4.8.6 1.3L6.5 17.5 3 15.5Z"/><path d="m9 11-3-4 2-.6 5 2.6"/></svg></span>
+        <span class="tt-t"><b id="tt-title">New trip</b><small id="tt-sub">Add your flight to the card</small></span>
+        <span class="tt-chev" aria-hidden="true"></span>
+      </button>
+      <form class="panel form" id="tform" autocomplete="on" novalidate hidden>
         <fieldset>
         <legend><span class="n">1</span>This trip</legend>
         <div class="row">
@@ -1008,11 +1135,11 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
         <div class="bar"><i id="m-bar" style="width:0"></i></div>
         <div class="missing" id="m-miss"></div>
       </div>
-      <button class="panel doc-tile" type="button" id="sheet-open" aria-haspopup="dialog" aria-controls="sheet-dlg">
+      <a class="panel doc-tile" href="#card">
         <span class="doc-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><circle cx="11" cy="10.6" r=".9" fill="currentColor" stroke="none"/><path d="M11 12.4v2.6h3l1.4 2.3"/><path d="M9.6 13.8a2.6 2.6 0 1 0 3.8 3"/></svg></span>
         <span class="doc-t"><b>Wheelchair handling sheet</b><span>For airport and airline staff. Open it to download the PDF or show the QR code.</span></span>
         <span class="doc-go" aria-hidden="true">→</span>
-      </button>
+      </a>
       <a class="panel promo" href="#transfers">
         <span class="promo-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16V8a2 2 0 0 1 2-2h9l4 4h1a2 2 0 0 1 2 2v4"/><path d="M3 16h18"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/><path d="M14 6v4h4"/></svg></span>
         <span class="promo-t"><b>Need a ride to or from the airport?</b><span>Request a wheelchair-accessible transfer. We find options for you.</span></span>
@@ -1025,24 +1152,36 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
       </a>
     </aside>
   </div>
+  <div class="fb-cta" aria-labelledby="fb-cta-t">
+    <span class="fb-cta-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12Z"/><path d="M8.5 10.5h7M8.5 13.5h4.5"/></svg></span>
+    <h2 id="fb-cta-t">Got an idea or some feedback?</h2>
+    <p>Tell us what would make travelling with FreeVel easier for you. Every answer helps us decide what to build next.</p>
+    <a class="btn sign fb-cta-btn" href="#feedback">Share your feedback <span aria-hidden="true">→</span></a>
+  </div>
+</section>
 
-  <dialog class="sheet-dlg" id="sheet-dlg" aria-labelledby="sheet-dlg-t">
-    <div class="sheet-dlg-head">
-      <h2 id="sheet-dlg-t">Wheelchair handling sheet</h2>
-      <button class="dlg-x" type="button" id="sheet-close" aria-label="Close">×</button>
-    </div>
-    <div class="sheet-dlg-body">
-      <div class="sheet" id="sheet" aria-live="polite" data-noi18n></div>
-    </div>
-    <div class="sheet-dlg-foot">
-      <div class="actions">
-        <button class="btn sign" type="button" id="sheet-qr-btn" aria-expanded="false" aria-controls="sheet-qr">Show QR code</button>
-        <button class="btn" type="button" id="pdf" hidden>Download PDF</button>
+<!-- ============ MY CARD (handling sheet) ============ -->
+<section class="view" id="v-card" aria-labelledby="t-card" hidden>
+  <div class="lede">
+    <h1 id="t-card">Your wheelchair handling sheet</h1>
+    <p>Everything airport and airline staff need to handle your wheelchair safely. Show the QR code at check-in or download the PDF.</p>
+  </div>
+  <div class="card-page">
+    <div class="sheet" id="sheet" aria-live="polite" data-noi18n></div>
+      <div class="panel card-act" aria-label="Use the sheet">
+        <div class="actions stack-actions">
+          <button class="btn sign" type="button" id="sheet-qr-btn" aria-expanded="false" aria-controls="sheet-qr">Show QR code</button>
+          <button class="btn" type="button" id="pdf" hidden>Download PDF</button>
+        </div>
+        <div class="sheet-qr" id="sheet-qr" hidden></div>
+        <p class="note" id="msg">The A4 PDF is ready to print and keep in your hand luggage.</p>
       </div>
-      <div class="sheet-qr" id="sheet-qr" hidden></div>
-      <p class="note" id="msg">The A4 PDF is ready to print and keep in your hand luggage.</p>
-    </div>
-  </dialog>
+      <div class="panel card-fix">
+        <b>Something wrong on the sheet?</b>
+        <p class="note">It is built from your profile and your current trip.</p>
+        <div class="actions"><a class="btn small ghost" href="#profile">Edit profile</a><a class="btn small ghost" href="#tform">Edit trip</a></div>
+      </div>
+  </div>
 </section>
 
 <!-- ============ 02 WHICH AIRLINE ============ -->
@@ -1085,20 +1224,30 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
 
 <!-- ============ 02 TRANSFERS ============ -->
 <section class="view" id="v-transfers" aria-labelledby="t-transfers" hidden>
-  <div class="lede">
-    <h1 id="t-transfers">Airport transfers</h1>
-    <p>A ride with a ramp. We reply within 24 hours, you pay nothing until you accept.</p>
+  <div class="lede lede-center">
+    <h1 id="t-transfers" data-blur="Airport transfers" data-noi18n>Airport transfers</h1>
+    <p class="lede-fade">A ride with a ramp. We reply within 24 hours, you pay nothing until you accept.</p>
   </div>
 
-  <ol class="how" aria-label="How it works">
-    <li><span class="how-n">1</span><div><b>You send a request</b><span>Where, when, and how you ride.</span></div></li>
-    <li><span class="how-n">2</span><div><b>We find a vehicle</b><span>Ramp or lift vans, or cars with room for your chair.</span></div></li>
-    <li><span class="how-n">3</span><div><b>You accept an option</b><span>We book it and send you the driver's details.</span></div></li>
+  <ol class="how how-cards" aria-label="How it works">
+    <li style="--d:0"><span class="how-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3 10 14"/><path d="M21 3 14.5 21l-4-7-7-4Z"/></svg></span><span class="how-n">1</span><b>You send a request</b><span class="how-t">Where, when, and how you ride.</span></li>
+    <li style="--d:1"><span class="how-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16V8a2 2 0 0 1 2-2h9l4 4h1a2 2 0 0 1 2 2v4"/><path d="M3 16h18"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/><path d="M14 6v4h4"/></svg></span><span class="how-n">2</span><b>We find a vehicle</b><span class="how-t">Ramp or lift vans, or cars with room for your chair.</span></li>
+    <li style="--d:2"><span class="how-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.7 2.7L16.5 9.5"/></svg></span><span class="how-n">3</span><b>You accept an option</b><span class="how-t">We book it and send you the driver's details.</span></li>
   </ol>
 
-  <div class="split">
-    <form class="panel form" id="trform" novalidate>
-      <fieldset>
+  <div class="ride-cta">
+    <button class="star-btn" type="button" id="ride-open" aria-expanded="false" aria-controls="trform"><span class="star-btn-in"><span class="shiny">You need a ride?</span><span class="star-arrow" aria-hidden="true">→</span></span></button>
+    <p class="ride-sub">Three short steps, about two minutes.</p>
+  </div>
+
+  <div class="tr-flow">
+    <form class="panel form tr-wizard" id="trform" novalidate hidden>
+      <ol class="wz-steps" aria-label="Steps">
+        <li data-wz="1" class="now"><span>1</span>Which ride?</li>
+        <li data-wz="2"><span>2</span>How you ride</li>
+        <li data-wz="3"><span>3</span>How we reach you</li>
+      </ol>
+      <fieldset id="tr-s1">
         <legend><span class="n">1</span>Which ride?</legend>
         <div class="opts three" role="radiogroup" aria-label="Direction">
           <label class="opt"><input type="radio" name="tdir" value="to" checked><b>To the airport</b><span>Before departure</span></label>
@@ -1127,9 +1276,11 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
           <label class="f">Drop-off address<input id="t-from-addr" type="text" placeholder="Hotel or home address"></label>
           <p class="hint-line">Leaving the aircraft with assistance can take 30 to 60 minutes after landing. We ask the driver to allow for it.</p>
         </div>
+        <p class="wz-err" id="wz-err-1" role="alert"></p>
+        <div class="wz-next"><button class="btn sign" type="button" data-next="2">Continue <span aria-hidden="true">→</span></button></div>
       </fieldset>
 
-      <fieldset>
+      <fieldset id="tr-s2" hidden>
         <legend><span class="n">2</span>How you ride</legend>
         <div class="opts" role="radiogroup" aria-label="Seating during the ride">
           <label class="opt"><input type="radio" name="tride" value="stay" checked><b>I stay in my wheelchair</b><span>Van with a ramp or lift</span></label>
@@ -1140,9 +1291,10 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
           <label class="f">Suitcases<span class="h">Not counting the wheelchair</span><input id="t-bags" type="number" min="0" max="10" value="1" inputmode="numeric"></label>
         </div>
         <div class="shared" id="t-chair"></div>
+        <div class="wz-next"><button class="btn sign" type="button" data-next="3">Continue <span aria-hidden="true">→</span></button></div>
       </fieldset>
 
-      <fieldset>
+      <fieldset id="tr-s3" hidden>
         <legend><span class="n">3</span>How we reach you</legend>
         <div class="choices" role="radiogroup" aria-label="Contact method">
           <label class="choice"><input type="radio" name="tway" value="phone" checked>Phone call</label>
@@ -1153,19 +1305,17 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
         <label class="f">Anything else the driver should know<span class="h">Optional</span><textarea id="t-notes" rows="3" placeholder="e.g. I travel with a guide dog, the entrance has two steps"></textarea></label>
       </fieldset>
 
-      <div class="form-foot">
+      <div class="form-foot" id="tr-foot" hidden>
         <span class="status" id="tr-status" role="status"></span>
         <button class="btn sign" type="submit" id="tr-send">Send request</button>
       </div>
       <textarea class="copybox" id="tr-copy" readonly hidden aria-label="Request to copy"></textarea>
     </form>
 
-    <aside class="side" aria-label="My transfer requests">
-      <div class="panel">
-        <div class="panel-h"><h2>My requests</h2><span class="pill" id="tr-count">0</span></div>
-        <div class="reqs" id="tr-list"></div>
-      </div>
-    </aside>
+    <div class="panel tr-mine" aria-label="My transfer requests">
+      <div class="panel-h"><h2>My requests</h2><span class="pill" id="tr-count">0</span></div>
+      <div class="reqs" id="tr-list"></div>
+    </div>
   </div>
 
   <div class="panel team" id="tr-team" hidden>
@@ -1327,7 +1477,7 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
           <li><b>Handling notes</b> are what you tell staff every time. Write them once here.</li>
         </ul>
       </div>
-      <a class="btn sign" href="#card">Plan a trip with this profile</a>
+      <a class="btn sign" href="#home">Plan a trip with this profile</a>
     </aside>
   </div>
 </section>
@@ -1640,7 +1790,7 @@ window.FREEVEL_CONFIG = {
     if(cfg.gaId){addScript("https://www.googletagmanager.com/gtag/js?id="+encodeURIComponent(cfg.gaId));gtag("js",new Date());
       gtag("config",cfg.gaId,{send_page_view:false})}
     page()}
-  function page(){if(!loaded)return;var v=(location.hash.replace("#","")||"card").replace(/^claim-.*/,"claim");
+  function page(){if(!loaded)return;var v=(location.hash.replace("#","")||"home").replace(/^claim-.*/,"claim");
     var p={page_title:"FreeVel · "+v,page_location:location.origin+location.pathname+"#"+v,page_path:"/"+v};
     if(cfg.gaId)gtag("event","page_view",p);
     if(cfg.gtmId)dataLayer.push(Object.assign({event:"fv_page_view"},p))}
@@ -1671,6 +1821,22 @@ window.FREEVEL_CONFIG = {
    - Elements marked data-noi18n are never touched (staff card, letters, user content).
    To add a translation: add "English text": "Testo italiano" to FV_IT below. */
 var FV_IT = /*DICT*/{
+"You need a ride?":"Ti serve un passaggio?",
+"Three short steps, about two minutes.":"Tre brevi passaggi, circa due minuti.",
+"Continue":"Continua",
+"Steps":"Passaggi",
+"Got an idea or some feedback?":"Hai un'idea o un suggerimento?",
+"Tell us what would make travelling with FreeVel easier for you. Every answer helps us decide what to build next.":"Raccontaci cosa renderebbe più facile viaggiare con FreeVel. Ogni risposta ci aiuta a decidere cosa costruire dopo.",
+"Share your feedback":"Lascia il tuo feedback",
+"New trip":"Nuovo viaggio",
+"Add your flight to the card":"Aggiungi il tuo volo alla scheda",
+"Edit trip details":"Modifica i dati del viaggio",
+"Your wheelchair handling sheet":"La scheda della tua carrozzina",
+"Everything airport and airline staff need to handle your wheelchair safely. Show it at check-in, print the PDF or copy the text.":"Tutto ciò che serve al personale dell'aeroporto e della compagnia aerea per movimentare la tua carrozzina in sicurezza. Mostrala al check-in, stampa il PDF o copia il testo.",
+"For airport and airline staff. Show it at check-in, download the PDF or copy the text.":"Per il personale dell'aeroporto e della compagnia aerea. Mostrala al check-in, scarica il PDF o copia il testo.",
+"Use the sheet":"Usa la scheda",
+"Something wrong on the sheet?":"Qualcosa non va nella scheda?",
+"It is built from your profile and your current trip.":"È creata dal tuo profilo e dal viaggio attuale.",
 "Wheelchair handling sheet":"Scheda per il personale",
 "For airport and airline staff. Open it to download the PDF or show the QR code.":"Per il personale dell'aeroporto e della compagnia aerea. Aprila per scaricare il PDF o mostrare il QR code.",
 "Check your airline's size limits":"Verifica le dimensioni per la compagnia",
@@ -2412,10 +2578,10 @@ function meterInto(pre,r,doneText){var miss=r.filter(function(x){return !String(
 function renderMeter(){meterInto("m",required(),"Ready for check-in");
   meterInto("pm",required().filter(function(x){return TRIP_KEYS.indexOf(x[0])<0}),"Profile complete")}
 
-function goField(e){var b=e.target.closest("[data-go]");if(!b)return;var el=$(b.dataset.go);
+function goField(e){var b=e.target.closest("[data-go]");if(!b)return;var el=$(b.dataset.go);if(el&&el.closest("#tform"))openTrip(false);
   var inProfile=!!el.closest("#v-profile");
   if(inProfile&&$("v-profile").hidden)location.hash="profile";
-  if(!inProfile&&$("v-card").hidden)location.hash="card";
+  if(!inProfile&&$("v-home").hidden)location.hash="home";
   setTimeout(function(){el.scrollIntoView({block:"center"});el.focus({preventScroll:true})},60)}
 $("m-miss").addEventListener("click",goField);$("pm-miss").addEventListener("click",goField);
 
@@ -2427,14 +2593,8 @@ function battUI(){if(!powered())return"";var t=BT[S.bt]?T(BT[S.bt][1]):"";
 
 /* ---------- home greeting + hero ---------- */
 
-/* ---------- handling sheet dialog ---------- */
-(function(){var d=$("sheet-dlg"),o=$("sheet-open");if(!d||!o)return;
-  function open(){renderSheet();if(d.showModal){try{d.showModal()}catch(e){d.setAttribute("open","")}}else d.setAttribute("open","")}
-  function close(){if(d.close)d.close();else d.removeAttribute("open");o.focus()}
-  o.addEventListener("click",open);$("sheet-close").addEventListener("click",close);
-  d.addEventListener("click",function(e){if(e.target===d)close()});
-  /* QR code of the full sheet, shown on demand so staff can scan it from the phone */
-  var qb=$("sheet-qr-btn"),qs=$("sheet-qr");
+/* ---------- My card: QR code of the full sheet, shown on demand so staff can scan it from the phone ---------- */
+(function(){var qb=$("sheet-qr-btn"),qs=$("sheet-qr");if(!qb||!qs)return;
   function qrHide(){qs.hidden=true;qs.innerHTML="";qb.setAttribute("aria-expanded","false");qb.textContent=T("Show QR code")}
   qb.addEventListener("click",function(){if(!qs.hidden){qrHide();return}
     /* drawn at the exact size it is shown (whole pixels per module) so phones scan it reliably */
@@ -2444,25 +2604,32 @@ function battUI(){if(!powered())return"";var t=BT[S.bt]?T(BT[S.bt][1]):"";
     qs.innerHTML="";qs.appendChild(c);qs.insertAdjacentHTML("beforeend","<span>"+esc(T("Staff can scan it to read the full sheet"))+"</span>");
     qs.hidden=false;qb.setAttribute("aria-expanded","true");qb.textContent=T("Hide QR code");
     try{qs.scrollIntoView({block:"nearest"})}catch(e){}});
-  d.addEventListener("close",qrHide);window.addEventListener("fv:lang",qrHide);
-  if(location.hash==="#sheet"){location.hash="card";setTimeout(open,0)}
+  window.addEventListener("fv:lang",qrHide);window.addEventListener("hashchange",qrHide);
 })();
-window.FV_showCheckin=function(){if(location.hash!=="#card"&&location.hash!=="")location.hash="card";
+window.FV_showCheckin=function(){if(location.hash!=="#home"&&location.hash!=="")location.hash="home";
   setTimeout(function(){var c=$("checkin");if(!c)return;c.scrollIntoView({behavior:"smooth",block:"start"});var f=$("fs");if(f)f.click()},60)};
 
 var HERO_IC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 13.5 21 7.5c.9-.3 1.4.8.6 1.3L6.5 17.5 3 15.5Z"/><path d="m9 11-3-4 2-.6 5 2.6"/></svg>';
 function renderHero(){var box=$("hero"),hi=$("hello-hi");if(!box)return;
   var first=String(S.name||"").trim().split(/\s+/)[0];
-  hi.innerHTML=first?esc(T("Hi"))+' <b class="hi-name">'+esc(first)+'</b> <span aria-hidden="true">👋</span>':esc(T("Hi,"));
+  hi.innerHTML=first?esc(T("Hi"))+' <b class="hi-name gt">'+esc(first)+'</b> <span class="wave" aria-hidden="true">👋</span>':esc(T("Hi,"));
   /* the name is entered once, in the profile; the greeting simply picks it up */
+  /* "Blur text": the words of the welcome float in one by one (rebuilt only when the text changes) */
+  var h1=$("t-home"),txt=T("ready for your next flight?");
+  if(h1&&h1.dataset.txt!==txt){h1.dataset.txt=txt;h1.setAttribute("aria-label",txt);
+    var ws=txt.split(/\s+/);h1.innerHTML=ws.map(function(w,i){return'<span class="bw" aria-hidden="true" style="--i:'+i+'">'+esc(w)+'</span>'}).join(" ")+
+      ' <span class="bw" aria-hidden="true" style="--i:'+ws.length+'"><span class="plane">✈️</span></span>'}
   var prof=["name","weight","h"].every(function(k){return String(S[k]||"").trim()}),
       trip=["airline","flight","date"].every(function(k){return String(S[k]||"").trim()});
   var steps='<ol class="hero-steps"><li class="'+(prof?'done':'')+'">'+T("1 Profile")+'</li><li class="'+(trip?'done':'')+'">'+T("2 Flight")+'</li><li>'+T("3 Show at check-in")+'</li></ol>';
   var ck=$("checkin");if(ck)ck.hidden=!prof;
-  var tf=$("tform");if(tf)tf.hidden=!prof; /* one clear starting point: the trip form appears once the profile exists */
+  /* one clear starting point: the New trip button appears once the profile exists */
+  var tt=$("trip-toggle");if(tt)tt.hidden=!prof;if(!prof&&$("tform"))$("tform").hidden=true;
+  box.classList.toggle("hero-start",!prof);
   var GO='<span class="hero-go" aria-hidden="true">→</span>';
-  if(!prof){box.innerHTML='<p class="hero-k">'+T("Start here")+'</p><a class="hero-box is-link" href="#profile"><span class="hero-ic">'+HERO_IC+'</span><div><b>'+T("Create your profile")+'</b><small>'+T("About 2 minutes, no account needed")+'</small></div>'+GO+'</a>'+steps+
-    '<div class="hero-cta"><a class="btn sign" href="#profile">'+T("Start")+'</a><a class="btn ghost" href="#fit">'+T("Which airline fits?")+'</a></div>';return}
+  if(!prof){box.innerHTML='<a class="star-btn" href="#profile"><span class="star-btn-in"><span class="shiny">'+T("Start here")+'</span><span class="star-arrow" aria-hidden="true">→</span></span></a>'+
+    '<p class="start-sub">'+T("Create your profile")+' · '+T("About 2 minutes, no account needed")+'</p>'+steps+
+    '<a class="start-alt" href="#fit">'+T("Which airline fits?")+'</a>';return}
   if(!trip){box.innerHTML='<p class="hero-k">'+T("Next step")+'</p><a class="hero-box is-link" href="#tform"><span class="hero-ic">'+HERO_IC+'</span><div><b>'+T("Add your flight")+'</b><small>'+T("Airline, flight number and date")+'</small></div>'+GO+'</a>'+steps+
     '<div class="hero-cta"><a class="btn sign" href="#tform">'+T("Add flight")+'</a><a class="btn ghost" href="#fit">'+T("Which airline fits?")+'</a></div>';return}
   box.innerHTML='<p class="hero-k">'+T("Your next flight")+'</p><div class="hero-box"><span class="hero-ic">'+HERO_IC+'</span><div><b>'+esc(S.airline)+' · '+esc(S.flight)+'</b><small>'+esc(S.date)+(S.route?' · '+esc(S.route):'')+'</small></div></div>'+steps+
@@ -2658,16 +2825,20 @@ function saveBlob(blob,fn,ok,say,b){
 function slug(t){return String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
 
 /* ---------- routing ---------- */
-var VIEWS=["card","fit","transfers","claim","feedback","profile"];
+var VIEWS=["home","card","fit","transfers","claim","feedback","profile"];
 function route(){var v=location.hash.replace("#",""),anchor=null;
   if(v.indexOf("claim-")===0){anchor=v;v="claim"}
-  if(v==="desk"){v="card";setTimeout(function(){var c=$("checkin");if(c&&!c.hidden)c.scrollIntoView({behavior:"smooth",block:"start"})},50)}
-  if(v==="prep")v="card";
-  if(VIEWS.indexOf(v)<0)v="card";
+  if(v==="desk"){v="home";setTimeout(function(){var c=$("checkin");if(c&&!c.hidden)c.scrollIntoView({behavior:"smooth",block:"start"})},50)}
+  if(v==="prep")v="home";if(v==="sheet")v="card";
+  /* #some-id inside a page: open that page and scroll to the element (e.g. #tform) */
+  if(VIEWS.indexOf(v)<0&&v){var el0=document.getElementById(v),pv=el0&&el0.closest(".view");if(pv){anchor=v;v=pv.id.slice(2)}}
+  if(VIEWS.indexOf(v)<0)v="home";
   VIEWS.forEach(function(n){$("v-"+n).hidden=n!==v});
   [].forEach.call(document.querySelectorAll("header [data-v],#bnav [data-v]"),function(a){if(a.dataset.v===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
-  if(v==="card")renderTag();if(v==="fit"){renderFit();renderFitSrc()}if(v==="transfers")setTimeout(trOpen,0);
+  if(v==="home")renderTag();if(v==="card")renderSheet();if(v==="fit"){renderFit();renderFitSrc()}if(v==="transfers"){setTimeout(trOpen,0);blurIn($("t-transfers"))}
   if(v==="claim")setTimeout(function(){cOpen();var el=anchor&&$(anchor);if(el)el.scrollIntoView({block:"start"})},0);
+  if(anchor==="tform")openTrip(true);
+  if(anchor&&v!=="claim")setTimeout(function(){var el=$(anchor);if(el)el.scrollIntoView({behavior:"smooth",block:"start"})},0);
   if(!anchor)window.scrollTo(0,0)}
 window.addEventListener("hashchange",route);
 
@@ -2763,7 +2934,39 @@ function renderFitSrc(){var box=$("fit-src");if(!box)return;
     AIRLINES.filter(function(a){return a.ck}).map(function(a){return esc(a.n)}).join(", ")+'.</p>'}
 window.addEventListener("fv:lang",function(){renderFit();renderFitSrc()});
 
-function renderAll(){renderFit();renderHero();renderTraveller();renderSheet();renderMeter();renderVerdicts();renderMail();if(!$("v-card").hidden)renderTag()}
+
+/* ---------- "Blur text" headings: elements with data-blur="English text" ----------
+   The words float in one by one each time the page is opened; a word that matches data-gradient gets the colour shimmer. */
+function blurIn(el){if(!el)return;var txt=T(el.dataset.blur),re=/transf|trasf/i;el.setAttribute("aria-label",txt);
+  el.innerHTML=txt.split(/\s+/).map(function(w,i){return'<span class="bw" aria-hidden="true" style="--i:'+i+'">'+(re.test(w)?'<span class="gt">'+esc(w)+'</span>':esc(w))+'</span>'}).join(" ")}
+window.addEventListener("fv:lang",function(){[].forEach.call(document.querySelectorAll("[data-blur]"),blurIn)});
+
+/* ---------- Transfers: "You need a ride?" opens a three-step form ---------- */
+function wzShow(n){for(var i=1;i<=3;i++){var li=document.querySelector('.wz-steps [data-wz="'+i+'"]');li.className=i<n?"done":i===n?"now":""}
+  var fs=$("tr-s"+n);fs.hidden=false;if(n===3)$("tr-foot").hidden=false;
+  setTimeout(function(){fs.scrollIntoView({behavior:"smooth",block:"start"});var f=fs.querySelector("input:not([type=radio]),textarea");if(f)f.focus({preventScroll:true})},60)}
+function wzLegErrors(){var d=trVal("tdir")||"to",errs=[];
+  ["to","from"].forEach(function(k){if(d!==k&&d!=="both")return;
+    if(!$("t-"+k+"-airport").value.trim())errs.push(T(k==="to"?"the departure airport":"the arrival airport"));
+    if(!$("t-"+k+"-date").value)errs.push(T(k==="to"?"the date of the ride to the airport":"the date of the ride from the airport"));
+    if(!$("t-"+k+"-addr").value.trim())errs.push(T(k==="to"?"the pickup address":"the drop-off address"))});return errs}
+(function(){var open=$("ride-open"),form=$("trform");if(!open||!form)return;
+  open.addEventListener("click",function(){form.hidden=false;open.setAttribute("aria-expanded","true");
+    document.querySelector(".ride-cta").hidden=true;trOpen();wzShow(1)});
+  form.addEventListener("click",function(e){var b=e.target.closest("[data-next]");if(!b)return;var n=+b.dataset.next;
+    if(n===2){var errs=wzLegErrors(),m=$("wz-err-1");if(errs.length){m.textContent=T("Please add {list}.",{list:errs.join(", ")});return}m.textContent=""}
+    b.parentNode.hidden=true;wzShow(n)});
+})();
+/* ---------- "New trip" button opens the trip form ---------- */
+function tripHas(){return ["airline","flight","date"].some(function(k){return String(S[k]||"").trim()})}
+function renderTripToggle(){var t=$("trip-toggle");if(!t)return;
+  if(tripHas()){$("tt-title").textContent=[S.flight,fmtDate(S.date)].filter(Boolean).join(" · ")||S.airline;$("tt-sub").textContent=T("Edit trip details")}
+  else{$("tt-title").textContent=T("New trip");$("tt-sub").textContent=T("Add your flight to the card")}}
+function openTrip(focus){var f=$("tform"),t=$("trip-toggle");if(!f)return;f.hidden=false;t.setAttribute("aria-expanded","true");
+  if(focus)setTimeout(function(){var i=$("f-airline");if(i)i.focus({preventScroll:true})},50)}
+(function(){var t=$("trip-toggle");if(!t)return;t.addEventListener("click",function(){var f=$("tform");
+  if(f.hidden){openTrip(true)}else{f.hidden=true;t.setAttribute("aria-expanded","false")}})})();
+function renderAll(){renderTripToggle();renderFit();renderHero();renderTraveller();renderSheet();renderMeter();renderVerdicts();renderMail();if(!$("v-home").hidden)renderTag()}
 renderCL();renderAll();route();
 
 /* PDF download works in any normal browser */
