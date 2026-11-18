@@ -333,6 +333,10 @@ button,input,select,textarea{font:inherit;color:inherit}
 .fit-ac span.bad{color:var(--bad);border-color:currentColor;background:var(--bad-soft)}
 .fit-ac span i{font-style:normal;opacity:.75}
 .fit-empty{display:grid;gap:10px;justify-items:start}
+/* disclaimer shown next to every rule-based verdict (battery, airline fit) */
+.advice-note{display:grid;gap:2px;margin:0 0 14px;padding:10px 14px;border-radius:12px;border-left:4px solid var(--info);background:var(--info-soft);color:var(--ink);font-size:14.5px;line-height:1.45}
+.advice-note b{color:var(--info)}
+.advice-note .when{font-size:13px;color:var(--muted)}
 .fit-src summary{cursor:pointer;font-family:var(--f-display);font-weight:600}
 .fit-src table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:12px}
 .fit-src th,.fit-src td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
@@ -2326,6 +2330,9 @@ var FV_IT = /*DICT*/{
 "The PDF could not be created. Use Copy letter instead.": "Non è stato possibile creare il PDF. Usa «Copia lettera».",
 "The PDF could not be created. Show the QR code, or show the card from your phone.": "Non è stato possibile creare il PDF. Mostra il QR code o mostra la scheda dal telefono.",
 "Show QR code": "Mostra QR code",
+"Guidance, not an approval.": "Indicazione, non un'autorizzazione.",
+"Always confirm with your airline before you fly.": "Conferma sempre con la tua compagnia aerea prima di partire.",
+"Rules last updated: {d}": "Regole aggiornate il: {d}",
 "Hide QR code": "Nascondi QR code",
 "QR code of the handling sheet": "QR code della scheda per il personale",
 "Staff can scan it to read the full sheet": "Il personale può inquadrarlo per leggere la scheda completa",
@@ -2725,7 +2732,7 @@ function verdicts(){var v=[];
   v.push(["info","NOTICE","Battery-powered wheelchairs need airline approval. Tell the airline at least 48 hours ahead."]);
   return v}
 function renderVerdicts(){var v=verdicts(),worst=v.some(function(x){return x[0]==="bad"})?"bad":v.some(function(x){return x[0]==="warn"})?"warn":"ok";
-  $("verdicts").innerHTML=v.map(function(x){return'<div class="verdict '+x[0]+'"><span class="ic">'+x[1]+'</span><p>'+esc(x[2])+'</p></div>'}).join("");
+  $("verdicts").innerHTML=adviceNote("battery")+v.map(function(x){return'<div class="verdict '+x[0]+'"><span class="ic">'+x[1]+'</span><p>'+esc(x[2])+'</p></div>'}).join("");
   var p=$("b-pill");p.className="pill "+worst;p.innerHTML='<span class="dot"></span>'+({ok:"All clear",warn:"Check needed",bad:"Problem"})[worst]}
 
 /* ---------- airline message ---------- */
@@ -2846,6 +2853,10 @@ window.addEventListener("hashchange",route);
    Door = clear opening of the hold door used for checked mobility aids, height x width in cm.
    AIRLINES: passengers 2025 = ENAC "Dati di traffico 2025", Tav. VET 1 (group brands added up).
    ck:true marks values still to double-check. Edit here, or later move to a Supabase table. */
+/* Date the rules behind each verdict were last updated. Change it whenever you re-check the rules. */
+function adviceNote(k){var RULES_DATE={fit:"2026-11-10",battery:"2026-11-09"},d=new Date(RULES_DATE[k]+"T12:00:00");
+  return '<p class="advice-note" role="note"><span><b>'+T("Guidance, not an approval.")+'</b> '+T("Always confirm with your airline before you fly.")+'</span>'+
+    '<span class="when">'+T("Rules last updated: {d}",{d:d.toLocaleDateString(FV.locale(),{day:"numeric",month:"long",year:"numeric"})})+'</span></p>'}
 var FIT_SRC={
   delta:["Delta Air Lines, aircraft bin door dimensions","https://www.delta.com/us/en/accessible-travel-services/overview"],
   alaska:["Alaska Air Cargo, fleet and capacity","https://www.alaskacargo.com/fleet"],
@@ -2916,7 +2927,7 @@ function renderFit(){var out=$("fit-out");if(!out)return;
   var nOk=res.filter(function(x){return x.r.s==="ok"}).length,PILL={ok:"Upright",warn:"Only on its side",bad:"Does not fit"};
   var rear=res.some(function(x){return x.r.main.concat(x.r.some).some(function(y){return y.r.rear})});
   out.innerHTML='<div class="fit-sum"><b>'+T("{n} of {t} airlines carry it upright",{n:nOk,t:res.length})+'</b><span class="note">'+
-    T("Wheelchair {h} cm high, {w} × {l} cm",{h:c.h,w:c.w,l:c.l})+'</span></div>'+
+    T("Wheelchair {h} cm high, {w} × {l} cm",{h:c.h,w:c.w,l:c.l})+'</span></div>'+adviceNote("fit")+
     (rear?'<p class="note" style="margin:-6px 0 12px">'+T("On the Boeing 737 it fits only through the front hold door (89 cm): ask staff to load it there.")+'</p>':'')+
     '<ol class="fit-list">'+res.map(function(x){var a=x.a,r=x.r;
       return '<li class="fit-al '+r.s+'"><div class="fit-top"><b>'+esc(a.n)+'</b><span class="pax">'+
