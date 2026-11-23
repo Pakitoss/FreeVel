@@ -753,14 +753,19 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 .doc-t span{font-size:14px;color:var(--muted)}
 .doc-go{font-size:22px;font-weight:700}
 a.doc-tile{text-decoration:none}
-.card-page{display:grid;grid-template-columns:minmax(0,640px) minmax(260px,1fr);grid-template-rows:auto 1fr;grid-template-areas:"sheet act" "sheet fix";gap:16px 24px;align-items:start}
+.card-page{display:grid;grid-template-columns:minmax(0,640px) minmax(260px,1fr);grid-template-rows:auto auto 1fr;grid-template-areas:"sheet act" "sheet prot" "sheet fix";gap:16px 24px;align-items:start}
 .card-page>.sheet{grid-area:sheet}
 .card-act{grid-area:act}
 .card-fix{grid-area:fix;display:grid;gap:6px}
+.protect{grid-area:prot;display:grid;gap:10px;border:1.5px solid var(--sign)}
+.protect h2{margin:0;font-size:20px;line-height:1.25}
+.protect .prot-price{margin:0;font-size:15px;color:var(--muted)}.protect .prot-price b{font-size:28px;color:var(--ink);margin-right:4px}
+.protect .chips{display:flex;flex-wrap:wrap;gap:8px}
+.protect .chips .btn[aria-pressed="true"]{border-color:var(--ink);background:var(--line)}
 .stack-actions{display:grid;gap:10px}
 .stack-actions .btn{width:100%}
 @media (max-width:900px){
-  .card-page{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"act" "sheet" "fix"}
+  .card-page{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"act" "prot" "sheet" "fix"}
   .stack-actions{grid-template-columns:1fr 1fr}
   .stack-actions .btn:first-child{grid-column:1/-1}
 }
@@ -1176,6 +1181,33 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
         <div class="sheet-qr" id="sheet-qr" hidden></div>
         <p class="note" id="msg">The A4 PDF is ready to print and keep in your hand luggage.</p>
       </div>
+      <section class="panel protect" id="protect" aria-labelledby="t-protect">
+        <span class="pill warn" style="justify-self:start">Coming soon</span>
+        <h2 id="t-protect">Protect your wheelchair on this trip</h2>
+        <p class="note" style="margin:0">If the airline damages or loses your wheelchair, it refunds at most about €1,800. A power wheelchair can cost much more. The Wheelchair Guarantee would pay for the repair or a replacement, and a loan wheelchair while you wait.</p>
+        <p class="prot-price" id="prot-price"></p>
+        <div class="actions" id="prot-ask">
+          <button class="btn sign" type="button" id="prot-yes"></button>
+          <button class="btn ghost" type="button" id="prot-no">No thanks</button>
+        </div>
+        <div id="prot-thanks" hidden>
+          <p style="margin:0 0 8px"><b>Thank you!</b> The guarantee is not available yet, so nothing has been charged. Leave your email and we will tell you when it launches.</p>
+          <div class="row" style="align-items:end">
+            <label class="f">Email (optional)<input id="prot-email" type="email" autocomplete="email" inputmode="email"></label>
+            <button class="btn small" type="button" id="prot-send">Notify me</button>
+          </div>
+        </div>
+        <div id="prot-why" hidden>
+          <p style="margin:0 0 8px">Thanks for telling us. What is the main reason?</p>
+          <div class="chips" role="group" aria-label="Main reason">
+            <button class="btn small ghost" type="button" data-why="price" aria-pressed="false">Too expensive</button>
+            <button class="btn small ghost" type="button" data-why="insured" aria-pressed="false">I already have insurance</button>
+            <button class="btn small ghost" type="button" data-why="no_need" aria-pressed="false">I don't need it</button>
+            <button class="btn small ghost" type="button" data-why="trust" aria-pressed="false">I don't trust it yet</button>
+          </div>
+        </div>
+        <p class="note" id="prot-msg" aria-live="polite" style="margin:0"></p>
+      </section>
       <div class="panel card-fix">
         <b>Something wrong on the sheet?</b>
         <p class="note">It is built from your profile and your current trip.</p>
@@ -1777,6 +1809,8 @@ window.FREEVEL_CONFIG = {
   saveFeedbackToSupabase: true,   // salva una copia di ogni feedback nella tabella feedback
   transferUrl: "https://formspree.io/f/mzeelnyk",          // ← incolla qui il tuo endpoint Formspree, es. "https://formspree.io/f/abcdwxyz"
   saveTransfersToSupabase: true,  // salva una copia di ogni richiesta nella tabella transfer_requests
+  protectionPrice: 5,              // prezzo (€) mostrato nel test "Garanzia Ausilio": cambialo per testare altri prezzi
+  saveProtectionToSupabase: true, // conta visualizzazioni e clic nella tabella protection_interest
   // Google Analytics 4 e Google Tag Manager. Si attivano SOLO dopo che l'utente accetta i cookie.
   // Usa UNO dei due: con GTM, configura GA4 dentro GTM e lascia gaId vuoto (altrimenti conti tutto due volte).
   gaId:  "G-W5VBKQEW7G",   // ← ID di misurazione GA4, es. "G-AB12CD34EF"
@@ -1850,6 +1884,25 @@ var FV_IT = /*DICT*/{
 "Something wrong on the sheet?":"Qualcosa non va nella scheda?",
 "It is built from your profile and your current trip.":"È creata dal tuo profilo e dal viaggio attuale.",
 "Wheelchair handling sheet":"Scheda per il personale",
+"Coming soon":"In arrivo",
+"Protect your wheelchair on this trip":"Assicura il tuo ausilio per questo viaggio",
+"If the airline damages or loses your wheelchair, it refunds at most about €1,800. A power wheelchair can cost much more. The Wheelchair Guarantee would pay for the repair or a replacement, and a loan wheelchair while you wait.":"Se la compagnia aerea danneggia o perde la tua carrozzina, rimborsa al massimo circa 1.800 €. Una carrozzina elettrica può costare molto di più. La Garanzia Ausilio pagherebbe la riparazione o la sostituzione, e una carrozzina sostitutiva mentre aspetti.",
+"per trip":"a viaggio",
+"Yes, add it for {p}":"Sì, aggiungila a {p}",
+"No thanks":"No grazie",
+"Thank you!":"Grazie!",
+"The guarantee is not available yet, so nothing has been charged. Leave your email and we will tell you when it launches.":"La garanzia non è ancora disponibile, quindi non ti è stato addebitato nulla. Lasciaci la tua email e ti avvisiamo quando parte.",
+"Email (optional)":"Email (facoltativa)",
+"Notify me":"Avvisami",
+"Thanks for telling us. What is the main reason?":"Grazie per avercelo detto. Qual è il motivo principale?",
+"Main reason":"Motivo principale",
+"Too expensive":"Costa troppo",
+"I already have insurance":"Ho già un'assicurazione",
+"I don't need it":"Non mi serve",
+"I don't trust it yet":"Non mi fido ancora",
+"Done: we will email you when the guarantee launches.":"Fatto: ti scriviamo quando la garanzia sarà disponibile.",
+"Thanks, this helps us decide what to build.":"Grazie, ci aiuta a decidere cosa costruire.",
+"Enter a valid email, or leave it empty.":"Inserisci un'email valida, oppure lascia vuoto.",
 "For airport and airline staff. Open it to download the PDF or show the QR code.":"Per il personale dell'aeroporto e della compagnia aerea. Aprila per scaricare il PDF o mostrare il QR code.",
 "Check your airline's size limits":"Verifica le dimensioni per la compagnia",
 "Compare your wheelchair's weight and size with each airline's limits.":"Confronta peso e misure della carrozzina con i limiti di ogni compagnia aerea.",
@@ -2872,7 +2925,7 @@ function route(){var v=location.hash.replace("#",""),anchor=null;
   if(VIEWS.indexOf(v)<0)v="home";
   VIEWS.forEach(function(n){$("v-"+n).hidden=n!==v});
   [].forEach.call(document.querySelectorAll("header [data-v],#bnav [data-v]"),function(a){if(a.dataset.v===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
-  if(v==="home")renderTag();if(v==="card")renderSheet();if(v==="fit"){renderFit();renderFitSrc()}if(v==="transfers"){setTimeout(trOpen,0);blurIn($("t-transfers"))}
+  if(v==="home")renderTag();if(v==="card"){renderSheet();renderProt();protShown()}if(v==="fit"){renderFit();renderFitSrc()}if(v==="transfers"){setTimeout(trOpen,0);blurIn($("t-transfers"))}
   if(v==="claim")setTimeout(function(){cOpen();var el=anchor&&$(anchor);if(el)el.scrollIntoView({block:"start"})},0);
   if(anchor==="tform")openTrip(true);
   if(anchor&&v!=="claim")setTimeout(function(){var el=$(anchor);if(el)el.scrollIntoView({behavior:"smooth",block:"start"})},0);
@@ -3004,7 +3057,39 @@ function openTrip(focus){var f=$("tform"),t=$("trip-toggle");if(!f)return;f.hidd
   if(focus)setTimeout(function(){var i=$("f-airline");if(i)i.focus({preventScroll:true})},50)}
 (function(){var t=$("trip-toggle");if(!t)return;t.addEventListener("click",function(){var f=$("tform");
   if(f.hidden){openTrip(true)}else{f.hidden=true;t.setAttribute("aria-expanded","false")}})})();
-function renderAll(){renderCabin();renderTripToggle();renderFit();renderHero();renderTraveller();renderSheet();renderMeter();renderVerdicts();renderMail();if(!$("v-home").hidden)renderTag()}
+/* ================= WHEELCHAIR GUARANTEE (fake door) =================
+   Tests whether travellers would add a paid guarantee to a trip. Nothing is sold or charged.
+   Counted in two places:
+   - Google Analytics 4 (only with cookie consent): protection_shown, protection_yes, protection_no,
+     protection_no_reason, protection_email. Params: price only, never personal or health data.
+   - Supabase table protection_interest (anonymous, no cookies): see supabase/protection_interest.sql.
+   Each device is counted once per action; device_id is a random id kept on the device, not linked to the account. */
+var PROT_KEY="freevel_prot_v1",PROT=load(PROT_KEY)||{};
+function protPrice(){var c=window.FREEVEL_CONFIG||{};return +c.protectionPrice||5}
+function protFmt(){return protPrice().toLocaleString(FV.locale(),{style:"currency",currency:"EUR",minimumFractionDigits:0,maximumFractionDigits:2})}
+function protDevice(){if(!PROT.dev){PROT.dev=(Date.now().toString(36)+Math.random().toString(36).slice(2,10));save(PROT_KEY,PROT)}return PROT.dev}
+function protLog(action,extra){extra=extra||{};
+  if(window.FV_track){var g={price:protPrice()};if(extra.reason)g.reason=extra.reason;FV_track("protection_"+action,g)}
+  var sb=window.supabaseClient,cfg=window.FREEVEL_CONFIG||{};if(!sb||cfg.saveProtectionToSupabase===false)return;
+  sb.from("protection_interest").insert([{device_id:protDevice(),action:action,price:protPrice(),reason:extra.reason||null,
+    email:extra.email||null,lang:FV.lang||null}]).then(function(){},function(){})}
+function renderProt(){if(!$("protect"))return;
+  $("prot-price").innerHTML='<b>'+esc(protFmt())+'</b>'+esc(T("per trip"));
+  $("prot-yes").textContent=T("Yes, add it for {p}",{p:protFmt()});
+  $("prot-ask").hidden=!!PROT.answer;$("prot-thanks").hidden=PROT.answer!=="yes"||!!PROT.email;$("prot-why").hidden=PROT.answer!=="no"||!!PROT.reason;
+  $("prot-msg").textContent=PROT.email?T("Done: we will email you when the guarantee launches."):PROT.reason?T("Thanks, this helps us decide what to build."):"";
+  [].forEach.call(document.querySelectorAll("#prot-why [data-why]"),function(b){b.setAttribute("aria-pressed",String(b.dataset.why===PROT.reason))})}
+function protShown(){if(PROT.shown)return;PROT.shown=1;save(PROT_KEY,PROT);protLog("shown")}
+(function(){if(!$("protect"))return;
+  $("prot-yes").onclick=function(){if(PROT.answer)return;PROT.answer="yes";save(PROT_KEY,PROT);protLog("yes");renderProt();var e=$("prot-email");if(e)e.focus()};
+  $("prot-no").onclick=function(){if(PROT.answer)return;PROT.answer="no";save(PROT_KEY,PROT);protLog("no");renderProt()};
+  [].forEach.call(document.querySelectorAll("#prot-why [data-why]"),function(b){b.onclick=function(){if(PROT.reason)return;
+    PROT.reason=b.dataset.why;save(PROT_KEY,PROT);protLog("no_reason",{reason:PROT.reason});renderProt()}});
+  $("prot-send").onclick=function(){var v=$("prot-email").value.trim();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){$("prot-msg").textContent=T("Enter a valid email, or leave it empty.");return}
+    PROT.email=1;save(PROT_KEY,PROT);protLog("email",{email:v});renderProt()};
+  window.addEventListener("fv:lang",renderProt)})();
+function renderAll(){renderCabin();renderProt();renderTripToggle();renderFit();renderHero();renderTraveller();renderSheet();renderMeter();renderVerdicts();renderMail();if(!$("v-home").hidden)renderTag()}
 renderCL();renderAll();route();
 
 /* PDF download works in any normal browser */
