@@ -753,14 +753,33 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 .doc-t span{font-size:14px;color:var(--muted)}
 .doc-go{font-size:22px;font-weight:700}
 a.doc-tile{text-decoration:none}
-.card-page{display:grid;grid-template-columns:minmax(0,640px) minmax(260px,1fr);grid-template-rows:auto 1fr;grid-template-areas:"sheet act" "sheet fix";gap:16px 24px;align-items:start}
+.card-page{display:grid;grid-template-columns:minmax(0,640px) minmax(260px,1fr);grid-template-rows:auto auto 1fr;grid-template-areas:"sheet act" "sheet prot" "sheet fix";gap:16px 24px;align-items:start}
 .card-page>.sheet{grid-area:sheet}
 .card-act{grid-area:act}
 .card-fix{grid-area:fix;display:grid;gap:6px}
+.quick{display:grid;gap:14px;margin-top:16px}
+.quick h2{margin:0;font-size:22px}
+.quick ol{list-style:none;margin:0;padding:0;display:grid;gap:18px;counter-reset:q}
+.quick ol>li{counter-increment:q;display:grid;gap:10px;padding-left:40px;position:relative}
+.quick ol>li::before{content:counter(q);position:absolute;left:0;top:-2px;width:28px;height:28px;border-radius:50%;background:var(--sign);color:var(--sign-ink);font-weight:700;display:grid;place-items:center}
+.quick .q-types{display:flex;flex-wrap:wrap;gap:8px}
+.quick .q-types .btn[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.quick details{font-size:15px}.quick details summary{cursor:pointer;font-weight:600;min-height:32px}
+.quick details ul{margin:6px 0 0;padding-left:18px;display:grid;gap:4px}
+.card-gap{display:grid;gap:10px;margin-bottom:18px;border:1.5px solid var(--warn);background:var(--warn-soft)}
+.card-gap h2{margin:0;font-size:19px}
+.card-gap .gap-list{display:flex;flex-wrap:wrap;gap:6px}
+.qf{display:grid;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.qf .actions{gap:8px}
+.protect{grid-area:prot;display:grid;gap:10px;border:1.5px solid var(--sign)}
+.protect h2{margin:0;font-size:20px;line-height:1.25}
+.protect .prot-price{margin:0;font-size:15px;color:var(--muted)}.protect .prot-price b{font-size:28px;color:var(--ink);margin-right:4px}
+.protect .chips{display:flex;flex-wrap:wrap;gap:8px}
+.protect .chips .btn[aria-pressed="true"]{border-color:var(--ink);background:var(--line)}
 .stack-actions{display:grid;gap:10px}
 .stack-actions .btn{width:100%}
 @media (max-width:900px){
-  .card-page{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"act" "sheet" "fix"}
+  .card-page{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"act" "prot" "sheet" "fix"}
   .stack-actions{grid-template-columns:1fr 1fr}
   .stack-actions .btn:first-child{grid-column:1/-1}
 }
@@ -1063,6 +1082,57 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
     <h1 id="t-home" data-noi18n>ready for your next flight? <span aria-hidden="true">✈️</span></h1>
   </div>
   <div class="hero" id="hero" aria-live="polite"></div>
+  <section class="panel quick" id="quick" aria-labelledby="t-quick" hidden>
+    <div>
+      <h2 id="t-quick">Your card in 2 minutes</h2>
+      <p class="note" style="margin:4px 0 0">Three questions. No account needed: everything stays on this device.</p>
+    </div>
+    <ol>
+      <li><b>What do you travel with?</b>
+        <div class="q-types" role="group" aria-label="Wheelchair type">
+          <button class="btn ghost" type="button" data-qtype="manual" aria-pressed="false">Manual wheelchair</button>
+          <button class="btn ghost" type="button" data-qtype="electric" aria-pressed="false">Power wheelchair</button>
+          <button class="btn ghost" type="button" data-qtype="scooter" aria-pressed="false">Mobility scooter</button>
+        </div>
+      </li>
+      <li><b>Weight and size in travel position</b>
+        <div class="row r4">
+          <label class="f">Weight<span class="unit" data-u="kg"><input id="q-weight" data-k="weight" type="number" min="0" inputmode="decimal"></span></label>
+          <label class="f">Height<span class="unit" data-u="cm"><input id="q-h" data-k="h" type="number" min="0" inputmode="numeric"></span></label>
+          <label class="f">Width<span class="unit" data-u="cm"><input id="q-w" data-k="w" type="number" min="0" inputmode="numeric"></span></label>
+          <label class="f">Length<span class="unit" data-u="cm"><input id="q-l" data-k="l" type="number" min="0" inputmode="numeric"></span></label>
+        </div>
+        <div id="q-batt" class="row" hidden>
+          <label class="f">Battery type
+            <select id="q-bt" data-k="bt">
+              <option value="">Select…</option>
+              <option value="li">Lithium-ion</option>
+              <option value="gel">Gel (non-spillable)</option>
+              <option value="agm">AGM (non-spillable)</option>
+              <option value="wet">Wet cell (spillable)</option>
+            </select>
+          </label>
+          <label class="f">Battery capacity<span class="unit" data-u="Wh"><input id="q-wh" data-k="wh" type="number" min="0" inputmode="decimal"></span></label>
+        </div>
+        <details>
+          <summary>Where do I find these?</summary>
+          <ul>
+            <li>Weight and size are on the label under the seat or in the user manual. Your dealer can also tell you.</li>
+            <li>Measure it in travel position: backrest folded, cushion and joystick removed.</li>
+            <li>Battery Wh is on the battery label. If you only see volts and Ah, multiply them: 24 V × 50 Ah = 1200 Wh.</li>
+            <li>Not sure yet? Leave it empty and add it later. The card works anyway.</li>
+          </ul>
+        </details>
+      </li>
+      <li><b>Your name <span class="note" style="font-weight:400">(optional, it goes on the card)</span></b>
+        <label class="f" style="max-width:420px">Name<input id="q-name" data-k="name" type="text" autocomplete="name"></label>
+      </li>
+    </ol>
+    <div class="actions">
+      <button class="btn sign" type="button" id="q-go">Create my card</button>
+      <a class="btn ghost" href="#profile">Full profile</a>
+    </div>
+  </section>
   <section class="checkin" id="checkin" aria-labelledby="t-desk" hidden>
     <div class="checkin-head">
       <div>
@@ -1166,6 +1236,12 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
     <h1 id="t-card">Your wheelchair handling sheet</h1>
     <p>Everything airport and airline staff need to handle your wheelchair safely. Show the QR code at check-in or download the PDF.</p>
   </div>
+  <section class="panel card-gap" id="card-gap" aria-labelledby="t-gap" hidden>
+    <h2 id="t-gap">Your card is not ready for staff yet</h2>
+    <p class="note" style="margin:0">Airline staff need these details to load your wheelchair safely:</p>
+    <div class="gap-list" id="gap-list"></div>
+    <div class="actions"><a class="btn sign" href="#quick" id="gap-go">Complete it in 1 minute</a></div>
+  </section>
   <div class="card-page">
     <div class="sheet" id="sheet" aria-live="polite" data-noi18n></div>
       <div class="panel card-act" aria-label="Use the sheet">
@@ -1175,7 +1251,47 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
         </div>
         <div class="sheet-qr" id="sheet-qr" hidden></div>
         <p class="note" id="msg">The A4 PDF is ready to print and keep in your hand luggage.</p>
+        <button class="btn ghost" type="button" id="remind" hidden>Add reminders to my calendar</button>
+        <div class="qf" id="qf" hidden>
+          <b>Was the card useful?</b>
+          <div class="actions" id="qf-ask">
+            <button class="btn small ghost" type="button" data-qf="yes">Yes, useful</button>
+            <button class="btn small ghost" type="button" data-qf="no">Not really</button>
+          </div>
+          <div id="qf-more" hidden>
+            <label class="f">What would make it better? <span class="note">(optional)</span><textarea id="qf-text" rows="2"></textarea></label>
+            <button class="btn small" type="button" id="qf-send">Send</button>
+          </div>
+          <p class="note" id="qf-msg" aria-live="polite" style="margin:0"></p>
+        </div>
       </div>
+      <section class="panel protect" id="protect" aria-labelledby="t-protect">
+        <span class="pill warn" style="justify-self:start">Coming soon</span>
+        <h2 id="t-protect">Protect your wheelchair on this trip</h2>
+        <p class="note" style="margin:0">If the airline damages or loses your wheelchair, it refunds at most about €1,800. A power wheelchair can cost much more. The Wheelchair Guarantee would pay for the repair or a replacement, and a loan wheelchair while you wait.</p>
+        <p class="prot-price" id="prot-price"></p>
+        <div class="actions" id="prot-ask">
+          <button class="btn sign" type="button" id="prot-yes"></button>
+          <button class="btn ghost" type="button" id="prot-no">No thanks</button>
+        </div>
+        <div id="prot-thanks" hidden>
+          <p style="margin:0 0 8px"><b>Thank you!</b> The guarantee is not available yet, so nothing has been charged. Leave your email and we will tell you when it launches.</p>
+          <div class="row" style="align-items:end">
+            <label class="f">Email (optional)<input id="prot-email" type="email" autocomplete="email" inputmode="email"></label>
+            <button class="btn small" type="button" id="prot-send">Notify me</button>
+          </div>
+        </div>
+        <div id="prot-why" hidden>
+          <p style="margin:0 0 8px">Thanks for telling us. What is the main reason?</p>
+          <div class="chips" role="group" aria-label="Main reason">
+            <button class="btn small ghost" type="button" data-why="price" aria-pressed="false">Too expensive</button>
+            <button class="btn small ghost" type="button" data-why="insured" aria-pressed="false">I already have insurance</button>
+            <button class="btn small ghost" type="button" data-why="no_need" aria-pressed="false">I don't need it</button>
+            <button class="btn small ghost" type="button" data-why="trust" aria-pressed="false">I don't trust it yet</button>
+          </div>
+        </div>
+        <p class="note" id="prot-msg" aria-live="polite" style="margin:0"></p>
+      </section>
       <div class="panel card-fix">
         <b>Something wrong on the sheet?</b>
         <p class="note">It is built from your profile and your current trip.</p>
@@ -1777,6 +1893,8 @@ window.FREEVEL_CONFIG = {
   saveFeedbackToSupabase: true,   // salva una copia di ogni feedback nella tabella feedback
   transferUrl: "https://formspree.io/f/mzeelnyk",          // ← incolla qui il tuo endpoint Formspree, es. "https://formspree.io/f/abcdwxyz"
   saveTransfersToSupabase: true,  // salva una copia di ogni richiesta nella tabella transfer_requests
+  protectionPrice: 5,              // prezzo (€) mostrato nel test "Garanzia Ausilio": cambialo per testare altri prezzi
+  saveProtectionToSupabase: true, // conta visualizzazioni e clic nella tabella protection_interest
   // Google Analytics 4 e Google Tag Manager. Si attivano SOLO dopo che l'utente accetta i cookie.
   // Usa UNO dei due: con GTM, configura GA4 dentro GTM e lascia gaId vuoto (altrimenti conti tutto due volte).
   gaId:  "G-W5VBKQEW7G",   // ← ID di misurazione GA4, es. "G-AB12CD34EF"
@@ -1850,6 +1968,63 @@ var FV_IT = /*DICT*/{
 "Something wrong on the sheet?":"Qualcosa non va nella scheda?",
 "It is built from your profile and your current trip.":"È creata dal tuo profilo e dal viaggio attuale.",
 "Wheelchair handling sheet":"Scheda per il personale",
+"Your card in 2 minutes":"La tua scheda in 2 minuti",
+"Three questions. No account needed: everything stays on this device.":"Tre domande. Non serve un account: tutto resta su questo dispositivo.",
+"What do you travel with?":"Con cosa viaggi?",
+"Wheelchair type":"Tipo di carrozzina",
+"Manual wheelchair":"Carrozzina manuale",
+"Power wheelchair":"Carrozzina elettrica",
+"Mobility scooter":"Scooter elettrico",
+"Weight and size in travel position":"Peso e misure in posizione da viaggio",
+"Battery capacity":"Capacità della batteria",
+"Where do I find these?":"Dove li trovo?",
+"Weight and size are on the label under the seat or in the user manual. Your dealer can also tell you.":"Peso e misure sono sull'etichetta sotto il sedile o nel manuale d'uso. Anche il tuo rivenditore può dirteli.",
+"Measure it in travel position: backrest folded, cushion and joystick removed.":"Misurala in posizione da viaggio: schienale piegato, cuscino e joystick tolti.",
+"Battery Wh is on the battery label. If you only see volts and Ah, multiply them: 24 V × 50 Ah = 1200 Wh.":"I Wh sono sull'etichetta della batteria. Se trovi solo volt e Ah, moltiplicali: 24 V × 50 Ah = 1200 Wh.",
+"Not sure yet? Leave it empty and add it later. The card works anyway.":"Non sei sicuro? Lascia vuoto e aggiungilo dopo. La scheda funziona lo stesso.",
+"Your name":"Il tuo nome",
+"(optional, it goes on the card)":"(facoltativo, va sulla scheda)",
+"Create my card":"Crea la mia scheda",
+"Full profile":"Profilo completo",
+"Your card is not ready for staff yet":"La tua scheda non è ancora pronta per il personale",
+"Airline staff need these details to load your wheelchair safely:":"Al personale servono questi dati per caricare la carrozzina in sicurezza:",
+"Complete it in 1 minute":"Completala in 1 minuto",
+"Size in travel position":"Misure in posizione da viaggio",
+"Battery Wh":"Wh della batteria",
+"Add reminders to my calendar":"Aggiungi i promemoria al calendario",
+"Was the card useful?":"La scheda ti è stata utile?",
+"Yes, useful":"Sì, utile",
+"Not really":"Non molto",
+"What would make it better?":"Cosa la renderebbe migliore?",
+"(optional)":"(facoltativo)",
+"Send":"Invia",
+"Thanks!":"Grazie!",
+"Thank you, it helps us improve the card.":"Grazie, ci aiuta a migliorare la scheda.",
+"your flight":"il tuo volo",
+"FreeVel: confirm assistance for {f}":"FreeVel: conferma l'assistenza per {f}",
+"Check that your assistance request and your wheelchair are on the booking. Open your FreeVel card:":"Controlla che la richiesta di assistenza e la carrozzina siano sulla prenotazione. Apri la tua scheda FreeVel:",
+"FreeVel: show your card at check-in ({f})":"FreeVel: mostra la scheda al check-in ({f})",
+"Open your card and show the QR code at the desk:":"Apri la scheda e mostra il QR code al banco:",
+"Reminders saved: open the file to add them to your calendar.":"Promemoria salvati: apri il file per aggiungerli al calendario.",
+"Coming soon":"In arrivo",
+"Protect your wheelchair on this trip":"Assicura il tuo ausilio per questo viaggio",
+"If the airline damages or loses your wheelchair, it refunds at most about €1,800. A power wheelchair can cost much more. The Wheelchair Guarantee would pay for the repair or a replacement, and a loan wheelchair while you wait.":"Se la compagnia aerea danneggia o perde la tua carrozzina, rimborsa al massimo circa 1.800 €. Una carrozzina elettrica può costare molto di più. La Garanzia Ausilio pagherebbe la riparazione o la sostituzione, e una carrozzina sostitutiva mentre aspetti.",
+"per trip":"a viaggio",
+"Yes, add it for {p}":"Sì, aggiungila a {p}",
+"No thanks":"No grazie",
+"Thank you!":"Grazie!",
+"The guarantee is not available yet, so nothing has been charged. Leave your email and we will tell you when it launches.":"La garanzia non è ancora disponibile, quindi non ti è stato addebitato nulla. Lasciaci la tua email e ti avvisiamo quando parte.",
+"Email (optional)":"Email (facoltativa)",
+"Notify me":"Avvisami",
+"Thanks for telling us. What is the main reason?":"Grazie per avercelo detto. Qual è il motivo principale?",
+"Main reason":"Motivo principale",
+"Too expensive":"Costa troppo",
+"I already have insurance":"Ho già un'assicurazione",
+"I don't need it":"Non mi serve",
+"I don't trust it yet":"Non mi fido ancora",
+"Done: we will email you when the guarantee launches.":"Fatto: ti scriviamo quando la garanzia sarà disponibile.",
+"Thanks, this helps us decide what to build.":"Grazie, ci aiuta a decidere cosa costruire.",
+"Enter a valid email, or leave it empty.":"Inserisci un'email valida, oppure lascia vuoto.",
 "For airport and airline staff. Open it to download the PDF or show the QR code.":"Per il personale dell'aeroporto e della compagnia aerea. Aprila per scaricare il PDF o mostrare il QR code.",
 "Check your airline's size limits":"Verifica le dimensioni per la compagnia",
 "Compare your wheelchair's weight and size with each airline's limits.":"Confronta peso e misure della carrozzina con i limiti di ogni compagnia aerea.",
@@ -2653,7 +2828,7 @@ function renderHero(){var box=$("hero"),hi=$("hello-hi");if(!box)return;
   if(h1&&h1.dataset.txt!==txt){h1.dataset.txt=txt;h1.setAttribute("aria-label",txt);
     var ws=txt.split(/\s+/);h1.innerHTML=ws.map(function(w,i){return'<span class="bw" aria-hidden="true" style="--i:'+i+'">'+esc(w)+'</span>'}).join(" ")+
       ' <span class="bw" aria-hidden="true" style="--i:'+ws.length+'"><span class="plane">✈️</span></span>'}
-  var prof=["name","weight","h"].every(function(k){return String(S[k]||"").trim()}),
+  var prof=profReady(),
       trip=["airline","flight","date"].every(function(k){return String(S[k]||"").trim()});
   var steps='<ol class="hero-steps"><li class="'+(prof?'done':'')+'">'+T("1 Profile")+'</li><li class="'+(trip?'done':'')+'">'+T("2 Flight")+'</li><li>'+T("3 Show at check-in")+'</li></ol>';
   var ck=$("checkin");if(ck)ck.hidden=!prof;
@@ -2661,7 +2836,7 @@ function renderHero(){var box=$("hero"),hi=$("hello-hi");if(!box)return;
   var tt=$("trip-toggle");if(tt)tt.hidden=!prof;if(!prof&&$("tform"))$("tform").hidden=true;
   box.classList.toggle("hero-start",!prof);
   var GO='<span class="hero-go" aria-hidden="true">→</span>';
-  if(!prof){box.innerHTML='<a class="star-btn" href="#profile"><span class="star-btn-in"><span class="shiny">'+T("Start here")+'</span><span class="star-arrow" aria-hidden="true">→</span></span></a>'+
+  if(!prof){box.innerHTML='<a class="star-btn" href="#quick"><span class="star-btn-in"><span class="shiny">'+T("Start here")+'</span><span class="star-arrow" aria-hidden="true">→</span></span></a>'+
     '<p class="start-sub">'+T("Create your profile")+' · '+T("About 2 minutes, no account needed")+'</p>'+steps;return}
   if(!trip){box.innerHTML='<p class="hero-k">'+T("Next step")+'</p><a class="hero-box is-link" href="#tform"><span class="hero-ic">'+HERO_IC+'</span><div><b>'+T("Add your flight")+'</b><small>'+T("Airline, flight number and date")+'</small></div>'+GO+'</a>'+steps+
     '<div class="hero-cta"><a class="btn sign" href="#tform">'+T("Add flight")+'</a></div>';return}
@@ -2872,7 +3047,7 @@ function route(){var v=location.hash.replace("#",""),anchor=null;
   if(VIEWS.indexOf(v)<0)v="home";
   VIEWS.forEach(function(n){$("v-"+n).hidden=n!==v});
   [].forEach.call(document.querySelectorAll("header [data-v],#bnav [data-v]"),function(a){if(a.dataset.v===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
-  if(v==="home")renderTag();if(v==="card")renderSheet();if(v==="fit"){renderFit();renderFitSrc()}if(v==="transfers"){setTimeout(trOpen,0);blurIn($("t-transfers"))}
+  if(v==="home")renderTag();if(v==="card"){renderSheet();renderProt();protShown()}if(v==="fit"){renderFit();renderFitSrc()}if(v==="transfers"){setTimeout(trOpen,0);blurIn($("t-transfers"))}
   if(v==="claim")setTimeout(function(){cOpen();var el=anchor&&$(anchor);if(el)el.scrollIntoView({block:"start"})},0);
   if(anchor==="tform")openTrip(true);
   if(anchor&&v!=="claim")setTimeout(function(){var el=$(anchor);if(el)el.scrollIntoView({behavior:"smooth",block:"start"})},0);
@@ -3004,7 +3179,93 @@ function openTrip(focus){var f=$("tform"),t=$("trip-toggle");if(!f)return;f.hidd
   if(focus)setTimeout(function(){var i=$("f-airline");if(i)i.focus({preventScroll:true})},50)}
 (function(){var t=$("trip-toggle");if(!t)return;t.addEventListener("click",function(){var f=$("tform");
   if(f.hidden){openTrip(true)}else{f.hidden=true;t.setAttribute("aria-expanded","false")}})})();
-function renderAll(){renderCabin();renderTripToggle();renderFit();renderHero();renderTraveller();renderSheet();renderMeter();renderVerdicts();renderMail();if(!$("v-home").hidden)renderTag()}
+/* ================= WHEELCHAIR GUARANTEE (fake door) =================
+   Tests whether travellers would add a paid guarantee to a trip. Nothing is sold or charged.
+   Counted in two places:
+   - Google Analytics 4 (only with cookie consent): protection_shown, protection_yes, protection_no,
+     protection_no_reason, protection_email. Params: price only, never personal or health data.
+   - Supabase table protection_interest (anonymous, no cookies): see supabase/protection_interest.sql.
+   Each device is counted once per action; device_id is a random id kept on the device, not linked to the account. */
+var PROT_KEY="freevel_prot_v1",PROT=load(PROT_KEY)||{};
+function protPrice(){var c=window.FREEVEL_CONFIG||{};return +c.protectionPrice||5}
+function protFmt(){return protPrice().toLocaleString(FV.locale(),{style:"currency",currency:"EUR",minimumFractionDigits:0,maximumFractionDigits:2})}
+function protDevice(){if(!PROT.dev){PROT.dev=(Date.now().toString(36)+Math.random().toString(36).slice(2,10));save(PROT_KEY,PROT)}return PROT.dev}
+function protLog(action,extra){extra=extra||{};
+  if(window.FV_track){var g={price:protPrice()};if(extra.reason)g.reason=extra.reason;FV_track("protection_"+action,g)}
+  var sb=window.supabaseClient,cfg=window.FREEVEL_CONFIG||{};if(!sb||cfg.saveProtectionToSupabase===false)return;
+  sb.from("protection_interest").insert([{device_id:protDevice(),action:action,price:protPrice(),reason:extra.reason||null,
+    email:extra.email||null,lang:FV.lang||null}]).then(function(){},function(){})}
+function renderProt(){if(!$("protect"))return;
+  $("prot-price").innerHTML='<b>'+esc(protFmt())+'</b>'+esc(T("per trip"));
+  $("prot-yes").textContent=T("Yes, add it for {p}",{p:protFmt()});
+  $("prot-ask").hidden=!!PROT.answer;$("prot-thanks").hidden=PROT.answer!=="yes"||!!PROT.email;$("prot-why").hidden=PROT.answer!=="no"||!!PROT.reason;
+  $("prot-msg").textContent=PROT.email?T("Done: we will email you when the guarantee launches."):PROT.reason?T("Thanks, this helps us decide what to build."):"";
+  [].forEach.call(document.querySelectorAll("#prot-why [data-why]"),function(b){b.setAttribute("aria-pressed",String(b.dataset.why===PROT.reason))})}
+function protShown(){if(PROT.shown)return;PROT.shown=1;save(PROT_KEY,PROT);protLog("shown")}
+(function(){if(!$("protect"))return;
+  $("prot-yes").onclick=function(){if(PROT.answer)return;PROT.answer="yes";save(PROT_KEY,PROT);protLog("yes");renderProt();var e=$("prot-email");if(e)e.focus()};
+  $("prot-no").onclick=function(){if(PROT.answer)return;PROT.answer="no";save(PROT_KEY,PROT);protLog("no");renderProt()};
+  [].forEach.call(document.querySelectorAll("#prot-why [data-why]"),function(b){b.onclick=function(){if(PROT.reason)return;
+    PROT.reason=b.dataset.why;save(PROT_KEY,PROT);protLog("no_reason",{reason:PROT.reason});renderProt()}});
+  $("prot-send").onclick=function(){var v=$("prot-email").value.trim();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){$("prot-msg").textContent=T("Enter a valid email, or leave it empty.");return}
+    PROT.email=1;save(PROT_KEY,PROT);protLog("email",{email:v});renderProt()};
+  window.addEventListener("fv:lang",renderProt)})();
+/* ================= ENGAGEMENT (Nov 2026) =================
+   Data: 4 saved sheets, none with the weight; "My card" was the most viewed page but had 1 download; no feedback; no returning users.
+   - Quick start on the home: 3 questions, no account; the trip step unlocks once it is done (weight no longer blocks it).
+   - "My card": banner listing the essentials still missing; quick thumbs feedback after the card is used.
+   - Calendar reminders (.ics) before the flight: a reason to come back.
+   GA4 events (consent-gated, no personal or health data): quick_card_created, card_complete, card_gap_click,
+   reminder_added, quick_feedback. Quick feedback is also saved in the Supabase feedback table. */
+var ENG_KEY="freevel_eng_v1",ENG=load(ENG_KEY)||{};
+function engSave(){save(ENG_KEY,ENG)}
+function essentialsMissing(){var m=[];if(!S.weight)m.push(["Weight","q-weight"]);if(!S.h||!S.w||!S.l)m.push(["Size in travel position","q-h"]);
+  if(powered()){if(!S.wh)m.push(["Battery Wh","q-wh"]);if(!S.bt)m.push(["Battery type","q-bt"])}return m}
+/* qsDone: true after "Create my card", false while completing from the card banner (keeps the form open), unset for older profiles */
+function profReady(){if(S.qsDone===false)return false;return !!S.qsDone||["name","weight","h"].every(function(k){return String(S[k]||"").trim()})}
+function syncInputs(){inputs.forEach(function(el){if(el===document.activeElement)return;var v=S[el.dataset.k];
+  if(el.type==="checkbox")el.checked=!!v;else if(el.tagName==="SELECT"){if(v!=null)el.value=v}else el.value=v==null?"":v})}
+function renderQuick(){var q=$("quick");if(!q)return;q.hidden=profReady();
+  [].forEach.call(q.querySelectorAll("[data-qtype]"),function(b){b.setAttribute("aria-pressed",String((S.type||"")===b.dataset.qtype))});
+  $("q-batt").hidden=!powered()}
+function renderGap(){var g=$("card-gap");if(!g)return;var m=essentialsMissing();g.hidden=!m.length;
+  $("gap-list").innerHTML=m.map(function(x){return'<span class="pill warn">'+esc(T(x[0]))+'</span>'}).join("");
+  $("remind").hidden=!S.date;
+  if(!m.length&&!ENG.complete){ENG.complete=1;engSave();window.FV_track&&FV_track("card_complete",{})}}
+(function(){var q=$("quick");if(!q)return;
+  [].forEach.call(q.querySelectorAll("[data-qtype]"),function(b){b.onclick=function(){S.type=b.dataset.qtype;persist();syncInputs();renderAll()}});
+  $("q-go").onclick=function(){S.qsDone=true;if(!S.type)S.type="manual";persist();
+    window.FV_track&&FV_track("quick_card_created",{has_weight:!!S.weight,has_size:!!(S.h&&S.w&&S.l)});
+    renderAll();location.hash="card"};
+  $("gap-go").addEventListener("click",function(){window.FV_track&&FV_track("card_gap_click",{missing:essentialsMissing().length});
+    S.qsDone=false;persist();renderAll();setTimeout(function(){var m=essentialsMissing()[0],el=m&&$(m[1]);if(el)el.focus()},120)})})();
+
+/* calendar reminders: 2 days before (assistance + battery) and on the day (show the card) */
+function icsDate(d,add){var x=new Date(d+"T12:00:00");x.setDate(x.getDate()+add);return x.toISOString().slice(0,10).replace(/-/g,"")}
+function icsEsc(t){return String(t).replace(/\\/g,"\\\\").replace(/[,;]/g,function(c){return"\\"+c}).replace(/\n/g,"\\n")}
+$("remind").onclick=function(){if(!S.date)return;var url=location.href.split("#")[0],fl=[S.airline,S.flight].filter(Boolean).join(" ")||T("your flight");
+  var ev=function(add,sum,desc){var d=icsDate(S.date,add);return["BEGIN:VEVENT","UID:fv-"+d+"-"+add+"@freevel","DTSTAMP:"+new Date().toISOString().replace(/[-:]/g,"").slice(0,15)+"Z",
+    "DTSTART;VALUE=DATE:"+d,"DTEND;VALUE=DATE:"+icsDate(S.date,add+1),"SUMMARY:"+icsEsc(sum),"DESCRIPTION:"+icsEsc(desc+"\n"+url+"#card"),
+    "BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:"+icsEsc(sum),"TRIGGER:PT9H","END:VALARM","END:VEVENT"].join("\r\n")};
+  var ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//FreeVel//EN",
+    ev(-2,T("FreeVel: confirm assistance for {f}",{f:fl}),T("Check that your assistance request and your wheelchair are on the booking. Open your FreeVel card:")),
+    ev(0,T("FreeVel: show your card at check-in ({f})",{f:fl}),T("Open your card and show the QR code at the desk:")),"END:VCALENDAR"].join("\r\n");
+  saveBlob(new Blob([ics],{type:"text/calendar"}),"freevel-reminders.ics",T("Reminders saved: open the file to add them to your calendar."),msg,null);
+  window.FV_track&&FV_track("reminder_added",{})};
+
+/* quick feedback after the card has been used (PDF or QR) */
+function qfShow(){if(ENG.qf)return;var b=$("qf");if(b)b.hidden=false}
+$("pdf").addEventListener("click",qfShow);$("sheet-qr-btn").addEventListener("click",qfShow);
+(function(){var box=$("qf");if(!box)return;var ans="";
+  [].forEach.call(box.querySelectorAll("[data-qf]"),function(b){b.onclick=function(){ans=b.dataset.qf;$("qf-ask").hidden=true;$("qf-more").hidden=false;
+    $("qf-msg").textContent=T("Thanks!");window.FV_track&&FV_track("quick_feedback",{useful:ans==="yes"});
+    send("");$("qf-text").focus()}});
+  function send(text){var sb=window.supabaseClient,cfg=window.FREEVEL_CONFIG||{};if(!sb||cfg.saveFeedbackToSupabase===false)return;
+    sb.from("feedback").insert([{rating:ans==="yes"?5:2,used:null,interests:[],comment:"[card] "+(ans==="yes"?"useful":"not useful")+(text?": "+text.slice(0,2000):""),contact:null,lang:FV.lang}]).then(function(){},function(){})}
+  $("qf-send").onclick=function(){var t=$("qf-text").value.trim();if(t)send(t);ENG.qf=1;engSave();$("qf-more").hidden=true;$("qf-msg").textContent=T("Thank you, it helps us improve the card.")}})();
+window.addEventListener("fv:lang",function(){renderQuick();renderGap()});
+function renderAll(){syncInputs();renderQuick();renderGap();renderCabin();renderProt();renderTripToggle();renderFit();renderHero();renderTraveller();renderSheet();renderMeter();renderVerdicts();renderMail();if(!$("v-home").hidden)renderTag()}
 renderCL();renderAll();route();
 
 /* PDF download works in any normal browser */
