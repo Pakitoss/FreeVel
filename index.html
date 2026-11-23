@@ -1412,6 +1412,18 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
           <label class="f">Height<span class="unit" data-u="cm"><input id="f-h" data-k="h" type="number" min="0" inputmode="numeric"></span></label>
         </div>
         <label class="chk"><input id="f-fold" data-k="fold" type="checkbox"><span>Folds or comes apart for transport</span></label>
+        <div id="cabin-box" hidden>
+          <label class="chk"><input id="f-cabin" data-k="cabin" type="checkbox"><span>Ask to keep it in the cabin closet, if there is space</span></label>
+          <p class="note" style="margin:4px 0 10px">Some airlines stow a folded manual wheelchair in an on-board closet instead of the hold. Space is first come, first served.</p>
+          <div id="cabin-dims" hidden>
+            <div class="row r3">
+              <label class="f">Folded length<span class="unit" data-u="cm"><input id="f-fl" data-k="fl" type="number" min="0" inputmode="numeric"></span></label>
+              <label class="f">Folded width<span class="unit" data-u="cm"><input id="f-fw" data-k="fw" type="number" min="0" inputmode="numeric"></span></label>
+              <label class="f">Folded height<span class="unit" data-u="cm"><input id="f-fh" data-k="fh" type="number" min="0" inputmode="numeric"></span></label>
+            </div>
+            <p class="note" id="cabin-fit" aria-live="polite" style="margin-top:8px"></p>
+          </div>
+        </div>
         <label class="f">Parts I keep with me in the cabin
           <span class="h">Cushion, joystick, headrest: anything that comes off and could break.</span>
           <input id="f-parts" data-k="parts" type="text" placeholder="e.g. pressure-relief cushion, joystick">
@@ -2121,6 +2133,15 @@ var FV_IT = /*DICT*/{
 "Flight:": "Volo:",
 "Fly with your wheelchair without explaining it all again at the desk.": "Vola con la tua carrozzina senza dover rispiegare tutto al banco.",
 "Folds or comes apart for transport": "Si piega o si smonta per il trasporto",
+"Ask to keep it in the cabin closet, if there is space": "Chiedi di tenerla nell'armadio di bordo, se c'è spazio",
+"Some airlines stow a folded manual wheelchair in an on-board closet instead of the hold. Space is first come, first served.": "Alcune compagnie sistemano la carrozzina manuale piegata in un armadio a bordo invece che in stiva. Il posto va a chi arriva prima.",
+"Folded length": "Lunghezza da piegata",
+"Folded width": "Larghezza da piegata",
+"Folded height": "Altezza da piegata",
+"Add the folded size to check it against a standard on-board closet ({c}).": "Aggiungi le misure da piegata per confrontarle con un armadio di bordo standard ({c}).",
+"Folded, it fits a standard on-board closet ({c}). Ask for it when you book and board early.": "Da piegata entra in un armadio di bordo standard ({c}). Chiedilo quando prenoti e sali a bordo per primo.",
+"Folded, it is larger than a standard on-board closet ({c}): it will probably travel in the hold.": "Da piegata è più grande di un armadio di bordo standard ({c}): probabilmente viaggerà in stiva.",
+"You asked to keep it in the cabin closet. If there is no space on board it goes in the hold, and these results apply.": "Hai chiesto di tenerla nell'armadio di bordo. Se a bordo non c'è spazio va in stiva, e valgono questi risultati.",
 "Footrests or armrests": "Pedane o braccioli",
 "For damage to checked items, send the airline a written claim within 7 days (Montreal Convention).": "Per i danni ai bagagli registrati, invia un reclamo scritto alla compagnia entro 7 giorni (Convenzione di Montréal).",
 "For damaged checked items the written complaint must reach the airline within 7 days of getting them back (Montreal Convention).": "Per i bagagli registrati danneggiati, il reclamo scritto deve arrivare alla compagnia entro 7 giorni dalla riconsegna (Convenzione di Montréal).",
@@ -2521,6 +2542,19 @@ function yn(v,en){return en?(v?"Yes":"No"):(v?"Sì":"No")}
 function fmtDate(d){if(!d)return"";var p=String(d).split("-");return p.length===3?p[2]+"/"+p[1]+"/"+p[0]:d}
 function dims(){return (S.l||S.w||S.h)?(S.l||"?")+" × "+(S.w||"?")+" × "+(S.h||"?")+" cm":""}
 function make(){return [S.brand,S.model].filter(Boolean).join(" ")}
+/* cabin closet: a folded manual wheelchair may travel in an on-board closet instead of the hold.
+   CLOSET = minimum closet size US airlines must offer on aircraft with 100+ seats (14 CFR 382.67: 13 x 36 x 42 in). */
+var CLOSET=[107,91,33];
+function cabinAsk(){return !powered()&&!!S.fold&&!!S.cabin}
+function foldDims(){return (S.fl||S.fw||S.fh)?(S.fl||"?")+" × "+(S.fw||"?")+" × "+(S.fh||"?")+" cm":""}
+function closetFit(){var a=[+S.fl||0,+S.fw||0,+S.fh||0];if(a.some(function(x){return!x}))return null;
+  a.sort(function(x,y){return y-x});return a.every(function(x,i){return x<=CLOSET[i]})}
+function cabinTxt(en){var f=foldDims();return en?"Requested, if space allows"+(f?" (folded "+f+")":""):"Richiesta, se c'è spazio"+(f?" (piegata "+f+")":"")}
+function renderCabin(){var box=$("cabin-box");if(!box)return;box.hidden=powered()||!S.fold;
+  $("cabin-dims").hidden=box.hidden||!S.cabin;var o=$("cabin-fit"),r=closetFit(),c=CLOSET.join(" × ")+" cm";
+  o.textContent=r===null?T("Add the folded size to check it against a standard on-board closet ({c}).",{c:c}):
+    r?T("Folded, it fits a standard on-board closet ({c}). Ask for it when you book and board early.",{c:c}):
+      T("Folded, it is larger than a standard on-board closet ({c}): it will probably travel in the hold.",{c:c})}
 function battLine(en){if(!powered())return"";var t=BT[S.bt]?BT[S.bt][en?1:0]:"";var q=S.wh?((S.bn?S.bn+" × ":"")+S.wh+" Wh"):(S.bn?S.bn+(en?(S.bn=="1"?" battery":" batteries"):(S.bn=="1"?" batteria":" batterie")):"");return [t,q].filter(Boolean).join(", ")}
 
 /* ---------- form binding ---------- */
@@ -2661,7 +2695,7 @@ function renderSheet(){var t=S.type||"manual",pw=powered(),bs=battSSR();
   var h='<div class="sheet-head"><div><h4>Wheelchair handling sheet</h4><div class="en">For airline, ground handling and cabin staff</div></div><div class="ssr">'+(S.wch?'<span class="y">'+esc(S.wch)+'</span>':'')+(bs?'<span>'+bs+'</span>':'')+'</div></div>';
   h+='<div class="sec">PASSENGER</div>'+rows([["Name",S.name],["Phone",S.phone],["Emergency contact",S.emerg],["Assistance",WCH[S.wch]]]);
   h+='<div class="sec">FLIGHT</div>'+rows([["Airline",S.airline],["Flight",[S.flight,fmtDate(S.date)].filter(Boolean).join(" · ")],["Route",S.route],["Booking ref (PNR)",S.pnr],["Hand over",HAND[S.handover||"gate"][1]],["Return",RET[S.ret||"door"][1]]]);
-  h+='<div class="sec">MOBILITY AID</div>'+rows([["Type",TYPE[t][1]],["Make & model",make()],["Weight",S.weight?S.weight+" kg":""],["Size L×W×H",dims()],["Collapsible",yn(S.fold,1)],["Kept in cabin",S.parts]]);
+  h+='<div class="sec">MOBILITY AID</div>'+rows([["Type",TYPE[t][1]],["Make & model",make()],["Weight",S.weight?S.weight+" kg":""],["Size L×W×H",dims()],["Collapsible",yn(S.fold,1)]].concat(cabinAsk()?[["Cabin closet",cabinTxt(1)]]:[]).concat([["Kept in cabin",S.parts]]));
   if(pw){h+='<div class="sec">BATTERY</div>'+rows([["Battery",battLine(1)],["Removable",yn(S.brem,1)],["Can be isolated",yn(S.bsw,1)],["How to disconnect",S.bhow]])}
   h+='<div class="handling"><small>HANDLING INSTRUCTIONS</small>'+(S.notes?esc(S.notes).replace(/\n/g,"<br>"):'<span class="empty">—</span>')+'</div>';
   $("sheet").innerHTML=h}
@@ -2676,6 +2710,7 @@ function plain(ascii){var L=[],pw=powered();
   L.push("Hand over: "+HAND[S.handover||"gate"][1]+" | Return: "+RET[S.ret||"door"][1]);
   L.push("Mobility aid: "+[TYPE[S.type||"manual"][1],make(),S.weight?S.weight+" kg":"",dims()?"LxWxH "+dims():""].filter(Boolean).join(", "));
   L.push("Collapsible: "+yn(S.fold,1)+(S.parts?" | Keep in cabin: "+S.parts:""));
+  if(cabinAsk())L.push("Cabin closet: "+cabinTxt(1));
   if(pw){L.push("Battery: "+(battLine(1)||"-")+" | Removable: "+yn(S.brem,1)+" | Isolator: "+yn(S.bsw,1));if(S.bhow)L.push("Disconnect: "+S.bhow)}
   L.push("Handling: "+(S.notes?S.notes.replace(/\n+/g," / "):"-"));
   var s=L.join("\n");
@@ -2696,6 +2731,7 @@ function renderTag(){var pw=powered(),t=S.type||"manual";
   var top='<div class="tag-top"><div class="codes"><div><div class="lbl">ASSISTANCE</div><div class="code">'+esc(S.wch||"WCH?")+'</div></div>'+(battSSR()?'<div><div class="lbl">MOBILITY AID</div><div class="code">'+battSSR()+'</div></div>':'')+'</div>'+
     '<div style="display:flex;gap:14px;align-items:center"><div class="sub">'+esc(TYPE[t][1])+(pw&&S.bt?'<br>'+esc(BT[S.bt][1]):'')+'</div><span class="hole" aria-hidden="true"></span></div></div>';
   var f=fact("Weight",S.weight?S.weight+" kg":"")+fact("Size L×W×H",dims(),1)+fact("Collapsible",yn(S.fold,1));
+  if(cabinAsk())f+=fact("Cabin closet","If space allows",1);
   if(pw)f+=fact("Battery",S.wh?(S.bn?S.bn+" × ":"")+S.wh+" Wh":"")+fact("Removable",yn(S.brem,1))+fact("Isolator",yn(S.bsw,1));
   var hand='<div class="tag-hand"><small>HANDLING INSTRUCTIONS</small>'+(S.notes?esc(S.notes).replace(/\n/g,"<br>"):"—")+(pw&&S.bhow?'<br><br><small>HOW TO DISCONNECT</small>'+esc(S.bhow):'')+'</div>';
   var dl='<dl><dt>PAX</dt><dd>'+esc(S.name||"—")+'</dd><dt>FLIGHT</dt><dd>'+esc([S.flight,fmtDate(S.date),S.route].filter(Boolean).join(" · ")||"—")+'</dd>'+(S.pnr?'<dt>PNR</dt><dd class="mono">'+esc(S.pnr)+'</dd>':'')+
@@ -2742,6 +2778,7 @@ function mail(){var en=mailLang==="en",pw=powered(),t=S.type||"manual",nm=S.name
     if(pw)L.push("- Battery: "+(battLine(1)||"-")+"; removable: "+yn(S.brem,1)+"; can be disconnected: "+yn(S.bsw,1));
     L.push("");
     L.push("I would like to hand over my wheelchair "+(S.handover==="checkin"?"at check-in":"at the aircraft door (gate delivery)")+" and receive it "+(S.ret==="belt"?"at baggage claim":"at the aircraft door")+" on arrival.");
+    if(cabinAsk())L.push("If there is space, I would like my folded wheelchair to be stowed in the cabin closet"+(foldDims()?" (folded size "+foldDims()+")":"")+".");
     if(S.parts)L.push("I will keep these parts with me in the cabin: "+S.parts+".");
     if(S.notes)L.push("","Handling instructions:",S.notes.split("\n").filter(Boolean).map(function(x){return"- "+x}).join("\n"));
     L.push("","Please confirm that the assistance and the carriage of my mobility aid are recorded on my booking.","","Kind regards,",nm+(S.phone?"\n"+S.phone:""));
@@ -2752,6 +2789,7 @@ function mail(){var en=mailLang==="en",pw=powered(),t=S.type||"manual",nm=S.name
     if(pw)L.push("- Batteria: "+(battLine(0)||"-")+"; rimovibile: "+yn(S.brem)+"; scollegabile: "+yn(S.bsw));
     L.push("");
     L.push("Vorrei consegnare la carrozzina "+(S.handover==="checkin"?"al check-in":"alla porta dell'aereo (consegna al gate)")+" e riaverla "+(S.ret==="belt"?"al nastro bagagli":"alla porta dell'aereo")+" all'arrivo.");
+    if(cabinAsk())L.push("Se c'è spazio, vorrei che la carrozzina piegata fosse sistemata nell'armadio di bordo"+(foldDims()?" (misure da piegata "+foldDims()+")":"")+".");
     if(S.parts)L.push("Terrò con me in cabina: "+S.parts+".");
     if(S.notes)L.push("","Istruzioni di movimentazione:",S.notes.split("\n").filter(Boolean).map(function(x){return"- "+x}).join("\n"));
     L.push("","Vi chiedo di confermare che l'assistenza e il trasporto dell'ausilio sono registrati sulla mia prenotazione.","","Cordiali saluti,",nm+(S.phone?"\n"+S.phone:""));}
@@ -2801,7 +2839,7 @@ function buildPDF(){var J=window.jspdf&&window.jspdf.jsPDF;if(!J)throw new Error
     y+=hgt;d.setDrawColor(201,206,214);d.setLineWidth(.2);d.line(M,y-1,W-M,y-1)}
   sec("PASSENGER");row("Phone",S.phone);row("Emergency contact",S.emerg);row("Assistance",WCH[S.wch]);
   sec("FLIGHT");row("Hand over",HAND[S.handover||"gate"][1]);row("Return",RET[S.ret||"door"][1]);
-  sec("MOBILITY AID");row("Type",TYPE[S.type||"manual"][1]);row("Make & model",make());row("Weight",S.weight?S.weight+" kg":"");row("Size LxWxH",dims());row("Collapsible",yn(S.fold,1));row("Kept in cabin",S.parts);
+  sec("MOBILITY AID");row("Type",TYPE[S.type||"manual"][1]);row("Make & model",make());row("Weight",S.weight?S.weight+" kg":"");row("Size LxWxH",dims());row("Collapsible",yn(S.fold,1));if(cabinAsk())row("Cabin closet",cabinTxt(1));row("Kept in cabin",S.parts);
   if(pw){sec("BATTERY");row("Battery",battLine(1));row("Removable",yn(S.brem,1));row("Can be isolated",yn(S.bsw,1));row("How to disconnect",S.bhow)}
   var nl=d.splitTextToSize(lat(S.notes||"-"),W-2*M-8),bh=nl.length*5.6+12;if(y+bh+4>285){d.addPage();y=18}y+=3;
   d.setDrawColor(17,20,24);d.setLineWidth(.8);d.rect(M,y,W-2*M,bh);d.setTextColor(90,96,107);d.setFont("helvetica","bold");d.setFontSize(8);d.text("HANDLING INSTRUCTIONS",M+4,y+6);
@@ -2917,6 +2955,7 @@ function renderFit(){var out=$("fit-out");if(!out)return;
   var rear=res.some(function(x){return x.r.main.concat(x.r.some).some(function(y){return y.r.rear})});
   out.innerHTML='<div class="fit-sum"><b>'+T("{n} of {t} airlines carry it upright",{n:nOk,t:res.length})+'</b><span class="note">'+
     T("Wheelchair {h} cm high, {w} × {l} cm",{h:c.h,w:c.w,l:c.l})+'</span></div>'+
+    (cabinAsk()?'<p class="note" style="margin:-6px 0 12px">'+T("You asked to keep it in the cabin closet. If there is no space on board it goes in the hold, and these results apply.")+'</p>':'')+
     (rear?'<p class="note" style="margin:-6px 0 12px">'+T("On the Boeing 737 it fits only through the front hold door (89 cm): ask staff to load it there.")+'</p>':'')+
     '<ol class="fit-list">'+res.map(function(x){var a=x.a,r=x.r;
       return '<li class="fit-al '+r.s+'"><div class="fit-top"><b>'+esc(a.n)+'</b><span class="pax">'+
@@ -2965,7 +3004,7 @@ function openTrip(focus){var f=$("tform"),t=$("trip-toggle");if(!f)return;f.hidd
   if(focus)setTimeout(function(){var i=$("f-airline");if(i)i.focus({preventScroll:true})},50)}
 (function(){var t=$("trip-toggle");if(!t)return;t.addEventListener("click",function(){var f=$("tform");
   if(f.hidden){openTrip(true)}else{f.hidden=true;t.setAttribute("aria-expanded","false")}})})();
-function renderAll(){renderTripToggle();renderFit();renderHero();renderTraveller();renderSheet();renderMeter();renderVerdicts();renderMail();if(!$("v-home").hidden)renderTag()}
+function renderAll(){renderCabin();renderTripToggle();renderFit();renderHero();renderTraveller();renderSheet();renderMeter();renderVerdicts();renderMail();if(!$("v-home").hidden)renderTag()}
 renderCL();renderAll();route();
 
 /* PDF download works in any normal browser */
