@@ -1006,6 +1006,9 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
 .partner-list li{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--line);border-radius:12px;background:var(--field);min-width:0}
 .partner-list b{display:block;font-family:var(--f-display);font-weight:600;font-size:16px;overflow-wrap:anywhere}
 .partner-list small{color:var(--muted);font-size:14px}
+.partner-links{display:flex;flex-wrap:wrap;gap:4px 16px;margin:4px 0 0;font-size:14px}
+.partner-links a{color:var(--teal-ink);font-weight:700;text-underline-offset:3px}
+.partner-links a:hover{color:var(--ink)}
 .partner-ic{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line);color:var(--teal-ink)}
 .partner-ic svg{width:20px;height:20px}
 @media (max-width:520px){.partner-list{grid-template-columns:minmax(0,1fr)}}
@@ -1415,8 +1418,8 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
       <h2 id="t-partners">Our NCC partners</h2>
       <p class="note">Chauffeur-hire companies we work with. In other cities we still look for the options for you.</p>
       <ul class="partner-list">
-        <li><span class="partner-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.4"/></svg></span><div><b data-noi18n>Lacometa13</b><small>Milan</small></div></li>
-        <li><span class="partner-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.4"/></svg></span><div><b data-noi18n>Autoblu Bologna Aeroporto</b><small data-noi18n>Bologna</small></div></li>
+        <li><span class="partner-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.4"/></svg></span><div><b data-noi18n>Lacometa13</b><small>Milan</small><p class="partner-links"><a href="https://www.ncc-taxi-milanolacometa13.com/" target="_blank" rel="noopener">Website</a><a href="tel:+393334797505" data-noi18n>+39 333 479 7505</a><a href="mailto:lacometa13@libero.it" data-noi18n>lacometa13@libero.it</a></p></div></li>
+        <li><span class="partner-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.4"/></svg></span><div><b data-noi18n>Autoblu Bologna Aeroporto</b><small data-noi18n>Bologna</small><p class="partner-links"><a href="https://autobluaeroportobologna.it/" target="_blank" rel="noopener">Website</a><a href="tel:+393515582267" data-noi18n>+39 351 558 2267</a><a href="https://wa.me/393515582267" target="_blank" rel="noopener" data-noi18n>WhatsApp</a></p></div></li>
       </ul>
     </section>
   </div>
@@ -2375,6 +2378,7 @@ var FV_IT = /*DICT*/{
 "Our NCC partners": "I nostri partner NCC",
 "Chauffeur-hire companies we work with. In other cities we still look for the options for you.": "Agenzie di noleggio con conducente con cui collaboriamo. Nelle altre città cerchiamo noi le opzioni, come sempre.",
 "Milan": "Milano",
+"Website": "Sito web",
 "My transfer requests": "Le mie richieste di trasferimento",
 "NOTICE": "AVVISO",
 "Name": "Nome",
