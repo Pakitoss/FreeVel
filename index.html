@@ -70,9 +70,11 @@
     const { email, password } = creds();
     if (!email || !password) return authMsg('Enter both email and password.', 'bad');
     if (password.length < 6) return authMsg('The password must be at least 6 characters.', 'bad');
+    const consent = authEl('auth-consent');
+    if (consent && !consent.checked) { consent.focus(); return authMsg('To create an account, tick the box to accept the Privacy notice.', 'bad'); }
     authMsg('Creating your account…');
     try {
-      const { data, error } = await supabaseClient.auth.signUp({ email, password, options: { emailRedirectTo: AUTH_REDIRECT } });
+      const { data, error } = await supabaseClient.auth.signUp({ email, password, options: { emailRedirectTo: AUTH_REDIRECT, data: { privacy_consent_at: new Date().toISOString(), health_data_consent: true } } });
       if (error) return authMsg(friendly(error), 'bad');
       if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0)
         return authMsg('An account with this email already exists. Sign in instead.', 'bad');
@@ -345,6 +347,13 @@ button,input,select,textarea{font:inherit;color:inherit}
 .cookie-in b{color:var(--ink);font-family:var(--f-display)}
 .cookie-b{display:flex;gap:8px}
 #cookie-link{color:inherit;text-decoration:underline;margin-left:6px}
+.cookie-in p a{color:var(--teal-ink);font-weight:700;text-decoration:underline}
+/* Accept and Reject look the same: neither choice is pushed (Garante cookie guidelines, 2021) */
+.btn.cookie-btn{background:var(--surface);color:var(--ink);border:1.5px solid var(--ink);min-width:110px}
+.btn.cookie-btn:hover{background:var(--field)}
+#privacy-link{color:inherit;text-decoration:underline;margin-left:6px}
+.chk.consent{font-size:14px;color:var(--muted);line-height:1.45}
+.chk.consent a{color:var(--teal-ink);font-weight:700}
 #cookie-link[hidden]{display:none}
 .tagline{white-space:nowrap;font-family:var(--f-display);font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--band-muted);margin-top:3px}
 .logo b{font-family:var(--f-display);font-size:24px;font-weight:700;letter-spacing:-.02em}
@@ -1261,6 +1270,7 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
             <label class="f">Email (optional)<input id="prot-email" type="email" autocomplete="email" inputmode="email"></label>
             <button class="btn small" type="button" id="prot-send">Notify me</button>
           </div>
+          <p class="note" style="margin:6px 0 0">We use your email only to tell you when the guarantee launches. <a href="privacy.html" target="_blank" rel="noopener">Privacy notice</a></p>
         </div>
         <div id="prot-why" hidden>
           <p style="margin:0 0 8px">Thanks for telling us. What is the main reason?</p>
@@ -1400,6 +1410,7 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
         </div>
         <label class="f"><span id="t-contact-l">Phone number</span><input id="t-contact" type="text" autocomplete="tel"></label>
         <label class="f">Anything else the driver should know<span class="h">Optional</span><textarea id="t-notes" rows="3" placeholder="e.g. I travel with a guide dog, the entrance has two steps"></textarea></label>
+        <label class="chk consent"><input id="t-consent" type="checkbox"><span>I have read the <a href="privacy.html" target="_blank" rel="noopener">privacy notice</a> and agree that FreeVel uses my details, including those about my wheelchair and mobility (health data), to organise this ride and shares them with the transfer company. Required.</span></label>
       </fieldset>
 
       <div class="form-foot" id="tr-foot" hidden>
@@ -1458,6 +1469,7 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
       <label class="f">Password
         <input id="auth-password" type="password" autocomplete="current-password">
       </label>
+      <label class="chk consent" id="auth-consent-row"><input id="auth-consent" type="checkbox"><span>I have read the <a href="privacy.html" target="_blank" rel="noopener">privacy notice</a> and agree that FreeVel keeps my profile in the cloud, including my wheelchair and assistance needs (health data). Needed only to create an account.</span></label>
       <div class="actions">
         <button class="btn sign" type="submit" id="auth-signin">Sign in</button>
         <button class="btn ghost" type="button" id="auth-register" onclick="registraUtente()">Create account</button>
@@ -1826,6 +1838,7 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
         <legend><span class="n">4</span>What's missing or not working?</legend>
         <label class="f"><span class="sr">Comment</span><textarea id="fb-text" rows="4" placeholder="e.g. at the desk they also asked me for…"></textarea></label>
         <label class="f">Email so we can follow up <span class="h">Optional. Used only for FreeVel testing.</span><input id="fb-mail" type="email" autocomplete="email"></label>
+        <p class="note">How we use your answers: <a href="privacy.html" target="_blank" rel="noopener">Privacy notice</a></p>
       </fieldset>
       <div class="form-foot">
         <span class="status" id="fb-status" role="status"></span>
@@ -1855,9 +1868,10 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
 
 <div id="cookie-banner" class="cookie" role="dialog" aria-live="polite" aria-labelledby="cookie-h" hidden>
   <div class="cookie-in">
-    <p><b id="cookie-h">Cookies for statistics</b><br>
-    <span>We use Google Analytics to count visits and see which features are used. It is off until you accept. We never send your name, contacts, flights or wheelchair details.</span></p>
-    <div class="cookie-b"><button class="btn ghost" type="button" id="cookie-no">Reject</button><button class="btn sign" type="button" id="cookie-yes">Accept</button></div>
+    <p><b id="cookie-h">This site uses cookies</b><br>
+    <span>We use only technical storage needed for the site to work. With your consent we also use Google Analytics cookies to count visits and see which features are used: they stay off until you accept. We never send your name, contacts, flights or wheelchair details. You can change your choice at any time from "Cookie settings" at the bottom of the page.</span>
+    <a href="privacy.html#cookie" target="_blank" rel="noopener">Cookie policy</a></p>
+    <div class="cookie-b"><button class="btn cookie-btn" type="button" id="cookie-no">Reject</button><button class="btn cookie-btn" type="button" id="cookie-yes">Accept</button></div>
   </div>
 </div>
 <nav class="bnav" id="bnav" aria-label="Sections">
@@ -1867,7 +1881,7 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
   <a href="#claim" data-v="claim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><span>Claim</span></a>
   <a href="#feedback" data-v="feedback"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg><span>Feedback</span></a>
 </nav>
-<footer class="gut"><div class="wrap"><span><b style="color:var(--ink);font-family:var(--f-display)">FreeVel</b> · Always by your side · prototype in testing with early users</span><span><span>This information does not replace your airline's rules.</span> <a href="javascript:void(0)" id="cookie-link" onclick="FV_cookieSettings()">Cookie settings</a></span></div></footer>
+<footer class="gut"><div class="wrap"><span><b style="color:var(--ink);font-family:var(--f-display)">FreeVel</b> · Always by your side · prototype in testing with early users</span><span><span>This information does not replace your airline's rules.</span> <a href="privacy.html" id="privacy-link" target="_blank" rel="noopener">Privacy &amp; cookie policy</a> <a href="javascript:void(0)" id="cookie-link" onclick="FV_cookieSettings()">Cookie settings</a></span></div></footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1919,15 +1933,22 @@ window.FREEVEL_CONFIG = {
     if(cfg.gaId)gtag("event",name,params);
     if(cfg.gtmId)dataLayer.push(Object.assign({event:name},params))};
   window.addEventListener("hashchange",page);
+  /* On withdrawal, remove the Google Analytics cookies already set (_ga, _ga_<ID>) on this host and its parent domains */
+  function clearGa(){var h=location.hostname.split("."),doms=[""];for(var i=0;i<h.length-1;i++)doms.push("; domain=."+h.slice(i).join("."));
+    document.cookie.split(";").forEach(function(c){var n=c.split("=")[0].trim();if(!/^_ga(_|$)|^_gid$|^_gat/.test(n))return;
+      doms.forEach(function(d){document.cookie=n+"=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/"+d})})}
   function banner(show){var b=document.getElementById("cookie-banner");if(b)b.hidden=!show}
   window.FV_cookieSettings=function(){banner(true)};
   document.addEventListener("DOMContentLoaded",function(){
     var b=document.getElementById("cookie-banner");if(!b)return;
     if(!cfg.gaId&&!cfg.gtmId){var l=document.getElementById("cookie-link");if(l)l.hidden=true;return}
     var c=get();if(c==="yes")load();else if(c!=="no")banner(true);
+    /* privacy.html links here with #cookie-settings to reopen the choice */
+    function fromHash(){if(location.hash==="#cookie-settings"){banner(true);try{history.replaceState(null,"",location.pathname)}catch(e){}}}
+    fromHash();window.addEventListener("hashchange",fromHash);
     document.getElementById("cookie-yes").onclick=function(){set("yes");banner(false);load()};
     document.getElementById("cookie-no").onclick=function(){var was=get()==="yes";set("no");banner(false);
-      if(was){gtag("consent","update",{analytics_storage:"denied"});location.reload()}};
+      if(was){gtag("consent","update",{analytics_storage:"denied"});clearGa();location.reload()}};
     document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("#pdf,#c-pdf");
       if(t)FV_track(t.id==="pdf"?"card_pdf_download":"claim_pdf_download")});
   });
@@ -2161,8 +2182,6 @@ var FV_IT = /*DICT*/{
 "Front cargo door on the main deck, not under the floor.": "Porta cargo anteriore sul ponte principale, non sotto il pavimento.",
 "Rear cargo door.": "Porta cargo posteriore.",
 "Passengers: {s}. Fleets: public fleet data checked November 2026; airlines marked “to confirm” still need a check.": "Passeggeri: {s}. Flotte: dati pubblici controllati a novembre 2026; da verificare ancora:",
-"Cookies for statistics": "Cookie statistici",
-"We use Google Analytics to count visits and see which features are used. It is off until you accept. We never send your name, contacts, flights or wheelchair details.": "Usiamo Google Analytics per contare le visite e capire quali funzioni vengono usate. È spento finché non accetti. Non inviamo mai nome, contatti, voli o dati della carrozzina.",
 "Reject": "Rifiuta",
 "Accept": "Accetta",
 "Cookie settings": "Impostazioni cookie",
@@ -2633,7 +2652,20 @@ var FV_IT = /*DICT*/{
 "{n} battery": "{n} batteria",
 "{n} photos could not be read.": "Non è stato possibile leggere {n} foto.",
 "{n} to add": "{n} da aggiungere",
-"{p} people · {b} suitcases": "{p} persone · {b} valigie"
+"{p} people · {b} suitcases": "{p} persone · {b} valigie",
+"This site uses cookies": "Questo sito usa i cookie",
+"We use only technical storage needed for the site to work. With your consent we also use Google Analytics cookies to count visits and see which features are used: they stay off until you accept. We never send your name, contacts, flights or wheelchair details. You can change your choice at any time from \"Cookie settings\" at the bottom of the page.": "Usiamo solo strumenti tecnici necessari al funzionamento del sito. Con il tuo consenso usiamo anche i cookie di Google Analytics per contare le visite e capire quali funzioni vengono usate: restano spenti finché non accetti. Non inviamo mai nome, contatti, voli o dati della carrozzina. Puoi cambiare scelta in qualsiasi momento da \"Impostazioni cookie\" in fondo alla pagina.",
+"Cookie policy": "Informativa cookie",
+"Privacy & cookie policy": "Privacy e cookie policy",
+"I have read the": "Ho letto",
+"privacy notice": "l'informativa privacy",
+"Privacy notice": "Informativa privacy",
+"and agree that FreeVel keeps my profile in the cloud, including my wheelchair and assistance needs (health data). Needed only to create an account.": "e acconsento a che FreeVel conservi il mio profilo nel cloud, compresi i dati sulla carrozzina e sulle mie esigenze di assistenza (dati relativi alla salute). Necessario solo per creare un account.",
+"and agree that FreeVel uses my details, including those about my wheelchair and mobility (health data), to organise this ride and shares them with the transfer company. Required.": "e acconsento a che FreeVel usi i miei dati, compresi quelli sulla carrozzina e sulla mobilità (dati relativi alla salute), per organizzare questo transfer e li condivida con la società di trasporto. Obbligatorio.",
+"To create an account, tick the box to accept the Privacy notice.": "Per creare un account spunta la casella per accettare l'Informativa privacy.",
+"To send the request, tick the box to accept the Privacy notice.": "Per inviare la richiesta spunta la casella per accettare l'Informativa privacy.",
+"How we use your answers:": "Come usiamo le tue risposte:",
+"We use your email only to tell you when the guarantee launches.": "Usiamo la tua email solo per avvisarti quando la garanzia sarà disponibile."
 }/*END*/;
 (function(){
   var KEY="freevel_lang",D=FV_IT;
@@ -3505,7 +3537,8 @@ function trMailPayload(q){var p={_subject:"🚐 Nuova richiesta transfer "+q.id+
   ride:q.ride==="stay"?"Resta in carrozzina (furgone con rampa/pedana)":"Si sposta su sedile, carrozzina nel bagagliaio",
   people:q.pax,suitcases:q.bags,wheelchair:q.chair.line,flight:q.flight||"-",notes:q.notes||"-",
   legs:q.legs.map(function(l){return legText(l)+" | "+(l.dir==="to"?"Ritiro: ":"Arrivo: ")+l.address}).join("\n"),
-  full_text:reqText(q),sent_at:new Date(q.created).toLocaleString("it-IT")};
+  full_text:reqText(q),sent_at:new Date(q.created).toLocaleString("it-IT"),
+  consenso_privacy:q.consent?"Sì, informativa letta e consenso dati salute ("+q.consent.at+")":"-"};
   if(q.way==="email"&&/@/.test(q.contact))p.email=q.contact;return p}
 /* Copy in Supabase (table transfer_requests). Works for signed-in users and guests if RLS allows. */
 function trSaveSupabase(q){var sb=window.supabaseClient,cfg=window.FREEVEL_CONFIG||{};
@@ -3522,11 +3555,12 @@ $("trform").addEventListener("submit",function(e){e.preventDefault();var d=trVal
     legs.push(l)});
   var contact=$("t-contact").value.trim();if(!contact)errs.push(T("how we can reach you"));
   if(errs.length){trStatusMsg(T("Please add {list}.",{list:errs.join(", ")}),"bad");return}
+  if(!$("t-consent").checked){trStatusMsg(T("To send the request, tick the box to accept the Privacy notice."),"bad");$("t-consent").focus();return}
   var q={id:"T"+Date.now().toString(36).toUpperCase().slice(-6),created:Date.now(),legs:legs,ride:trVal("tride")||"stay",
     pax:Math.max(1,parseInt($("t-pax").value,10)||1),bags:Math.max(0,parseInt($("t-bags").value,10)||0),way:trVal("tway")||"phone",contact:contact,
     notes:$("t-notes").value.trim().slice(0,1000),name:S.name||"",flight:[S.airline,S.flight,S.route].filter(Boolean).join(" · "),
     chair:{line:[TYPE[S.type||"manual"][1],make(),S.weight?S.weight+" kg":"",dims(),S.fold?"folds":"does not fold",S.wch||"",powered()?battLine(1):""].filter(Boolean).join(" · ")},
-    accepted:false,cancelled:false};
+    accepted:false,cancelled:false,consent:{privacy:true,health:true,at:new Date().toISOString()}};
   var b=$("tr-send");b.disabled=true;trStatusMsg("Sending…","");$("tr-copy").hidden=true;
   var url=(window.FREEVEL_CONFIG||{}).transferUrl,online=host.db&&host.uid;
   function done(){window.FV_track&&FV_track("transfer_request",{legs:q.legs.length,ride:q.ride,people:+q.pax||1});MY.requests.unshift(q);save(TRK,MY);renderMyReqs();$("t-notes").value="";
