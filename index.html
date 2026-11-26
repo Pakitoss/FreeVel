@@ -998,6 +998,17 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
 .wz-err{margin:0;color:var(--bad);font-weight:700;font-size:14px}
 .wz-err:empty{display:none}
 .tr-mine{scroll-margin-top:120px}
+/* NCC partners on the Transfers page */
+.partners{display:grid;gap:8px}
+.partners h2{font-size:20px}
+.partners .note{margin:0}
+.partner-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:8px 0 0;padding:0;list-style:none}
+.partner-list li{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--line);border-radius:12px;background:var(--field);min-width:0}
+.partner-list b{display:block;font-family:var(--f-display);font-weight:600;font-size:16px;overflow-wrap:anywhere}
+.partner-list small{color:var(--muted);font-size:14px}
+.partner-ic{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line);color:var(--teal-ink)}
+.partner-ic svg{width:20px;height:20px}
+@media (max-width:520px){.partner-list{grid-template-columns:minmax(0,1fr)}}
 @media (prefers-reduced-motion:reduce){.tr-wizard fieldset{animation:none!important}}
 
 /* date and time fields never wider than their column on phones */
@@ -1399,6 +1410,15 @@ a.hero-box:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
       <div class="panel-h"><h2>My requests</h2><span class="pill" id="tr-count">0</span></div>
       <div class="reqs" id="tr-list"></div>
     </div>
+
+    <section class="panel partners" aria-labelledby="t-partners">
+      <h2 id="t-partners">Our NCC partners</h2>
+      <p class="note">Chauffeur-hire companies we work with. In other cities we still look for the options for you.</p>
+      <ul class="partner-list">
+        <li><span class="partner-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.4"/></svg></span><div><b data-noi18n>Lacometa13</b><small>Milan</small></div></li>
+        <li><span class="partner-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.4"/></svg></span><div><b data-noi18n>Autoblu Bologna Aeroporto</b><small data-noi18n>Bologna</small></div></li>
+      </ul>
+    </section>
   </div>
 
   <div class="panel team" id="tr-team" hidden>
@@ -2352,6 +2372,9 @@ var FV_IT = /*DICT*/{
 "My card": "La mia scheda",
 "My profile": "Il mio profilo",
 "My requests": "Le mie richieste",
+"Our NCC partners": "I nostri partner NCC",
+"Chauffeur-hire companies we work with. In other cities we still look for the options for you.": "Agenzie di noleggio con conducente con cui collaboriamo. Nelle altre città cerchiamo noi le opzioni, come sempre.",
+"Milan": "Milano",
 "My transfer requests": "Le mie richieste di trasferimento",
 "NOTICE": "AVVISO",
 "Name": "Nome",
